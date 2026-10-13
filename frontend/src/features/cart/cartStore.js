@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { unitPrice } from '@/lib/format'
+import { findVariantForSize } from '@/lib/shoeSize'
 
 // Client state: the cart lives in the browser (and syncs to the carts/cart_items tables after login).
 export const useCartStore = create(
@@ -9,7 +10,7 @@ export const useCartStore = create(
       items: [],
       promoCode: '',
       add: (product, size, qty = 1, variant = null) => set((s) => {
-        const variantId = variant?.id ?? product?.variants?.find((item) => String(item.sizeEu ?? item.size ?? item.size_label) === String(size))?.id ?? null
+        const variantId = variant?.id ?? findVariantForSize(product?.variants, size)?.id ?? null
         const key = variantId ? `${product.id}-${variantId}` : `${product.id}-${size}`
         const found = s.items.find((i) => i.key === key)
         return found

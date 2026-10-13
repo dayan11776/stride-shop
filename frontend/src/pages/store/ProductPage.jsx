@@ -9,6 +9,7 @@ import { Chip } from '@/components/ui/Chip'
 import { Icon } from '@/components/ui/Icon'
 import { ErrorState, LoadingState } from '@/components/ui/PageState'
 import { USE_MOCK } from '@/lib/apiClient'
+import { findVariantForSize } from '@/lib/shoeSize'
 
 export function Component() {
   const { slug } = useParams()
@@ -24,7 +25,7 @@ export function Component() {
   const sizes = product.sizes?.length ? product.sizes : [6, 7, 8, 9, 10, 11]
   const onAdd = () => {
     if (!size) { setMessage('Choose a size before adding to your bag.'); return }
-    const variant = product.variants?.find((item) => String(item.sizeEu ?? item.size_eu ?? item.size ?? item.size_label) === String(size))
+    const variant = findVariantForSize(product.variants, size)
     if (!USE_MOCK && !variant) { setMessage('That size is currently unavailable. Please choose another size.'); return }
     add(product, size, quantity, variant); setMessage(`${product.name} was added to your bag.`)
   }

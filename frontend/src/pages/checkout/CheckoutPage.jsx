@@ -110,7 +110,7 @@ export function Component() {
       }
       const orderNumber = order.orderNumber ?? order.order_number ?? order.id
       clear()
-      navigate(`/order-confirmation/${orderNumber}`, { state: { order: { ...order, email: values.email } } })
+      navigate(`/order-confirmation/${orderNumber}`, { state: { order: { ...order, email: values.email, isGuest: !user } } })
     } catch (reason) {
       setError(reason.message || 'Checkout could not be completed. Please try again.')
     } finally {

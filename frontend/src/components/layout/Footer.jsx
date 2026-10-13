@@ -14,7 +14,7 @@ export function Footer() {
   const subscribe = async (event) => {
     event.preventDefault(); setStatus('')
     try {
-      if (!USE_MOCK) await api('/newsletter/subscribe', { method: 'POST', body: { email } })
+      if (!USE_MOCK) await api('/newsletter', { method: 'POST', body: { email } })
       navigate('/newsletter/subscribed', { state: { email } })
     } catch (error) { setStatus(error.message || 'We could not add you right now.') }
   }

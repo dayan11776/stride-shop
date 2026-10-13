@@ -4,6 +4,7 @@ from __future__ import annotations
 import json
 from io import StringIO
 
+from django.contrib.auth import get_user_model
 from django.core.management import call_command
 from django.test import TestCase, override_settings
 
@@ -14,16 +15,21 @@ from commerce.models import Order, Payment
 class CheckoutFlowTests(TestCase):
     def setUp(self):
         call_command("seed_data", stdout=StringIO(), verbosity=0)
+        self.customer = get_user_model().objects.create_user(
+            email="customer@example.test",
+            password="StrideTest123!",
+            full_name="Stride QA",
+        )
         login = self.post(
             "/api/auth/login",
-            {"email": "customer@stride.local", "password": "StrideDemo123!"},
+            {"email": self.customer.email, "password": "StrideTest123!"},
         )
         self.assertEqual(login.status_code, 200)
         self.variant = Product.objects.prefetch_related("variants").first().variants.first()
         self.shipping = self.client.get("/api/shipping-methods").json()[0]
         self.checkout = {
             "fullName": "Stride QA",
-            "email": "customer@stride.local",
+            "email": self.customer.email,
             "phone": "09171234567",
             "line1": "1 Test Lane",
             "city": "Quezon City",
@@ -87,3 +93,26 @@ class CheckoutFlowTests(TestCase):
         self.assertEqual(order.status, Order.Status.CANCELLED)
         self.assertEqual(payment.status, Payment.Status.FAILED)
         self.assertEqual(inventory.quantity_reserved, 0)
+
+
+class SeedDataSecurityTests(TestCase):
+    def test_seed_data_never_creates_public_demo_accounts(self):
+        call_command("seed_data", stdout=StringIO(), verbosity=0)
+        user_model = get_user_model()
+        self.assertFalse(user_model.objects.filter(email="admin@stride.local").exists())
+        self.assertFalse(user_model.objects.filter(email="customer@stride.local").exists())
+
+    def test_legacy_demo_accounts_are_disabled(self):
+        user_model = get_user_model()
+        demo_admin = user_model.objects.create_superuser(
+            email="admin@stride.local",
+            password="known-demo-password",
+            full_name="Legacy Demo Admin",
+        )
+        call_command("disable_demo_accounts", stdout=StringIO(), verbosity=0)
+        demo_admin.refresh_from_db()
+        self.assertFalse(demo_admin.is_active)
+        self.assertFalse(demo_admin.is_staff)
+        self.assertFalse(demo_admin.is_superuser)
+        self.assertFalse(demo_admin.has_usable_password())
+        self.assertFalse(demo_admin.is_team_member)

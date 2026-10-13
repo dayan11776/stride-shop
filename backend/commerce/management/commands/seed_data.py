@@ -1,7 +1,6 @@
-"""Create a compact, repeatable local catalog for the STRIDE storefront."""
+"""Create a compact, repeatable catalog and content fixture for STRIDE."""
 from decimal import Decimal
 
-from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 from django.db import transaction
 
@@ -23,7 +22,7 @@ PRODUCTS = [
 
 
 class Command(BaseCommand):
-    help = "Seed a local STRIDE demo catalog, content, and development accounts."
+    help = "Seed a STRIDE catalog, content, shipping methods, and promotion data."
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -133,24 +132,6 @@ class Command(BaseCommand):
         for position, (topic, question, answer) in enumerate(faqs, start=1):
             FAQ.objects.update_or_create(question=question, defaults={"topic": topic, "answer": answer, "position": position, "is_published": True})
 
-        user_model = get_user_model()
-        admin, _ = user_model.objects.get_or_create(
-            email="admin@stride.local",
-            defaults={"full_name": "STRIDE Admin", "role": user_model.Role.ADMIN, "is_staff": True, "is_superuser": True},
-        )
-        admin.role = user_model.Role.ADMIN
-        admin.is_staff = True
-        admin.is_superuser = True
-        admin.set_password("StrideAdmin123!")
-        admin.save()
-        customer, _ = user_model.objects.get_or_create(
-            email="customer@stride.local",
-            defaults={"full_name": "STRIDE Customer", "role": user_model.Role.CUSTOMER},
-        )
-        customer.set_password("StrideDemo123!")
-        customer.save()
-
         self.stdout.write(self.style.SUCCESS(
-            f"Seeded {product_count} products. Demo customer: customer@stride.local / StrideDemo123!; "
-            "admin: admin@stride.local / StrideAdmin123!"
+            f"Seeded {product_count} products, shipping methods, promotion data, and content."
         ))
