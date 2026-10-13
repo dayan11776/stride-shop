@@ -1,0 +1,38 @@
+.announce { min-height: 30px; padding: 7px 16px; color: var(--ink); background: var(--sage); text-align: center; font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; }
+.announce span { margin: 0 9px; }
+.shell { position: relative; z-index: 20; border-bottom: 1px solid rgba(38,43,31,.14); background: var(--cream); }
+.header { display: flex; min-height: 76px; align-items: center; gap: 24px; }
+.logo { flex: 0 0 auto; color: var(--ink); font-family: var(--font-display); font-size: 40px; font-weight: 800; letter-spacing: .075em; line-height: 1; text-decoration: none; }
+.logo span { position: relative; top: -14px; margin-left: 1px; font-family: var(--font-body); font-size: 8px; letter-spacing: 0; }
+.nav { display: flex; flex: 1; align-items: center; justify-content: center; gap: clamp(15px, 2vw, 32px); }
+.nav a { position: relative; padding: 29px 0 26px; color: var(--ink); font-size: 12px; font-weight: 700; letter-spacing: .075em; text-decoration: none; text-transform: uppercase; white-space: nowrap; }
+.nav a::after { position: absolute; right: 0; bottom: 19px; left: 0; height: 2px; background: var(--olive); content: ''; opacity: 0; transform: scaleX(.4); transition: .18s ease; }
+.nav a:hover::after, .nav .active::after { opacity: 1; transform: scaleX(1); }
+.searchForm { display: flex; width: clamp(130px, 14vw, 210px); align-items: center; gap: 7px; border-bottom: 1px solid var(--ink); padding: 5px 0; }
+.searchForm input, .mobileSearch input { width: 100%; border: 0; outline: 0; color: var(--ink); background: transparent; font-size: 13px; }
+.searchForm input::placeholder, .mobileSearch input::placeholder { color: var(--olive-gray); }
+.actions { display: flex; align-items: center; gap: 4px; }
+.action { position: relative; display: grid; width: 38px; height: 44px; place-items: center; border: 0; color: var(--ink); background: transparent; }
+.action b, .bottomIcon i { position: absolute; top: 5px; right: 2px; display: grid; min-width: 15px; height: 15px; place-items: center; border-radius: 50%; color: var(--cream); background: var(--ink); font-size: 9px; font-style: normal; line-height: 1; }
+.menuButton, .mobileSearch, .mobileMenu, .bottomNav { display: none; }
+@media (max-width: 1050px) { .nav { gap: 16px; } .searchForm { width: 145px; } }
+@media (max-width: 860px) {
+  .header { min-height: 63px; justify-content: space-between; gap: 12px; }
+  .menuButton { display: grid; width: 40px; height: 44px; place-items: center; border: 0; background: transparent; }
+  .logo { margin-right: auto; font-size: 35px; }
+  .nav, .searchForm { display: none; }
+  .actions { gap: 0; }
+  .actions .action:nth-child(2) { display: none; }
+  .mobileSearch { display: block; padding-bottom: 13px; }
+  .mobileSearch form { display: flex; min-height: 40px; align-items: center; gap: 9px; border: 1px solid var(--line); border-radius: var(--radius-pill); padding: 0 14px; background: rgba(255,255,255,.35); }
+  .mobileMenu { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid rgba(38,43,31,.1); padding: 10px 0 19px; }
+  .mobileMenu > a { padding: 13px 4px; font-size: 15px; font-weight: 700; text-decoration: none; text-transform: uppercase; }
+  .menuMeta { display: grid; grid-column: 1 / -1; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 8px; padding-top: 14px; border-top: 1px solid rgba(38,43,31,.1); }
+  .menuMeta a, .menuMeta button { padding: 8px 4px; border: 0; color: var(--olive-gray); background: transparent; font-weight: 600; text-align: left; text-decoration: none; }
+  .bottomNav { position: fixed; z-index: 40; right: 0; bottom: 0; left: 0; display: grid; grid-template-columns: repeat(5, 1fr); min-height: 64px; border-top: 1px solid rgba(38,43,31,.15); background: var(--cream); box-shadow: 0 -5px 18px rgba(38,43,31,.06); }
+  .bottomNav a { display: grid; place-content: center; gap: 3px; color: var(--olive-gray); font-size: 9px; font-weight: 700; text-align: center; text-decoration: none; text-transform: uppercase; }
+  .bottomIcon { position: relative; display: grid; justify-content: center; }
+  .bottomIcon i { top: -5px; right: calc(50% - 17px); }
+  .bottomActive { color: var(--ink) !important; }
+}
+@media (max-width: 430px) { .announce { font-size: 9px; } .announce span { margin: 0 4px; } .actions .action { width: 33px; } }

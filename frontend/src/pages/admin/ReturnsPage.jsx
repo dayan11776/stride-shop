@@ -1,0 +1,2 @@
+import { AdminCollectionView } from '@/components/admin/AdminViews'
+export function Component() { return <AdminCollectionView title="Returns" description="Review return requests and keep customers informed about the next step." path="/staff/returns" columns={[{ label: 'Order', key: 'orderNumber' }, { label: 'Resolution', key: 'resolution' }, { label: 'Status', key: 'status', kind: 'status' }, { label: 'Requested', key: 'requestedAt' }]} /> }

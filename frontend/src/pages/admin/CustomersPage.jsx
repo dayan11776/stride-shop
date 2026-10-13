@@ -1,0 +1,2 @@
+import { AdminCollectionView } from '@/components/admin/AdminViews'
+export function Component() { return <AdminCollectionView title="Customers" description="See your registered STRIDE customers and their account details." path="/staff/customers" columns={[{ label: 'Customer', key: 'fullName' }, { label: 'Email', key: 'email' }, { label: 'Phone', key: 'phone' }, { label: 'Joined', key: 'createdAt' }]} /> }

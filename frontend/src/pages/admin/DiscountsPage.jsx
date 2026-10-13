@@ -1,0 +1,2 @@
+import { AdminCollectionView } from '@/components/admin/AdminViews'
+export function Component() { return <AdminCollectionView title="Discounts" description="Create and monitor promotions used at checkout." path="/staff/promos" columns={[{ label: 'Code', key: 'code' }, { label: 'Type', key: 'discount_type' }, { label: 'Value', key: 'value', kind: 'money' }, { label: 'Uses', key: 'times_used' }, { label: 'Active', key: 'is_active' }]} /> }

@@ -1,0 +1,2 @@
+import { AdminCollectionView } from '@/components/admin/AdminViews'
+export function Component() { return <AdminCollectionView title="Products" description="Keep your catalogue, launch status and product structure accurate." path="/staff/products" columns={[{ label: 'Product', key: 'name' }, { label: 'Audience', key: 'audience' }, { label: 'Status', key: 'status', kind: 'status' }, { label: 'New arrival', key: 'is_new_arrival' }, { label: 'Slug', key: 'slug' }]} /> }

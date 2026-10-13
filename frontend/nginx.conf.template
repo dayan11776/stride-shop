@@ -1,0 +1,25 @@
+server {
+    listen ${PORT};
+    listen [::]:${PORT};
+    server_name _;
+
+    root /usr/share/nginx/html;
+    index index.html;
+
+    location = /healthz {
+        add_header Content-Type text/plain;
+        return 200 "ok\n";
+    }
+
+    # Let React Router own client-side routes while serving real static files
+    # directly when they exist.
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    location ~* \.(?:css|js|mjs|map|png|jpg|jpeg|gif|svg|webp|ico|woff2?)$ {
+        try_files $uri =404;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+}

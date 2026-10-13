@@ -1,0 +1,16 @@
+.card { position: relative; min-width: 0; }
+.tile { position: relative; display: block; aspect-ratio: .88; overflow: hidden; border-radius: var(--radius); background: var(--beige); }
+.tile img { display: block; width: 100%; height: 100%; object-fit: cover; mix-blend-mode: multiply; transition: transform .4s ease; }
+.tile:hover img { transform: scale(1.045); }
+.view { position: absolute; right: 10px; bottom: 10px; display: inline-flex; align-items: center; gap: 4px; border-radius: var(--radius-pill); padding: 8px 11px; color: var(--cream); background: var(--ink); font-size: 10px; font-weight: 700; letter-spacing: .07em; opacity: 0; text-transform: uppercase; transform: translateY(5px); transition: .2s ease; }
+.tile:hover .view { opacity: 1; transform: translateY(0); }
+.badge { position: absolute; top: 10px; left: 10px; z-index: 1; }
+.heart { position: absolute; top: 8px; right: 7px; z-index: 2; display: grid; width: 38px; height: 38px; place-items: center; border: 0; border-radius: 50%; color: var(--ink); background: rgba(247,242,235,.87); backdrop-filter: blur(4px); }
+.heart[aria-pressed='true'] { color: #914e4a; background: var(--cream); }
+.copy { padding: 12px 1px 0; }
+.brand { margin: 0 0 2px; color: var(--olive-gray); font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.name { font-family: var(--font-body); font-size: 15px; font-weight: 700; letter-spacing: 0; line-height: 1.2; text-transform: none; }
+.name a { text-decoration: none; }
+.price { display: flex; gap: 8px; margin: 6px 0 0; font-size: 14px; }
+.price s { color: var(--olive-gray); }
+@media (max-width: 680px) { .tile { aspect-ratio: .8; } .copy { padding-top: 9px; } .view { display: none; } .heart { width: 36px; height: 36px; } .name { font-size: 14px; } .price { font-size: 13px; } }

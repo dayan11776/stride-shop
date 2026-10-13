@@ -1,0 +1,4 @@
+import { Link, useLocation } from 'react-router-dom'
+import { Button } from '@/components/ui/Button'
+import { Icon } from '@/components/ui/Icon'
+export function Component() { const email = useLocation().state?.email; return <section className="container section"><div className="mx-auto max-w-[650px] py-14 text-center"><div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-sage"><Icon name="check" size={30} /></div><p className="eyebrow mt-7">You are on the list</p><h1 className="page-heading">Good things<br />are coming.</h1><p className="mx-auto mt-5 max-w-[450px] leading-6 text-[var(--olive-gray)]">{email ? `We will send the newest drops and selected stories to ${email}.` : 'We will send the newest drops and selected stories to your inbox.'}</p><Button as={Link} to="/shop" className="mt-7">Keep shopping <Icon name="arrow" size={17} /></Button></div></section> }

@@ -1,0 +1,5 @@
+.btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 12px 28px; border-radius: var(--radius-pill); font-weight: 600; text-decoration: none; border: 0; }
+.primary { background: var(--sage); color: var(--ink); }
+.primary:hover { background: var(--sage-dark); }
+.secondary { background: transparent; color: var(--ink); border: 1.5px solid var(--ink); }
+.btn:disabled { background: var(--gray); color: var(--olive-gray); cursor: not-allowed; }

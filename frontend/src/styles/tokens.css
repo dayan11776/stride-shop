@@ -1,0 +1,9 @@
+:root {
+  /* Palette from the UI design */
+  --sage: #8B9A6E; --sage-dark: #73805b; --cream: #F7F2EB; --beige: #EAE2D6; --gray: #EEEEEE;
+  --ink: #262B1F; --olive: #5A6844; --olive-gray: #5e6355; --line: #c9c0b2; --error: #a93632; --success: #3f654d;
+  /* Type, spacing, radius */
+  --font-display: 'Barlow Condensed', sans-serif; --font-body: 'Barlow', sans-serif;
+  --space-1: 4px; --space-2: 8px; --space-3: 16px; --space-4: 24px; --space-5: 32px; --space-6: 48px; --space-7: 64px;
+  --radius: 8px; --radius-lg: 16px; --radius-pill: 999px; --shadow: 0 14px 36px rgba(38, 43, 31, .10);
+}

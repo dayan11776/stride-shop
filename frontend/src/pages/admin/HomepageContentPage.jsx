@@ -1,0 +1,2 @@
+import { AdminCollectionView } from '@/components/admin/AdminViews'
+export function Component() { return <AdminCollectionView title="Homepage content" description="Arrange the campaigns, storytelling and calls to action that appear on the storefront." path="/staff/content/homepage" columns={[{ label: 'Section', key: 'sectionKey' }, { label: 'Title', key: 'title' }, { label: 'Position', key: 'position' }, { label: 'Visible', key: 'isVisible' }]} /> }
