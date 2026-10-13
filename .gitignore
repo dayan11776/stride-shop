@@ -1,0 +1,22 @@
+# Local Python runtime and generated Django files
+backend/.venv/
+backend/.packages/
+backend/db.sqlite3
+backend/staticfiles/
+backend/**/__pycache__/
+*.py[cod]
+
+# Local frontend output
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.vercel/
+
+# Local task artifacts
+outputs/
+work/
+
+# Environment and editor state
+backend/.env
+.env
+.DS_Store
