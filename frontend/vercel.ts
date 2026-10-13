@@ -4,7 +4,7 @@ if (!apiOrigin) {
   throw new Error('API_ORIGIN must point to the Render API origin, for example https://stride-shop-api.onrender.com')
 }
 
-export const config = {
+export default {
   rewrites: [
     // Keep Django's session and CSRF cookies first-party to the Vercel site.
     { source: '/api/:path*', destination: `${apiOrigin}/api/:path*` },
