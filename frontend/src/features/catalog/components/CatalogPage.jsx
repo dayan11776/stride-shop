@@ -27,9 +27,9 @@ export function CatalogPage({ title, filters }) {
       {isLoading && <CatalogSkeleton />}
       {isError && <ErrorState title="The collection is taking a moment." detail={error?.message} onRetry={refetch} />}
       {!isLoading && !isError && list.length === 0 && <div className="page-state"><div><h2 style={{ fontSize: 40 }}>No matches yet</h2><p className="muted">Try a different search or browse all styles.</p></div></div>}
-      {!isLoading && !isError && list.length > 0 && <div className="grid">{list.map((product) => <ProductCard key={product.id} product={product} />)}</div>}
+      {!isLoading && !isError && list.length > 0 && <div className="product-grid">{list.map((product) => <ProductCard key={product.id} product={product} />)}</div>}
     </section>
   )
 }
 
-function CatalogSkeleton() { return <div className="grid">{Array.from({ length: 8 }, (_, index) => <div key={index}><div className="skeleton" style={{ height: 280 }} /><div className="skeleton mt-3" style={{ width: '70%' }} /><div className="skeleton mt-2" style={{ width: '42%' }} /></div>)}</div> }
+function CatalogSkeleton() { return <div className="product-grid">{Array.from({ length: 8 }, (_, index) => <div key={index}><div className="skeleton" style={{ height: 280 }} /><div className="skeleton mt-3" style={{ width: '70%' }} /><div className="skeleton mt-2" style={{ width: '42%' }} /></div>)}</div> }
