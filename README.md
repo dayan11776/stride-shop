@@ -66,10 +66,11 @@ The frontend production container is defined by [frontend/Dockerfile](frontend/D
 
 ## Deploy to Vercel + Render
 
-The repository includes `frontend/vercel.ts` and `render.yaml` for the requested Vercel frontend and Render Django/PostgreSQL deployment. Follow [docs/vercel-render.md](docs/vercel-render.md) after publishing the repository. The Vercel configuration proxies `/api` to Render so Django's session and CSRF cookies stay first-party to the storefront.
+The repository includes `frontend/vercel.json` and `render.yaml` for the requested Vercel frontend and Render Django/PostgreSQL deployment. Follow [docs/vercel-render.md](docs/vercel-render.md) after publishing the repository. The Vercel configuration proxies `/api` to Render so Django's session and CSRF cookies stay first-party to the storefront.
 
 ## Payments
 
 Xendit is called only by the Django API. The frontend receives checkout URLs/statuses only; it must never receive a secret key or webhook token. The live Xendit keys, callback token, and the public webhook registration are account-specific configuration the project owner must add in the Xendit dashboard.
 
 The included integration covers hosted customer checkout and payment callbacks. Store payouts are intentionally outside this build because the supplied schema has no beneficiary or payout records; add those business requirements before enabling any payout flow.
+

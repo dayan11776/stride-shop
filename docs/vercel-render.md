@@ -17,8 +17,8 @@ Render free services and free PostgreSQL are suitable only for a demo: availabil
 1. Import the same GitHub repository into Vercel.
 2. Set **Root Directory** to `frontend`.
 3. Keep the detected Vite build command (`npm run build`) and output directory (`dist`).
-4. Add a Production environment variable named `API_ORIGIN` with the Render origin only, for example `https://stride-shop-api.onrender.com`. Do not include `/api`.
-5. Deploy. `frontend/vercel.ts` proxies `/api/*` to Render before applying the Vite SPA fallback.
+4. Confirm `frontend/vercel.json` points to the deployed Render API origin. It currently targets `https://stride-shop-api.onrender.com`; change that value only if the backend service URL changes.
+5. Deploy. `frontend/vercel.json` proxies `/api/*` to Render before applying the Vite SPA fallback.
 
 Keep `VITE_API_URL=/api` and `VITE_USE_MOCK=false`. Do not put Xendit keys or any other secrets in `VITE_*` variables.
 
@@ -45,3 +45,4 @@ XENDIT_FAILURE_REDIRECT_URL=https://your-project.vercel.app/checkout
 ```
 
 Register the public webhook at `https://<render-service>.onrender.com/api/webhooks/xendit`. Never commit these values or expose them through Vercel environment variables.
+
