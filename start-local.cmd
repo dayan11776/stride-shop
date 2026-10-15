@@ -7,6 +7,7 @@ set "STRIDE_BACKEND=%STRIDE_ROOT%backend"
 set "STRIDE_FRONTEND=%STRIDE_ROOT%frontend"
 set "STRIDE_PYTHON=%STRIDE_BACKEND%\.venv\Scripts\python.exe"
 set "STRIDE_NEEDS_SEED=0"
+set "DJANGO_DEBUG=True"
 
 if not exist "%STRIDE_BACKEND%\db.sqlite3" set "STRIDE_NEEDS_SEED=1"
 

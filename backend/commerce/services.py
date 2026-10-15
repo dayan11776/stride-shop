@@ -258,8 +258,36 @@ def release_order_reservations(order: Order, *, actor=None, note: str = "") -> O
     return order
 
 
+MAX_PER_LINE = 10
+ALLOWED_TRANSITIONS = {
+    "pending": {"paid", "cancelled"},
+    "paid": {"packed", "cancelled", "refunded"},
+    "packed": {"shipped", "cancelled"},
+    "shipped": {"delivered"},
+    "delivered": {"refunded"},
+    "cancelled": set(),
+    "refunded": set(),
+}
+
+
+def max_cart_quantity(variant) -> int:
+    """Most pairs a shopper can hold for one variant: stock left, capped per line."""
+    inventory = Inventory.objects.filter(variant=variant).first()
+    return max(0, min(MAX_PER_LINE, inventory.available if inventory else 0))
+
+
+def ensure_cart_quantity(variant, quantity: int) -> None:
+    cap = max_cart_quantity(variant)
+    if quantity > cap:
+        message = f"Only {cap} available in this size." if cap else "This size is out of stock."
+        raise ValidationError({"quantity": message})
+
+
 @transaction.atomic
 def set_order_status(order: Order, status: str, *, actor=None, note: str = "") -> Order:
+    current = Order.objects.get(pk=order.pk).status
+    if status != current and status not in ALLOWED_TRANSITIONS.get(current, set()):
+        raise ValidationError({"status": f"An order that is {current} cannot become {status}."})
     if status == Order.Status.CANCELLED:
         return release_order_reservations(order, actor=actor, note=note)
     order = Order.objects.select_for_update().get(pk=order.pk)

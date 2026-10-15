@@ -3,6 +3,10 @@ import { persist } from 'zustand/middleware'
 import { unitPrice } from '@/lib/format'
 import { findVariantForSize } from '@/lib/shoeSize'
 
+// Most pairs of one size a shopper can hold (the API also caps this by stock).
+export const MAX_PER_LINE = 10
+export const maxQtyFor = (item) => Math.max(1, Math.min(MAX_PER_LINE, Number(item?.variant?.available ?? MAX_PER_LINE)))
+
 // Client state: the cart lives in the browser (and syncs to the carts/cart_items tables after login).
 export const useCartStore = create(
   persist(
@@ -13,11 +17,11 @@ export const useCartStore = create(
         const variantId = variant?.id ?? findVariantForSize(product?.variants, size)?.id ?? null
         const key = variantId ? `${product.id}-${variantId}` : `${product.id}-${size}`
         const found = s.items.find((i) => i.key === key)
-        return found
-          ? { items: s.items.map((i) => (i.key === key ? { ...i, qty: i.qty + qty } : i)) }
-          : { items: [...s.items, { key, product, size, qty, variantId, variant }] }
+        if (found) return { items: s.items.map((i) => (i.key === key ? { ...i, qty: Math.min(i.qty + qty, maxQtyFor(i)) } : i)) }
+        const item = { key, product, size, qty, variantId, variant }
+        return { items: [...s.items, { ...item, qty: Math.min(qty, maxQtyFor(item)) }] }
       }),
-      setQty: (key, qty) => set((s) => ({ items: s.items.map((i) => (i.key === key ? { ...i, qty } : i)).filter((i) => i.qty > 0) })),
+      setQty: (key, qty) => set((s) => ({ items: s.items.map((i) => (i.key === key ? { ...i, qty: Math.min(qty, maxQtyFor(i)) } : i)).filter((i) => i.qty > 0) })),
       remove: (key) => set((s) => ({ items: s.items.filter((i) => i.key !== key) })),
       setPromoCode: (promoCode) => set({ promoCode }),
       clear: () => set({ items: [], promoCode: '' }),

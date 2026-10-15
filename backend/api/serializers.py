@@ -150,8 +150,10 @@ class ProductCardSerializer(serializers.ModelSerializer):
         return [variant for variant in obj.variants.all() if variant.is_active]
 
     def get_price(self, obj):
-        prices = [variant.current_price for variant in self._variants(obj)]
-        return number(min(prices)) if prices else None
+        # List price of the variant a shopper pays least for, so a crossed-out
+        # "was" price is never the sale price.
+        variants = self._variants(obj)
+        return number(min(variants, key=lambda variant: variant.current_price).price) if variants else None
 
     def get_salePrice(self, obj):
         sale_prices = [variant.current_price for variant in self._variants(obj) if variant.sale_price is not None and variant.current_price == variant.sale_price]
@@ -225,6 +227,11 @@ class WishlistItemSerializer(serializers.ModelSerializer):
 
 class StockNotificationSerializer(serializers.ModelSerializer):
     variantId = serializers.UUIDField(source="variant_id")
+
+    def validate_variantId(self, value):
+        if not ProductVariant.objects.filter(pk=value, is_active=True).exists():
+            raise serializers.ValidationError("That product size could not be found.")
+        return value
 
     class Meta:
         model = StockNotification

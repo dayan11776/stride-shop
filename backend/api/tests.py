@@ -116,3 +116,69 @@ class SeedDataSecurityTests(TestCase):
         self.assertFalse(demo_admin.is_superuser)
         self.assertFalse(demo_admin.has_usable_password())
         self.assertFalse(demo_admin.is_team_member)
+
+
+class FixedBugTests(TestCase):
+    """Regression tests for the bugs found in the 2026-10-14 retest."""
+
+    def setUp(self):
+        call_command("seed_data", stdout=StringIO(), verbosity=0)
+        self.product = Product.objects.get(slug="school-lace")
+        self.variant = self.product.variants.first()
+        self.shipping = self.client.get("/api/shipping-methods").json()[0]
+
+    def post(self, path, payload):
+        return self.client.post(path, data=json.dumps(payload), content_type="application/json")
+
+    def checkout_body(self, email="qa@example.test"):
+        return {
+            "fullName": "QA",
+            "email": email,
+            "phone": "09171234567",
+            "line1": "1 Lane",
+            "city": "Bacoor",
+            "province": "Cavite",
+            "postalCode": "4102",
+            "shippingMethod": self.shipping["id"],
+            "paymentMethod": "cod",
+        }
+
+    def test_list_price_is_not_the_sale_price(self):
+        data = self.client.get("/api/products/school-lace").json()
+        self.assertGreater(data["price"], data["salePrice"])
+
+    def test_unknown_variant_stock_alert_is_a_400_not_a_500(self):
+        response = self.post(
+            "/api/stock-notifications",
+            {"email": "a@b.com", "variantId": "00000000-0000-0000-0000-000000000000"},
+        )
+        self.assertEqual(response.status_code, 400)
+
+    def test_visitor_me_is_not_an_error(self):
+        response = self.client.get("/api/auth/me")
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNone(response.json()["user"])
+
+    def test_cart_quantity_is_capped_at_stock(self):
+        Inventory.objects.filter(variant=self.variant).update(quantity_on_hand=3, quantity_reserved=0)
+        self.assertEqual(self.post("/api/cart/items", {"variantId": str(self.variant.id), "quantity": 3}).status_code, 201)
+        self.assertEqual(self.post("/api/cart/items", {"variantId": str(self.variant.id), "quantity": 1}).status_code, 400)
+        item = self.client.get("/api/cart").json()["items"][0]
+        patch = self.client.patch(
+            f"/api/cart/items/{item['id']}",
+            data=json.dumps({"quantity": 9999}),
+            content_type="application/json",
+        )
+        self.assertEqual(patch.status_code, 400)
+
+    def test_order_status_cannot_jump_or_leave_a_final_state(self):
+        self.post("/api/cart/items", {"variantId": str(self.variant.id), "quantity": 1})
+        order = Order.objects.get(order_number=self.post("/api/checkout/create", self.checkout_body()).json()["order"]["orderNumber"])
+        from commerce.services import set_order_status
+        from rest_framework.exceptions import ValidationError
+
+        with self.assertRaises(ValidationError):
+            set_order_status(order, "shipped")  # pending cannot ship
+        set_order_status(order, "cancelled")
+        with self.assertRaises(ValidationError):
+            set_order_status(order, "paid")  # cancelled is final

@@ -6,6 +6,7 @@ PostgreSQL automatically when a hosting provider supplies DATABASE_URL.
 from __future__ import annotations
 
 import os
+import sys
 from pathlib import Path
 
 
@@ -25,7 +26,11 @@ def env_list(name: str, default: str = "") -> list[str]:
 
 
 SECRET_KEY = env("DJANGO_SECRET_KEY", "unsafe-development-key-change-me")
-DEBUG = env_bool("DJANGO_DEBUG", True)
+DEBUG = env_bool("DJANGO_DEBUG", False)
+if not DEBUG and SECRET_KEY.startswith("unsafe-") and "test" not in sys.argv:
+    from django.core.exceptions import ImproperlyConfigured
+
+    raise ImproperlyConfigured("Set DJANGO_SECRET_KEY to a long random value (or DJANGO_DEBUG=True for local development).")
 # `testserver` keeps Django's built-in test client usable without changing the
 # production allow-list supplied through DJANGO_ALLOWED_HOSTS.
 ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1,testserver")

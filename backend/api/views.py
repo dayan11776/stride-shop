@@ -22,7 +22,7 @@ from rest_framework.views import APIView
 from accounts.models import Address
 from catalog.models import Brand, Category, Inventory, Product, ProductVariant, Review, SizeChartEntry, StockNotification, WishlistItem
 from commerce.models import CartItem, Order, OrderItem, Payment, PromoCode, ReturnItem, ReturnRequest, ShippingMethod
-from commerce.services import apply_promo, calculate_cart_totals, capture_payment, create_order_from_cart, get_cart_for_request, release_order_reservations, set_order_status
+from commerce.services import apply_promo, calculate_cart_totals, capture_payment, create_order_from_cart, ensure_cart_quantity, get_cart_for_request, release_order_reservations, set_order_status
 from commerce.xendit import XenditError, create_invoice, is_configured
 from content.models import AuditLog, ContactMessage, ContentPage, FAQ, HomepageSection, NewsletterSubscriber
 
@@ -158,9 +158,11 @@ class LogoutView(APIView):
 
 
 class MeView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get(self, request):
+        if not request.user.is_authenticated:
+            return Response({"user": None})
         return Response({"user": UserSerializer(request.user).data})
 
 
@@ -354,9 +356,12 @@ class CartView(APIView):
         for payload in items:
             serializer = CartItemInputSerializer(data=payload)
             serializer.is_valid(raise_exception=True)
+            variant = serializer.validated_data["variant"]
+            existing = CartItem.objects.filter(cart=cart, variant=variant).first()
+            ensure_cart_quantity(variant, (existing.quantity if existing else 0) + serializer.validated_data["quantity"])
             cart_item, created = CartItem.objects.get_or_create(
                 cart=cart,
-                variant=serializer.validated_data["variant"],
+                variant=variant,
                 defaults={"quantity": serializer.validated_data["quantity"]},
             )
             if not created:
@@ -372,9 +377,12 @@ class CartItemsView(APIView):
         cart, token = get_cart_for_request(request)
         serializer = CartItemInputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        variant = serializer.validated_data["variant"]
+        existing = CartItem.objects.filter(cart=cart, variant=variant).first()
+        ensure_cart_quantity(variant, (existing.quantity if existing else 0) + serializer.validated_data["quantity"])
         item, created = CartItem.objects.get_or_create(
             cart=cart,
-            variant=serializer.validated_data["variant"],
+            variant=variant,
             defaults={"quantity": serializer.validated_data["quantity"]},
         )
         if not created:
@@ -394,6 +402,7 @@ class CartItemDetailView(APIView):
         item = self.get_object(cart, item_id)
         serializer = CartItemUpdateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        ensure_cart_quantity(item.variant, serializer.validated_data["quantity"])
         item.quantity = serializer.validated_data["quantity"]
         item.save(update_fields=["quantity"])
         return cart_response(cart, token)
