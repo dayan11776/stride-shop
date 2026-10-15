@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import hashlib
 import hmac
+import time
 from decimal import Decimal
 
 from django.conf import settings
@@ -22,6 +24,7 @@ from rest_framework.views import APIView
 from accounts.models import Address
 from catalog.models import Brand, Category, Inventory, Product, ProductVariant, Review, SizeChartEntry, StockNotification, WishlistItem
 from commerce.models import CartItem, Order, OrderItem, Payment, PromoCode, ReturnItem, ReturnRequest, ShippingMethod
+from commerce.payments import HostedCheckoutError, active_provider, create_hosted_checkout, is_online_payment_configured
 from commerce.services import apply_promo, calculate_cart_totals, capture_payment, create_order_from_cart, ensure_cart_quantity, get_cart_for_request, release_order_reservations, set_order_status
 from commerce.xendit import XenditError, create_invoice, is_configured
 from content.models import AuditLog, ContactMessage, ContentPage, FAQ, HomepageSection, NewsletterSubscriber
@@ -458,14 +461,20 @@ class CheckoutCreateView(APIView):
         # Do this before converting the cart into an order.  Otherwise a
         # missing payment configuration would leave an unpaid order holding
         # inventory that the customer can never pay for.
-        if serializer.validated_data["payment_method"] != Payment.Method.COD and not is_configured():
-            return Response(
-                {
-                    "message": "Online payment is not available yet. Please choose cash on delivery or try again later.",
-                    "configured": False,
-                },
-                status=status.HTTP_503_SERVICE_UNAVAILABLE,
-            )
+        payment_provider = Payment.Provider.COD
+        if serializer.validated_data["payment_method"] != Payment.Method.COD:
+            try:
+                payment_provider = active_provider()
+            except HostedCheckoutError:
+                payment_provider = ""
+            if not payment_provider or not is_online_payment_configured():
+                return Response(
+                    {
+                        "message": "Online payment is not available yet. Please choose cash on delivery or try again later.",
+                        "configured": False,
+                    },
+                    status=status.HTTP_503_SERVICE_UNAVAILABLE,
+                )
         shipping_method = resolve_shipping_method(serializer.validated_data.pop("shipping_method_ref"))
         cart, token = get_cart_for_request(request)
         order, payment = create_order_from_cart(
@@ -473,13 +482,14 @@ class CheckoutCreateView(APIView):
             checkout=serializer.validated_data,
             shipping_method=shipping_method,
             user=request.user,
+            payment_provider=payment_provider,
         )
         order = Order.objects.select_related("shipping_method").prefetch_related("items", "addresses", "payments", "shipments", "status_history").get(pk=order.pk)
         response = Response(
             {
                 "order": OrderSerializer(order).data,
-                "payment": {"id": str(payment.id), "status": payment.status, "method": payment.method},
-                "nextAction": "xendit_checkout" if payment.method != Payment.Method.COD else "order_received",
+                "payment": {"id": str(payment.id), "status": payment.status, "method": payment.method, "provider": payment.provider},
+                "nextAction": "online_checkout" if payment.method != Payment.Method.COD else "order_received",
             },
             status=status.HTTP_201_CREATED,
         )
@@ -529,6 +539,53 @@ class XenditCheckoutView(APIView):
         )
 
 
+class OnlineCheckoutView(APIView):
+    """Create the hosted checkout for the provider recorded on an order."""
+
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        payment_id = request.data.get("paymentId") or request.data.get("payment_id")
+        order_id = request.data.get("orderId") or request.data.get("order_id")
+        payments = Payment.objects.select_related("order__user").prefetch_related("order__items", "order__addresses")
+        if payment_id:
+            payment = get_object_or_404(payments, pk=payment_id)
+        elif order_id:
+            payment = get_object_or_404(payments.filter(order_id=order_id).exclude(method=Payment.Method.COD).order_by("-created_at"))
+        else:
+            raise ValidationError({"paymentId": "A payment or order ID is required."})
+
+        order = payment.order
+        if request.user.is_authenticated:
+            if not request.user.is_team_member and order.user_id != request.user.id:
+                raise PermissionDenied("You do not have access to this payment.")
+        elif not order.user_id:
+            supplied_email = str(request.data.get("email", "")).lower()
+            if not supplied_email or supplied_email != order.guest_email.lower():
+                raise PermissionDenied("Guest checkout requires the order email.")
+        else:
+            raise PermissionDenied("Sign in to continue to payment.")
+
+        if payment.method == Payment.Method.COD:
+            raise ValidationError({"payment": "Cash on delivery does not use hosted checkout."})
+        if payment.status != Payment.Status.PENDING:
+            raise ValidationError({"payment": "This payment is no longer pending."})
+
+        try:
+            checkout = create_hosted_checkout(payment)
+        except HostedCheckoutError as exc:
+            return Response({"message": str(exc), "configured": is_online_payment_configured()}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+        return Response(
+            {
+                "paymentId": str(payment.id),
+                "checkoutUrl": checkout.get("checkout_url"),
+                "provider": checkout.get("provider"),
+                "providerRef": checkout.get("provider_ref"),
+                "expiresAt": checkout.get("expires_at"),
+            }
+        )
+
+
 @method_decorator(csrf_exempt, name="dispatch")
 class XenditWebhookView(APIView):
     """Server-to-server callback. Verify the callback token before touching orders."""
@@ -546,9 +603,9 @@ class XenditWebhookView(APIView):
         provider_ref = str(event.get("id") or event.get("invoice_id") or "")
         payment = None
         if provider_ref:
-            payment = Payment.objects.filter(provider_ref=provider_ref).select_related("order").first()
+            payment = Payment.objects.filter(provider_ref=provider_ref, provider__in=[Payment.Provider.XENDIT, ""]).select_related("order").first()
         if payment is None and external_id:
-            payment = Payment.objects.filter(order__order_number=external_id).exclude(method=Payment.Method.COD).order_by("-created_at").select_related("order").first()
+            payment = Payment.objects.filter(order__order_number=external_id, provider__in=[Payment.Provider.XENDIT, ""]).exclude(method=Payment.Method.COD).order_by("-created_at").select_related("order").first()
         if payment is None:
             raise NotFound("No matching payment was found.")
         event_status = str(event.get("status", "")).upper()
@@ -563,6 +620,64 @@ class XenditWebhookView(APIView):
             # the corresponding order as cancelled as part of releasing it.
             release_order_reservations(payment.order, note="Xendit invoice expired or failed.")
         return Response({"received": True})
+
+
+@method_decorator(csrf_exempt, name="dispatch")
+class PayMongoWebhookView(APIView):
+    """Verify PayMongo's raw-body signature before changing order state."""
+
+    authentication_classes = []
+    permission_classes = [AllowAny]
+
+    @staticmethod
+    def signature_is_valid(request) -> bool:
+        secret = str(settings.PAYMONGO_WEBHOOK_SECRET or "")
+        signature_header = request.headers.get("Paymongo-Signature", "")
+        if not secret or not signature_header:
+            return False
+        parts = {}
+        for entry in signature_header.split(","):
+            key, separator, value = entry.strip().partition("=")
+            if separator and key:
+                parts[key] = value
+        timestamp = parts.get("t", "")
+        signature_key = "li" if str(settings.PAYMONGO_SECRET_KEY or "").startswith("sk_live_") else "te"
+        received = parts.get(signature_key, "")
+        try:
+            age = abs(time.time() - int(timestamp))
+        except (TypeError, ValueError):
+            return False
+        if not received or age > settings.PAYMONGO_WEBHOOK_TOLERANCE_SECONDS:
+            return False
+        message = f"{timestamp}.".encode("utf-8") + request.body
+        expected = hmac.new(secret.encode("utf-8"), message, hashlib.sha256).hexdigest()
+        return hmac.compare_digest(expected, received)
+
+    def post(self, request):
+        if not self.signature_is_valid(request):
+            raise PermissionDenied("Invalid PayMongo webhook signature.")
+
+        envelope = request.data if isinstance(request.data, dict) else {}
+        event = envelope.get("data", {}) if isinstance(envelope.get("data", {}), dict) else {}
+        if event.get("type") != "checkout_session.payment.paid":
+            return Response({"received": True, "handled": False})
+        session = event.get("data", {}) if isinstance(event.get("data", {}), dict) else {}
+        attributes = session.get("attributes", {}) if isinstance(session.get("attributes", {}), dict) else {}
+        session_id = str(session.get("id") or "")
+        reference_number = str(attributes.get("reference_number") or "")
+
+        payment = None
+        if session_id:
+            payment = Payment.objects.filter(provider=Payment.Provider.PAYMONGO, provider_ref=session_id).select_related("order").first()
+        if payment is None and reference_number:
+            payment = Payment.objects.filter(provider=Payment.Provider.PAYMONGO, order__order_number=reference_number).order_by("-created_at").select_related("order").first()
+        # A signed event for an old or foreign Checkout Session should not be
+        # retried indefinitely; it has no order in this store to settle.
+        if payment is None:
+            return Response({"received": True, "matched": False})
+
+        capture_payment(payment, provider_ref=session_id or payment.provider_ref)
+        return Response({"received": True, "matched": True})
 
 
 class AccountOrdersView(APIView):
@@ -825,3 +940,4 @@ class SalesReportView(APIView):
                 ],
             }
         )
+

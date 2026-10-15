@@ -5,7 +5,7 @@ STRIDE is a full-stack shoe e-commerce application: a Django REST Framework API 
 ## Project layout
 
 ```text
-backend/    Django, Django REST Framework, PostgreSQL integration, Xendit server integration
+backend/    Django, Django REST Framework, PostgreSQL integration, hosted-payment integrations
 frontend/   React, Vite, Tailwind, production Nginx container
 docs/       Deployment notes
 ```
@@ -54,9 +54,9 @@ The important production settings are:
 | --- | --- |
 | Backend | `DJANGO_SECRET_KEY`, `DJANGO_DEBUG=False`, `DJANGO_ALLOWED_HOSTS`, `DATABASE_URL`, `CORS_ALLOWED_ORIGINS`, `CSRF_TRUSTED_ORIGINS` |
 | Frontend | `VITE_API_URL`, `VITE_USE_MOCK=false` |
-| Backend payment integration | `XENDIT_SECRET_KEY`, `XENDIT_WEBHOOK_TOKEN`, optionally `XENDIT_API_URL`, `XENDIT_SUCCESS_REDIRECT_URL`, `XENDIT_FAILURE_REDIRECT_URL` |
+| Backend PayMongo integration | `PAYMENT_PROVIDER=paymongo`, `PAYMONGO_SECRET_KEY`, `PAYMONGO_WEBHOOK_SECRET`, `PAYMONGO_SUCCESS_REDIRECT_URL`, `PAYMONGO_CANCEL_REDIRECT_URL`, optionally `PAYMONGO_PAYMENT_METHOD_TYPES` |
 
-Never use `VITE_` for credentials, database URLs, or Xendit secrets: Vite exposes these values in the browser build.
+Never use `VITE_` for credentials, database URLs, or payment secrets: Vite exposes these values in the browser build.
 
 ## Deploy to Railway
 
@@ -70,7 +70,10 @@ The repository includes `frontend/vercel.json` and `render.yaml` for the request
 
 ## Payments
 
-Xendit is called only by the Django API. The frontend receives checkout URLs/statuses only; it must never receive a secret key or webhook token. The live Xendit keys, callback token, and the public webhook registration are account-specific configuration the project owner must add in the Xendit dashboard.
+PayMongo Hosted Checkout is called only by the Django API. The frontend receives a checkout URL/status only; it never receives a secret API key or webhook signing secret. Add the account-specific PayMongo values in Render, then register `https://<render-service>.onrender.com/api/webhooks/paymongo` for `checkout_session.payment.paid`. The signed webhook, rather than the browser redirect, is the source of truth for marking an order paid.
+
+`PAYMENT_PROVIDER=auto` preserves the existing Xendit integration until a complete PayMongo configuration is present. Set it to `paymongo` to require PayMongo for new online orders, or `xendit` to retain the legacy provider during a transition. Existing Xendit checkout and webhook routes remain available for historical orders.
 
 The included integration covers hosted customer checkout and payment callbacks. Store payouts are intentionally outside this build because the supplied schema has no beneficiary or payout records; add those business requirements before enabling any payout flow.
+
 

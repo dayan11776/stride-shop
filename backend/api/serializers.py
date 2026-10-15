@@ -423,12 +423,13 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 
 class PaymentSerializer(serializers.ModelSerializer):
+    provider = serializers.CharField(read_only=True)
     providerRef = serializers.CharField(source="provider_ref", read_only=True)
     paidAt = serializers.DateTimeField(source="paid_at", read_only=True)
 
     class Meta:
         model = Payment
-        fields = ("id", "method", "providerRef", "amount", "currency", "status", "paidAt", "created_at")
+        fields = ("id", "method", "provider", "providerRef", "amount", "currency", "status", "paidAt", "created_at")
 
 
 class ShipmentSerializer(serializers.ModelSerializer):
@@ -572,3 +573,4 @@ class AdminOrderSerializer(serializers.ModelSerializer):
         model = Order
         fields = ("id", "order_number", "user", "guest_email", "status", "shipping_method", "promo_code", "subtotal", "discount_total", "shipping_fee", "tax_total", "grand_total", "currency", "notes", "placed_at")
         read_only_fields = ("id", "order_number", "placed_at")
+

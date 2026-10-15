@@ -2,7 +2,11 @@
 from __future__ import annotations
 
 import json
+import hashlib
+import hmac
+import time
 from io import StringIO
+from unittest.mock import MagicMock, patch
 
 from django.contrib.auth import get_user_model
 from django.core.management import call_command
@@ -94,6 +98,94 @@ class CheckoutFlowTests(TestCase):
         self.assertEqual(payment.status, Payment.Status.FAILED)
         self.assertEqual(inventory.quantity_reserved, 0)
 
+    @override_settings(
+        PAYMENT_PROVIDER="paymongo",
+        PAYMONGO_SECRET_KEY="sk_test_unit",
+        PAYMONGO_WEBHOOK_SECRET="unit-paymongo-webhook-secret",
+        PAYMONGO_SUCCESS_REDIRECT_URL="https://store.example.test/order-confirmation/{order_number}",
+        PAYMONGO_CANCEL_REDIRECT_URL="https://store.example.test/checkout",
+        PAYMONGO_PAYMENT_METHOD_TYPES=["card", "gcash", "qrph"],
+    )
+    @patch("commerce.paymongo.urlopen")
+    def test_paymongo_session_and_signed_paid_callback_capture_payment(self, mock_urlopen):
+        self.add_line()
+        created = self.post("/api/checkout/create", {**self.checkout, "paymentMethod": "ewallet"})
+        self.assertEqual(created.status_code, 201, created.content)
+        payload = created.json()
+        self.assertEqual(payload["payment"]["provider"], Payment.Provider.PAYMONGO)
+        order = Order.objects.get(pk=payload["order"]["id"])
+        payment = Payment.objects.get(pk=payload["payment"]["id"])
+
+        provider_response = {
+            "data": {
+                "id": "cs_unit_test",
+                "type": "checkout_session",
+                "attributes": {"checkout_url": "https://checkout.paymongo.test/cs_unit_test"},
+            }
+        }
+        http_response = MagicMock()
+        http_response.read.return_value = json.dumps(provider_response).encode("utf-8")
+        mock_urlopen.return_value.__enter__.return_value = http_response
+
+        checkout = self.post(
+            "/api/payments/checkout",
+            {"paymentId": str(payment.id), "orderId": str(order.id), "email": self.customer.email},
+        )
+        self.assertEqual(checkout.status_code, 200, checkout.content)
+        self.assertEqual(checkout.json()["provider"], Payment.Provider.PAYMONGO)
+        self.assertEqual(checkout.json()["checkoutUrl"], "https://checkout.paymongo.test/cs_unit_test")
+        request = mock_urlopen.call_args.args[0]
+        request_payload = json.loads(request.data.decode("utf-8"))
+        attributes = request_payload["data"]["attributes"]
+        self.assertEqual(request.full_url, "https://api.paymongo.com/v2/checkout_sessions")
+        self.assertEqual(attributes["reference_number"], order.order_number)
+        self.assertEqual(attributes["line_items"][0]["amount"], int(payment.amount * 100))
+        self.assertEqual(attributes["payment_method_types"], ["card", "gcash", "qrph"])
+
+        payment.refresh_from_db()
+        self.assertEqual(payment.provider_ref, "cs_unit_test")
+        event = {
+            "event_type": "send.webhook",
+            "data": {
+                "type": "checkout_session.payment.paid",
+                "livemode": False,
+                "data": {
+                    "id": "cs_unit_test",
+                    "type": "checkout_session",
+                    "attributes": {"reference_number": order.order_number, "payments": [{"id": "pay_unit_test", "attributes": {"status": "paid"}}]},
+                },
+            },
+        }
+        raw_event = json.dumps(event, separators=(",", ":")).encode("utf-8")
+        timestamp = str(int(time.time()))
+        signature = hmac.new(
+            b"unit-paymongo-webhook-secret",
+            f"{timestamp}.".encode("utf-8") + raw_event,
+            hashlib.sha256,
+        ).hexdigest()
+        callback = self.client.post(
+            "/api/webhooks/paymongo",
+            data=raw_event,
+            content_type="application/json",
+            HTTP_PAYMONGO_SIGNATURE=f"t={timestamp},te={signature},li=",
+        )
+        self.assertEqual(callback.status_code, 200, callback.content)
+
+        payment.refresh_from_db()
+        order.refresh_from_db()
+        self.assertEqual(payment.status, Payment.Status.CAPTURED)
+        self.assertEqual(order.status, Order.Status.PAID)
+
+    @override_settings(PAYMONGO_SECRET_KEY="sk_test_unit", PAYMONGO_WEBHOOK_SECRET="unit-paymongo-webhook-secret")
+    def test_paymongo_webhook_rejects_an_invalid_signature(self):
+        response = self.client.post(
+            "/api/webhooks/paymongo",
+            data=b'{"data":{}}',
+            content_type="application/json",
+            HTTP_PAYMONGO_SIGNATURE=f"t={int(time.time())},te=not-valid,li=",
+        )
+        self.assertEqual(response.status_code, 403, response.content)
+
 
 class SeedDataSecurityTests(TestCase):
     def test_seed_data_never_creates_public_demo_accounts(self):
@@ -182,3 +274,4 @@ class FixedBugTests(TestCase):
         set_order_status(order, "cancelled")
         with self.assertRaises(ValidationError):
             set_order_status(order, "paid")  # cancelled is final
+

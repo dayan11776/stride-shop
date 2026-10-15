@@ -154,12 +154,27 @@ SESSION_COOKIE_SAMESITE = "Lax"
 CSRF_COOKIE_SAMESITE = "Lax"
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
-# Stored only on the server. The React application must never receive this key.
+# Stored only on the server. The React application must never receive these
+# credentials.  In ``auto`` mode, PayMongo is preferred when its full hosted
+# checkout configuration is present; otherwise existing Xendit configuration
+# remains available as a migration fallback.
+PAYMENT_PROVIDER = str(env("PAYMENT_PROVIDER", "auto") or "auto").lower()
+
 XENDIT_SECRET_KEY = env("XENDIT_SECRET_KEY", "")
 XENDIT_WEBHOOK_TOKEN = env("XENDIT_WEBHOOK_TOKEN", "")
 XENDIT_API_URL = env("XENDIT_API_URL", "https://api.xendit.co")
 XENDIT_SUCCESS_REDIRECT_URL = env("XENDIT_SUCCESS_REDIRECT_URL", "")
 XENDIT_FAILURE_REDIRECT_URL = env("XENDIT_FAILURE_REDIRECT_URL", "")
 
+PAYMONGO_SECRET_KEY = env("PAYMONGO_SECRET_KEY", "")
+PAYMONGO_WEBHOOK_SECRET = env("PAYMONGO_WEBHOOK_SECRET", "")
+PAYMONGO_API_URL = env("PAYMONGO_API_URL", "https://api.paymongo.com")
+PAYMONGO_SUCCESS_REDIRECT_URL = env("PAYMONGO_SUCCESS_REDIRECT_URL", "")
+PAYMONGO_CANCEL_REDIRECT_URL = env("PAYMONGO_CANCEL_REDIRECT_URL", "")
+PAYMONGO_PAYMENT_METHOD_TYPES = env_list("PAYMONGO_PAYMENT_METHOD_TYPES", "card,gcash,qrph")
+PAYMONGO_SEND_EMAIL_RECEIPT = env_bool("PAYMONGO_SEND_EMAIL_RECEIPT", True)
+PAYMONGO_WEBHOOK_TOLERANCE_SECONDS = int(env("PAYMONGO_WEBHOOK_TOLERANCE_SECONDS", "300") or 300)
+
 EMAIL_BACKEND = env("EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend")
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", "STRIDE <no-reply@stride.local>")
+

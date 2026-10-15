@@ -72,6 +72,8 @@ def create_invoice(payment: Payment) -> dict:
         raise XenditError("Could not reach Xendit. Please try again shortly.") from exc
     provider_ref = str(data.get("id") or data.get("external_id") or "")
     if provider_ref:
+        payment.provider = Payment.Provider.XENDIT
         payment.provider_ref = provider_ref
-        payment.save(update_fields=["provider_ref"])
+        payment.save(update_fields=["provider", "provider_ref"])
     return data
+

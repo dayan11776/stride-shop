@@ -212,8 +212,16 @@ class Payment(UUIDModel):
         FAILED = "failed", "Failed"
         REFUNDED = "refunded", "Refunded"
 
+    class Provider(models.TextChoices):
+        XENDIT = "xendit", "Xendit"
+        PAYMONGO = "paymongo", "PayMongo"
+        COD = "cod", "Cash on delivery"
+
     order = models.ForeignKey(Order, on_delete=models.PROTECT, related_name="payments")
     method = models.CharField(max_length=10, choices=Method.choices)
+    # Empty is retained for payments created before provider tracking was
+    # introduced. New checkout payments always record their provider.
+    provider = models.CharField(max_length=16, choices=Provider.choices, blank=True, default="", db_index=True)
     provider_ref = models.CharField(max_length=255, blank=True, db_index=True)
     amount = models.DecimalField(max_digits=12, decimal_places=2)
     currency = models.CharField(max_length=3, default="PHP", validators=[RegexValidator(r"^[A-Z]{3}$")])
@@ -292,3 +300,4 @@ class Refund(UUIDModel):
 
     class Meta:
         db_table = "refunds"
+

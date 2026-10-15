@@ -20,7 +20,7 @@ Render free services and free PostgreSQL are suitable only for a demo: availabil
 4. Confirm `frontend/vercel.json` points to the deployed Render API origin. It currently targets `https://stride-shop-api.onrender.com`; change that value only if the backend service URL changes.
 5. Deploy. `frontend/vercel.json` proxies `/api/*` to Render before applying the Vite SPA fallback.
 
-Keep `VITE_API_URL=/api` and `VITE_USE_MOCK=false`. Do not put Xendit keys or any other secrets in `VITE_*` variables.
+Keep `VITE_API_URL=/api` and `VITE_USE_MOCK=false`. Do not put PayMongo keys or any other secrets in `VITE_*` variables.
 
 ## 3. Trust the Vercel storefront in Django
 
@@ -33,16 +33,21 @@ CORS_ALLOWED_ORIGINS=https://your-project.vercel.app
 
 The proxy makes browser calls same-origin, which keeps the session and CSRF cookies functional. The CORS setting remains useful for non-proxied API clients.
 
-## 4. Optional Xendit configuration
+## 4. PayMongo Hosted Checkout
 
-Set these in Render only when live payments are ready:
+Set these in Render only when PayMongo payments are ready. Use `sk_test_...` during testing and `sk_live_...` only after completing PayMongo's live-account checks:
 
 ```text
-XENDIT_SECRET_KEY=
-XENDIT_WEBHOOK_TOKEN=
-XENDIT_SUCCESS_REDIRECT_URL=https://your-project.vercel.app/order-confirmation/{order_number}
-XENDIT_FAILURE_REDIRECT_URL=https://your-project.vercel.app/checkout
+PAYMENT_PROVIDER=paymongo
+PAYMONGO_SECRET_KEY=
+PAYMONGO_WEBHOOK_SECRET=
+PAYMONGO_SUCCESS_REDIRECT_URL=https://your-project.vercel.app/order-confirmation/{order_number}
+PAYMONGO_CANCEL_REDIRECT_URL=https://your-project.vercel.app/checkout
+PAYMONGO_PAYMENT_METHOD_TYPES=card,gcash,qrph
 ```
 
-Register the public webhook at `https://<render-service>.onrender.com/api/webhooks/xendit`. Never commit these values or expose them through Vercel environment variables.
+In PayMongo Dashboard, add `https://<render-service>.onrender.com/api/webhooks/paymongo` under Developers → Webhooks and subscribe to `checkout_session.payment.paid`. Copy the endpoint's signing secret to `PAYMONGO_WEBHOOK_SECRET`. Never commit these values or expose them through Vercel environment variables.
+
+`PAYMENT_PROVIDER=auto` retains Xendit until a complete PayMongo configuration exists; set `PAYMENT_PROVIDER=xendit` only for a deliberate legacy fallback.
+
 

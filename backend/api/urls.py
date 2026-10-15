@@ -46,8 +46,10 @@ urlpatterns = [
     path("shipping-methods", views.ShippingMethodListView.as_view(), name="shipping-methods"),
     path("checkout/quote", views.CheckoutQuoteView.as_view(), name="checkout-quote"),
     path("checkout/create", views.CheckoutCreateView.as_view(), name="checkout-create"),
+    path("payments/checkout", views.OnlineCheckoutView.as_view(), name="online-checkout"),
     path("payments/xendit/checkout", views.XenditCheckoutView.as_view(), name="xendit-checkout"),
     path("webhooks/xendit", views.XenditWebhookView.as_view(), name="xendit-webhook"),
+    path("webhooks/paymongo", views.PayMongoWebhookView.as_view(), name="paymongo-webhook"),
     path("content/homepage", views.HomepageSectionsView.as_view(), name="homepage-sections"),
     path("content/pages/<slug:slug>", views.ContentPageView.as_view(), name="content-page"),
     path("content/faqs", views.FAQListView.as_view(), name="faqs"),
@@ -58,3 +60,4 @@ urlpatterns = [
     path("staff/reports/sales", views.SalesReportView.as_view(), name="staff-sales-report"),
     path("", include(router.urls)),
 ]
+

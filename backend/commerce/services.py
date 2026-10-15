@@ -117,7 +117,7 @@ def apply_promo(cart: Cart, code: str) -> Cart:
 
 @transaction.atomic
 def create_order_from_cart(
-    *, cart: Cart, checkout: dict[str, Any], shipping_method: ShippingMethod, user=None
+    *, cart: Cart, checkout: dict[str, Any], shipping_method: ShippingMethod, user=None, payment_provider: str = ""
 ) -> tuple[Order, Payment]:
     """Snapshot a cart into an order and reserve inventory atomically."""
     locked_items = list(
@@ -178,6 +178,7 @@ def create_order_from_cart(
     payment = Payment.objects.create(
         order=order,
         method=checkout["payment_method"],
+        provider=payment_provider,
         amount=order.grand_total,
         currency=order.currency,
     )
@@ -302,3 +303,4 @@ def set_order_status(order: Order, status: str, *, actor=None, note: str = "") -
         changed_by=actor if getattr(actor, "is_authenticated", False) else None,
     )
     return order
+
