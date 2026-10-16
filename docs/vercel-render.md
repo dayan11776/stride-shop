@@ -42,12 +42,14 @@ PAYMENT_PROVIDER=paymongo
 PAYMONGO_SECRET_KEY=
 PAYMONGO_WEBHOOK_SECRET=
 PAYMONGO_SUCCESS_REDIRECT_URL=https://your-project.vercel.app/order-confirmation/{order_number}
-PAYMONGO_CANCEL_REDIRECT_URL=https://your-project.vercel.app/checkout
+PAYMONGO_CANCEL_REDIRECT_URL=https://your-project.vercel.app/checkout?paymentCancelled={payment_id}
 PAYMONGO_PAYMENT_METHOD_TYPES=card,gcash,qrph
 ```
 
 In PayMongo Dashboard, add `https://<render-service>.onrender.com/api/webhooks/paymongo` under Developers → Webhooks and subscribe to `checkout_session.payment.paid`. Copy the endpoint's signing secret to `PAYMONGO_WEBHOOK_SECRET`. Never commit these values or expose them through Vercel environment variables.
 
-`PAYMENT_PROVIDER=auto` retains Xendit until a complete PayMongo configuration exists; set `PAYMENT_PROVIDER=xendit` only for a deliberate legacy fallback.
+PayMongo's cancel URL only returns the shopper to STRIDE; it does not cancel the Checkout Session. The supplied checkout screen lets the shopper resume the same active session or explicitly cancel the order. STRIDE expires the session through PayMongo before it releases the stock reservation.
+
+`PAYMENT_PROVIDER=auto` retains Xendit until a complete PayMongo configuration exists; set `PAYMENT_PROVIDER=xendit` only for a deliberate legacy fallback. Payments created before the PayMongo migration are preserved as Xendit payments so they cannot be rerouted to PayMongo.
 
 

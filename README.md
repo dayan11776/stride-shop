@@ -70,9 +70,9 @@ The repository includes `frontend/vercel.json` and `render.yaml` for the request
 
 ## Payments
 
-PayMongo Hosted Checkout is called only by the Django API. The frontend receives a checkout URL/status only; it never receives a secret API key or webhook signing secret. Add the account-specific PayMongo values in Render, then register `https://<render-service>.onrender.com/api/webhooks/paymongo` for `checkout_session.payment.paid`. The signed webhook, rather than the browser redirect, is the source of truth for marking an order paid.
+PayMongo Hosted Checkout is called only by the Django API. The frontend receives a checkout URL/status only; it never receives a secret API key or webhook signing secret. Add the account-specific PayMongo values in Render, use `https://<frontend>/checkout?paymentCancelled={payment_id}` for `PAYMONGO_CANCEL_REDIRECT_URL`, then register `https://<render-service>.onrender.com/api/webhooks/paymongo` for `checkout_session.payment.paid`. The signed webhook, rather than the browser redirect, is the source of truth for marking an order paid. A cancellation redirect shows an explicit Resume payment / Cancel order choice; stock is released only after PayMongo confirms that the Checkout Session expired.
 
-`PAYMENT_PROVIDER=auto` preserves the existing Xendit integration until a complete PayMongo configuration is present. Set it to `paymongo` to require PayMongo for new online orders, or `xendit` to retain the legacy provider during a transition. Existing Xendit checkout and webhook routes remain available for historical orders.
+`PAYMENT_PROVIDER=auto` preserves the existing Xendit integration until a complete PayMongo configuration is present. Set it to `paymongo` to require PayMongo for new online orders, or `xendit` to retain the legacy provider during a transition. Existing Xendit checkout and webhook routes remain available for historical orders; the migration labels older payments as Xendit so a pending invoice cannot be rerouted to PayMongo.
 
 The included integration covers hosted customer checkout and payment callbacks. Store payouts are intentionally outside this build because the supplied schema has no beneficiary or payout records; add those business requirements before enabling any payout flow.
 

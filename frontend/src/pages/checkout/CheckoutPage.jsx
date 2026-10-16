@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useCartStore, selectSubtotal } from '@/features/cart/cartStore'
 import { useAuthStore } from '@/features/auth/authStore'
 import { api, listFrom, payloadFrom, USE_MOCK } from '@/lib/apiClient'
@@ -8,6 +8,23 @@ import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
 
 const mockShipping = [{ id: 'standard', name: 'Standard delivery', baseFee: 180, estDaysMin: 2, estDaysMax: 5 }]
+
+function pendingPaymentKey(paymentId) {
+  return `stride.pending-payment.${paymentId}`
+}
+
+function rememberedPaymentEmail(paymentId) {
+  if (!paymentId || typeof window === 'undefined') return ''
+  try {
+    return JSON.parse(window.sessionStorage.getItem(pendingPaymentKey(paymentId)) || '{}').email || ''
+  } catch {
+    return ''
+  }
+}
+
+function forgetPendingPayment(paymentId) {
+  if (paymentId && typeof window !== 'undefined') window.sessionStorage.removeItem(pendingPaymentKey(paymentId))
+}
 
 async function synchronizeCart(items, promoCode) {
   const currentCart = payloadFrom(await api('/cart'))
@@ -33,6 +50,7 @@ async function synchronizeCart(items, promoCode) {
 
 export function Component() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const items = useCartStore((state) => state.items)
   const promoCode = useCartStore((state) => state.promoCode)
   const clear = useCartStore((state) => state.clear)
@@ -43,6 +61,11 @@ export function Component() {
   const [shippingId, setShippingId] = useState(mockShipping[0].id)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
+  const cancelledPaymentId = searchParams.get('paymentCancelled') || ''
+  const [cancelEmail, setCancelEmail] = useState(() => rememberedPaymentEmail(cancelledPaymentId) || user?.email || '')
+  const [cancelBusy, setCancelBusy] = useState(false)
+  const [cancelError, setCancelError] = useState('')
+  const [cancellationComplete, setCancellationComplete] = useState(false)
 
   useEffect(() => {
     if (USE_MOCK) return
@@ -55,11 +78,69 @@ export function Component() {
     }).catch(() => {})
   }, [])
 
+  useEffect(() => {
+    setCancelEmail(rememberedPaymentEmail(cancelledPaymentId) || user?.email || '')
+    setCancelError('')
+    setCancellationComplete(false)
+  }, [cancelledPaymentId, user?.email])
+
   const selectedShipping = useMemo(
     () => shippingMethods.find((item) => String(item.id) === String(shippingId)) ?? shippingMethods[0],
     [shippingId, shippingMethods],
   )
   const shipping = subtotal >= 3500 ? 0 : Number(selectedShipping?.baseFee ?? selectedShipping?.base_fee ?? 180)
+
+  const resumePayment = async () => {
+    if (!cancelEmail.trim()) {
+      setCancelError('Enter the email address used for this order to continue payment.')
+      return
+    }
+    setCancelBusy(true)
+    setCancelError('')
+    try {
+      await api('/csrf')
+      const payment = payloadFrom(await api('/payments/checkout', {
+        method: 'POST',
+        body: { paymentId: cancelledPaymentId, email: cancelEmail.trim() },
+      }))
+      const paymentUrl = payment?.checkoutUrl ?? payment?.checkout_url
+      if (!paymentUrl) throw new Error('The payment provider did not return a checkout link. Please try again.')
+      window.location.assign(paymentUrl)
+    } catch (reason) {
+      setCancelError(reason.message || 'We could not resume this payment. Please try again.')
+      setCancelBusy(false)
+    }
+  }
+
+  const cancelPayment = async () => {
+    if (!cancelEmail.trim()) {
+      setCancelError('Enter the email address used for this order to cancel it.')
+      return
+    }
+    setCancelBusy(true)
+    setCancelError('')
+    try {
+      await api('/csrf')
+      await api('/payments/paymongo/cancel', {
+        method: 'POST',
+        body: { paymentId: cancelledPaymentId, email: cancelEmail.trim() },
+      })
+      forgetPendingPayment(cancelledPaymentId)
+      clear()
+      setCancellationComplete(true)
+    } catch (reason) {
+      setCancelError(reason.message || 'We could not cancel this payment. Please try again.')
+    } finally {
+      setCancelBusy(false)
+    }
+  }
+
+  if (cancelledPaymentId) {
+    if (cancellationComplete) {
+      return <section className="container section"><div className="mx-auto max-w-xl surface p-6 text-center sm:p-8"><p className="eyebrow">Payment cancelled</p><h1 className="page-heading mt-3">Your reservation was released.</h1><p className="mt-4 muted">The payment checkout was expired and this order was cancelled. You can return to the shop whenever you are ready.</p><Button as={Link} to="/shop" className="mt-6">Continue shopping <Icon name="arrow" size={17} /></Button></div></section>
+    }
+    return <section className="container section"><div className="mx-auto max-w-xl surface p-6 sm:p-8"><p className="eyebrow">Payment not completed</p><h1 className="page-heading mt-3">Your order is still waiting for payment.</h1><p className="mt-4 muted">Returning from the payment provider does not cancel an order automatically. You may resume the secure payment page or explicitly cancel this order.</p><label className="field-label mt-6">Email used for the order<input className="field mt-2" type="email" value={cancelEmail} onChange={(event) => setCancelEmail(event.target.value)} autoComplete="email" required /></label>{cancelError && <p className="status status-error mt-4" role="alert">{cancelError}</p>}<div className="mt-6 grid gap-3 sm:grid-cols-2"><Button type="button" onClick={resumePayment} disabled={cancelBusy}>{cancelBusy ? 'Contacting PayMongo…' : 'Resume payment'}</Button><Button type="button" variant="secondary" onClick={cancelPayment} disabled={cancelBusy}>Cancel order</Button></div><Link className="mt-5 inline-block text-sm font-semibold underline" to="/shop">Leave order pending and continue shopping</Link></div></section>
+  }
 
   if (!items.length) return <section className="container section"><div className="page-state"><div><h1 className="page-heading">Your bag is empty</h1><p className="mt-4 muted">Add something you love before checking out.</p><Button as={Link} to="/shop" className="mt-5">Shop shoes</Button></div></div></section>
 
@@ -104,6 +185,9 @@ export function Component() {
         }))
         const paymentUrl = payment?.checkoutUrl ?? payment?.checkout_url ?? payment?.payment_url ?? payment?.invoice_url
         if (!paymentUrl) throw new Error('The payment provider did not return a checkout link. Please try again or choose cash on delivery.')
+        if (payment?.provider === 'paymongo' && payment?.paymentId) {
+          window.sessionStorage.setItem(pendingPaymentKey(payment.paymentId), JSON.stringify({ email: values.email }))
+        }
         clear()
         window.location.assign(paymentUrl)
         return

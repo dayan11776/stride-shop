@@ -5,8 +5,9 @@ import json
 import hashlib
 import hmac
 import time
-from io import StringIO
+from io import BytesIO, StringIO
 from unittest.mock import MagicMock, patch
+from urllib.error import HTTPError
 
 from django.contrib.auth import get_user_model
 from django.core.management import call_command
@@ -103,7 +104,7 @@ class CheckoutFlowTests(TestCase):
         PAYMONGO_SECRET_KEY="sk_test_unit",
         PAYMONGO_WEBHOOK_SECRET="unit-paymongo-webhook-secret",
         PAYMONGO_SUCCESS_REDIRECT_URL="https://store.example.test/order-confirmation/{order_number}",
-        PAYMONGO_CANCEL_REDIRECT_URL="https://store.example.test/checkout",
+        PAYMONGO_CANCEL_REDIRECT_URL="https://store.example.test/checkout?paymentCancelled={payment_id}",
         PAYMONGO_PAYMENT_METHOD_TYPES=["card", "gcash", "qrph"],
     )
     @patch("commerce.paymongo.urlopen")
@@ -141,6 +142,7 @@ class CheckoutFlowTests(TestCase):
         self.assertEqual(attributes["reference_number"], order.order_number)
         self.assertEqual(attributes["line_items"][0]["amount"], int(payment.amount * 100))
         self.assertEqual(attributes["payment_method_types"], ["card", "gcash", "qrph"])
+        self.assertEqual(attributes["cancel_url"], f"https://store.example.test/checkout?paymentCancelled={payment.id}")
 
         payment.refresh_from_db()
         self.assertEqual(payment.provider_ref, "cs_unit_test")
@@ -185,6 +187,156 @@ class CheckoutFlowTests(TestCase):
             HTTP_PAYMONGO_SIGNATURE=f"t={int(time.time())},te=not-valid,li=",
         )
         self.assertEqual(response.status_code, 403, response.content)
+
+    @override_settings(
+        PAYMENT_PROVIDER="paymongo",
+        PAYMONGO_SECRET_KEY="sk_test_unit",
+        PAYMONGO_WEBHOOK_SECRET="unit-paymongo-webhook-secret",
+        PAYMONGO_SUCCESS_REDIRECT_URL="https://store.example.test/order-confirmation/{order_number}",
+        PAYMONGO_CANCEL_REDIRECT_URL="https://store.example.test/checkout?paymentCancelled={payment_id}",
+        PAYMONGO_PAYMENT_METHOD_TYPES=["card", "gcash", "qrph"],
+    )
+    @patch("commerce.paymongo.urlopen")
+    def test_paymongo_provider_details_are_not_returned_to_shopper(self, mock_urlopen):
+        self.add_line()
+        created = self.post("/api/checkout/create", {**self.checkout, "paymentMethod": "ewallet"})
+        payment = Payment.objects.get(pk=created.json()["payment"]["id"])
+        mock_urlopen.side_effect = HTTPError(
+            "https://api.paymongo.com",
+            422,
+            "Unprocessable Content",
+            None,
+            BytesIO(b'{"error":"provider-internal-detail"}'),
+        )
+
+        response = self.post(
+            "/api/payments/checkout",
+            {"paymentId": str(payment.id), "email": self.customer.email},
+        )
+        self.assertEqual(response.status_code, 503, response.content)
+        self.assertNotIn("provider-internal-detail", response.content.decode("utf-8"))
+
+    @override_settings(
+        PAYMENT_PROVIDER="paymongo",
+        PAYMONGO_SECRET_KEY="sk_test_unit",
+        PAYMONGO_WEBHOOK_SECRET="unit-paymongo-webhook-secret",
+        PAYMONGO_SUCCESS_REDIRECT_URL="https://store.example.test/order-confirmation/{order_number}",
+        PAYMONGO_CANCEL_REDIRECT_URL="https://store.example.test/checkout?paymentCancelled={payment_id}",
+        PAYMONGO_PAYMENT_METHOD_TYPES=["card", "gcash", "qrph"],
+    )
+    @patch("commerce.paymongo.urlopen")
+    def test_explicit_paymongo_cancellation_expires_session_and_releases_stock(self, mock_urlopen):
+        self.add_line()
+        created = self.post("/api/checkout/create", {**self.checkout, "paymentMethod": "ewallet"})
+        self.assertEqual(created.status_code, 201, created.content)
+        order = Order.objects.get(pk=created.json()["order"]["id"])
+        payment = Payment.objects.get(pk=created.json()["payment"]["id"])
+        payment.provider_ref = "cs_cancel_unit_test"
+        payment.save(update_fields=["provider_ref"])
+
+        provider_response = {"data": {"id": payment.provider_ref, "attributes": {"status": "expired"}}}
+        http_response = MagicMock()
+        http_response.read.return_value = json.dumps(provider_response).encode("utf-8")
+        mock_urlopen.return_value.__enter__.return_value = http_response
+
+        cancelled = self.post(
+            "/api/payments/paymongo/cancel",
+            {"paymentId": str(payment.id), "email": self.customer.email},
+        )
+        self.assertEqual(cancelled.status_code, 200, cancelled.content)
+        self.assertTrue(cancelled.json()["cancelled"])
+        request = mock_urlopen.call_args.args[0]
+        self.assertEqual(request.full_url, "https://api.paymongo.com/v1/checkout_sessions/cs_cancel_unit_test/expire")
+        self.assertEqual(request.get_method(), "POST")
+
+        payment.refresh_from_db()
+        order.refresh_from_db()
+        inventory = Inventory.objects.get(variant=self.variant)
+        self.assertEqual(payment.status, Payment.Status.FAILED)
+        self.assertEqual(order.status, Order.Status.CANCELLED)
+        self.assertEqual(inventory.quantity_reserved, 0)
+
+    @override_settings(
+        PAYMENT_PROVIDER="paymongo",
+        PAYMONGO_SECRET_KEY="sk_test_unit",
+        PAYMONGO_WEBHOOK_SECRET="unit-paymongo-webhook-secret",
+        PAYMONGO_SUCCESS_REDIRECT_URL="https://store.example.test/order-confirmation/{order_number}",
+        PAYMONGO_CANCEL_REDIRECT_URL="https://store.example.test/checkout?paymentCancelled={payment_id}",
+        PAYMONGO_PAYMENT_METHOD_TYPES=["card", "gcash", "qrph"],
+    )
+    @patch("commerce.paymongo.urlopen")
+    def test_paymongo_processing_payment_is_not_cancelled_or_released(self, mock_urlopen):
+        self.add_line()
+        created = self.post("/api/checkout/create", {**self.checkout, "paymentMethod": "ewallet"})
+        self.assertEqual(created.status_code, 201, created.content)
+        order = Order.objects.get(pk=created.json()["order"]["id"])
+        payment = Payment.objects.get(pk=created.json()["payment"]["id"])
+        payment.provider_ref = "cs_processing_unit_test"
+        payment.save(update_fields=["provider_ref"])
+
+        active_response = {
+            "data": {
+                "id": payment.provider_ref,
+                "attributes": {"status": "active", "payments": [{"attributes": {"status": "processing"}}]},
+            }
+        }
+        http_response = MagicMock()
+        http_response.read.return_value = json.dumps(active_response).encode("utf-8")
+        mock_urlopen.side_effect = [
+            HTTPError("https://api.paymongo.com", 400, "Bad Request", None, BytesIO(b"{}")),
+            MagicMock(__enter__=MagicMock(return_value=http_response)),
+        ]
+
+        cancelled = self.post(
+            "/api/payments/paymongo/cancel",
+            {"paymentId": str(payment.id), "email": self.customer.email},
+        )
+        self.assertEqual(cancelled.status_code, 409, cancelled.content)
+
+        payment.refresh_from_db()
+        order.refresh_from_db()
+        inventory = Inventory.objects.get(variant=self.variant)
+        self.assertEqual(payment.status, Payment.Status.PENDING)
+        self.assertEqual(order.status, Order.Status.PENDING)
+        self.assertEqual(inventory.quantity_reserved, 1)
+
+    @override_settings(
+        PAYMENT_PROVIDER="paymongo",
+        PAYMONGO_SECRET_KEY="sk_test_unit",
+        PAYMONGO_WEBHOOK_SECRET="unit-paymongo-webhook-secret",
+        PAYMONGO_SUCCESS_REDIRECT_URL="https://store.example.test/order-confirmation/{order_number}",
+        PAYMONGO_CANCEL_REDIRECT_URL="https://store.example.test/checkout?paymentCancelled={payment_id}",
+        PAYMONGO_PAYMENT_METHOD_TYPES=["card", "gcash", "qrph"],
+    )
+    def test_legacy_xendit_checkout_route_refuses_a_paymongo_payment(self):
+        self.add_line()
+        created = self.post("/api/checkout/create", {**self.checkout, "paymentMethod": "ewallet"})
+        self.assertEqual(created.status_code, 201, created.content)
+        payment = Payment.objects.get(pk=created.json()["payment"]["id"])
+        self.assertEqual(payment.provider, Payment.Provider.PAYMONGO)
+
+        response = self.post(
+            "/api/payments/xendit/checkout",
+            {"paymentId": str(payment.id), "email": self.customer.email},
+        )
+        self.assertEqual(response.status_code, 400, response.content)
+        payment.refresh_from_db()
+        self.assertEqual(payment.provider, Payment.Provider.PAYMONGO)
+        self.assertEqual(payment.provider_ref, "")
+
+    @override_settings(PAYMENT_PROVIDER="paymongo")
+    def test_legacy_xendit_reference_is_not_routed_to_paymongo(self):
+        self.add_line()
+        created = self.post("/api/checkout/create", {**self.checkout, "paymentMethod": "cod"})
+        payment = Payment.objects.get(pk=created.json()["payment"]["id"])
+        payment.method = Payment.Method.EWALLET
+        payment.provider = ""
+        payment.provider_ref = "inv_legacy_xendit"
+        payment.save(update_fields=["method", "provider", "provider_ref"])
+
+        from commerce.payments import provider_for_payment
+
+        self.assertEqual(provider_for_payment(payment), Payment.Provider.XENDIT)
 
 
 class SeedDataSecurityTests(TestCase):

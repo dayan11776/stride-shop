@@ -24,6 +24,7 @@ from rest_framework.views import APIView
 from accounts.models import Address
 from catalog.models import Brand, Category, Inventory, Product, ProductVariant, Review, SizeChartEntry, StockNotification, WishlistItem
 from commerce.models import CartItem, Order, OrderItem, Payment, PromoCode, ReturnItem, ReturnRequest, ShippingMethod
+from commerce.paymongo import PayMongoError, expire_checkout_session
 from commerce.payments import HostedCheckoutError, active_provider, create_hosted_checkout, is_online_payment_configured
 from commerce.services import apply_promo, calculate_cart_totals, capture_payment, create_order_from_cart, ensure_cart_quantity, get_cart_for_request, release_order_reservations, set_order_status
 from commerce.xendit import XenditError, create_invoice, is_configured
@@ -511,20 +512,13 @@ class XenditCheckoutView(APIView):
             payment = get_object_or_404(payments.filter(order_id=order_id).exclude(method=Payment.Method.COD).order_by("-created_at"))
         else:
             raise ValidationError({"paymentId": "A payment or order ID is required."})
-        order = payment.order
-        if request.user.is_authenticated:
-            if not request.user.is_team_member and order.user_id != request.user.id:
-                raise PermissionDenied("You do not have access to this payment.")
-        elif not order.user_id:
-            supplied_email = str(request.data.get("email", "")).lower()
-            if not supplied_email or supplied_email != order.guest_email.lower():
-                raise PermissionDenied("Guest checkout requires the order email.")
-        else:
-            raise PermissionDenied("Sign in to continue to payment.")
+        ensure_payment_access(request, payment)
         if payment.method == Payment.Method.COD:
             raise ValidationError({"payment": "Cash on delivery does not use hosted checkout."})
         if payment.status != Payment.Status.PENDING:
             raise ValidationError({"payment": "This payment is no longer pending."})
+        if payment.provider not in {"", Payment.Provider.XENDIT}:
+            raise ValidationError({"payment": "This payment was created for another provider."})
         try:
             invoice = create_invoice(payment)
         except XenditError as exc:
@@ -555,16 +549,7 @@ class OnlineCheckoutView(APIView):
         else:
             raise ValidationError({"paymentId": "A payment or order ID is required."})
 
-        order = payment.order
-        if request.user.is_authenticated:
-            if not request.user.is_team_member and order.user_id != request.user.id:
-                raise PermissionDenied("You do not have access to this payment.")
-        elif not order.user_id:
-            supplied_email = str(request.data.get("email", "")).lower()
-            if not supplied_email or supplied_email != order.guest_email.lower():
-                raise PermissionDenied("Guest checkout requires the order email.")
-        else:
-            raise PermissionDenied("Sign in to continue to payment.")
+        ensure_payment_access(request, payment)
 
         if payment.method == Payment.Method.COD:
             raise ValidationError({"payment": "Cash on delivery does not use hosted checkout."})
@@ -584,6 +569,82 @@ class OnlineCheckoutView(APIView):
                 "expiresAt": checkout.get("expires_at"),
             }
         )
+
+
+def ensure_payment_access(request, payment: Payment) -> None:
+    """Authorize a payment for either its signed-in owner or guest email."""
+    order = payment.order
+    if request.user.is_authenticated:
+        if not request.user.is_team_member and order.user_id != request.user.id:
+            raise PermissionDenied("You do not have access to this payment.")
+    elif not order.user_id:
+        supplied_email = str(request.data.get("email", "")).strip().lower()
+        if not supplied_email or supplied_email != order.guest_email.lower():
+            raise PermissionDenied("Guest checkout requires the order email.")
+    else:
+        raise PermissionDenied("Sign in to continue to payment.")
+
+
+class PayMongoCancelView(APIView):
+    """Explicitly expire a PayMongo checkout before releasing its reservation."""
+
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        payment_id = request.data.get("paymentId") or request.data.get("payment_id")
+        if not payment_id:
+            raise ValidationError({"paymentId": "A payment ID is required."})
+        payment = get_object_or_404(Payment.objects.select_related("order__user"), pk=payment_id)
+        ensure_payment_access(request, payment)
+        if payment.provider != Payment.Provider.PAYMONGO:
+            raise ValidationError({"payment": "Only PayMongo checkouts can be cancelled here."})
+        if payment.status == Payment.Status.CAPTURED:
+            return Response(
+                {"message": "This payment has already completed and cannot be cancelled.", "paymentStatus": payment.status},
+                status=status.HTTP_409_CONFLICT,
+            )
+        if payment.status != Payment.Status.PENDING:
+            return Response(
+                {"message": "This payment can no longer be cancelled.", "paymentStatus": payment.status},
+                status=status.HTTP_409_CONFLICT,
+            )
+
+        try:
+            remote_state = expire_checkout_session(payment)
+        except PayMongoError as exc:
+            return Response({"message": str(exc)}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+
+        if remote_state == "paid":
+            try:
+                capture_payment(payment, provider_ref=payment.provider_ref)
+            except DjangoValidationError:
+                return Response(
+                    {"message": "The payment was completed but needs review before this order can be confirmed."},
+                    status=status.HTTP_202_ACCEPTED,
+                )
+            return Response(
+                {"message": "The payment was already completed; your order is being confirmed.", "paymentStatus": Payment.Status.CAPTURED},
+                status=status.HTTP_409_CONFLICT,
+            )
+        if remote_state != "expired":
+            return Response(
+                {"message": "Your payment is still active or processing. It was not cancelled, so your reservation remains active.", "paymentStatus": payment.status},
+                status=status.HTTP_409_CONFLICT,
+            )
+
+        with transaction.atomic():
+            locked_payment = Payment.objects.select_for_update().select_related("order").get(pk=payment.pk)
+            if locked_payment.status == Payment.Status.CAPTURED:
+                return Response(
+                    {"message": "This payment has already completed and cannot be cancelled.", "paymentStatus": locked_payment.status},
+                    status=status.HTTP_409_CONFLICT,
+                )
+            if locked_payment.status == Payment.Status.PENDING:
+                locked_payment.status = Payment.Status.FAILED
+                locked_payment.save(update_fields=["status"])
+                release_order_reservations(locked_payment.order, note="PayMongo checkout explicitly cancelled by shopper.")
+
+        return Response({"cancelled": True, "paymentStatus": Payment.Status.FAILED})
 
 
 @method_decorator(csrf_exempt, name="dispatch")

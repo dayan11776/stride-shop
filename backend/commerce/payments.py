@@ -37,6 +37,11 @@ def is_online_payment_configured() -> bool:
 def provider_for_payment(payment: Payment) -> str:
     if payment.provider in {Payment.Provider.PAYMONGO, Payment.Provider.XENDIT}:
         return payment.provider
+    # Provider tracking was introduced after Xendit invoices existed in the
+    # database.  A non-empty legacy reference is therefore an Xendit invoice,
+    # never a reason to create a PayMongo checkout for that order.
+    if payment.provider_ref:
+        return Payment.Provider.XENDIT
     return active_provider()
 
 

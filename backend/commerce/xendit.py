@@ -33,6 +33,8 @@ def create_invoice(payment: Payment) -> dict:
     """Create a Xendit hosted checkout invoice for a pending order payment."""
     if not is_configured():
         raise XenditError("Xendit is not configured. Set XENDIT_SECRET_KEY on the server.")
+    if payment.provider not in {"", Payment.Provider.XENDIT}:
+        raise XenditError("This payment was created for another provider and cannot be sent to Xendit.")
     order = payment.order
     payload = {
         "external_id": order.order_number,

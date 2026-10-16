@@ -47,6 +47,7 @@ urlpatterns = [
     path("checkout/quote", views.CheckoutQuoteView.as_view(), name="checkout-quote"),
     path("checkout/create", views.CheckoutCreateView.as_view(), name="checkout-create"),
     path("payments/checkout", views.OnlineCheckoutView.as_view(), name="online-checkout"),
+    path("payments/paymongo/cancel", views.PayMongoCancelView.as_view(), name="paymongo-cancel"),
     path("payments/xendit/checkout", views.XenditCheckoutView.as_view(), name="xendit-checkout"),
     path("webhooks/xendit", views.XenditWebhookView.as_view(), name="xendit-webhook"),
     path("webhooks/paymongo", views.PayMongoWebhookView.as_view(), name="paymongo-webhook"),
