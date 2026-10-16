@@ -5,7 +5,7 @@ export const USE_MOCK = String(import.meta.env.VITE_USE_MOCK).toLowerCase() === 
 
 export class ApiError extends Error {
   constructor(status, body) {
-    super(messageFromBody(body) ?? `Request failed (${status})`)
+    super(messageFromBody(body) ?? fallbackMessage(status))
     this.name = 'ApiError'
     this.status = status
     this.body = body
@@ -14,10 +14,20 @@ export class ApiError extends Error {
 
 function messageFromBody(body) {
   if (!body) return null
-  if (typeof body === 'string') return body
+  if (typeof body === 'string') {
+    // Django (and reverse proxies) may return an HTML error document for an
+    // unexpected server failure. Never render its markup as the checkout
+    // error message; the customer only needs a clear, safe next step.
+    return /<\/?(?:!doctype|html|head|body|title)\b/i.test(body) ? null : body
+  }
   if (body.message || body.detail || body.error) return body.message ?? body.detail ?? body.error
   const first = Object.values(body).flat().find(Boolean)
   return typeof first === 'string' ? first : null
+}
+
+function fallbackMessage(status) {
+  if (status >= 500) return 'The service is temporarily unavailable. Please try again shortly.'
+  return `Request failed (${status})`
 }
 
 function getCookie(name) {

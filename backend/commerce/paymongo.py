@@ -70,19 +70,19 @@ def _request_session(path: str, *, method: str, body: bytes | None = None, idemp
         headers["Content-Type"] = "application/json"
     if idempotency_key:
         headers["Idempotency-Key"] = idempotency_key
-    request = Request(
-        f"{settings.PAYMONGO_API_URL.rstrip('/')}{path}",
-        data=body,
-        headers=headers,
-        method=method,
-    )
     try:
+        request = Request(
+            f"{settings.PAYMONGO_API_URL.rstrip('/')}{path}",
+            data=body,
+            headers=headers,
+            method=method,
+        )
         with urlopen(request, timeout=20) as response:  # nosec B310 — configured HTTPS URL
             payload = json.loads(response.read().decode("utf-8"))
     except HTTPError as exc:
         logger.warning("PayMongo %s %s failed with HTTP %s.", method, path, exc.code)
         raise PayMongoHTTPError(exc.code, "PayMongo could not complete this payment request. Please try again shortly.") from exc
-    except URLError as exc:
+    except (URLError, OSError) as exc:
         logger.warning("PayMongo %s %s could not be reached.", method, path)
         raise PayMongoError("Could not reach PayMongo. Please try again shortly.") from exc
     except (TypeError, ValueError) as exc:
