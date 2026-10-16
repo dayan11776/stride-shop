@@ -6,11 +6,13 @@ import hashlib
 import hmac
 import time
 from io import BytesIO, StringIO
+from unittest import skipUnless
 from unittest.mock import MagicMock, patch
 from urllib.error import HTTPError
 
 from django.contrib.auth import get_user_model
 from django.core.management import call_command
+from django.db import connection
 from django.test import TestCase, override_settings
 
 from catalog.models import Inventory, Product
@@ -73,6 +75,17 @@ class CheckoutFlowTests(TestCase):
 
         self.assertEqual(response.status_code, 503, response.content)
         self.assertEqual(Order.objects.count(), before)
+
+    @patch("api.views.create_order_from_cart", side_effect=RuntimeError("unexpected database failure"))
+    def test_unexpected_checkout_failure_is_json_not_html(self, _mock_create_order):
+        self.add_line()
+
+        response = self.post("/api/checkout/create", {**self.checkout, "paymentMethod": "cod"})
+
+        self.assertEqual(response.status_code, 500, response.content)
+        self.assertEqual(response["Content-Type"].split(";")[0], "application/json")
+        self.assertEqual(response.json()["message"], "The service encountered an unexpected error. Please try again shortly.")
+        self.assertNotIn("unexpected database failure", response.content.decode("utf-8"))
 
     @override_settings(XENDIT_SECRET_KEY="unit-test-key", XENDIT_WEBHOOK_TOKEN="unit-test-callback")
     def test_failed_xendit_callback_releases_stock(self):
@@ -215,6 +228,54 @@ class CheckoutFlowTests(TestCase):
         )
         self.assertEqual(response.status_code, 503, response.content)
         self.assertNotIn("provider-internal-detail", response.content.decode("utf-8"))
+
+    @override_settings(
+        PAYMENT_PROVIDER="paymongo",
+        PAYMONGO_SECRET_KEY="sk_test_unit",
+        PAYMONGO_WEBHOOK_SECRET="unit-paymongo-webhook-secret",
+        PAYMONGO_SUCCESS_REDIRECT_URL="https://store.example.test/order-confirmation/{order_number}",
+        PAYMONGO_CANCEL_REDIRECT_URL="https://store.example.test/checkout?paymentCancelled={payment_id}",
+        PAYMONGO_PAYMENT_METHOD_TYPES=["card", "gcash", "qrph"],
+    )
+    @patch("commerce.paymongo.urlopen", side_effect=TimeoutError("provider read timed out"))
+    def test_paymongo_timeout_returns_a_safe_503(self, _mock_urlopen):
+        self.add_line()
+        created = self.post("/api/checkout/create", {**self.checkout, "paymentMethod": "ewallet"})
+        self.assertEqual(created.status_code, 201, created.content)
+        payment = Payment.objects.get(pk=created.json()["payment"]["id"])
+
+        response = self.post(
+            "/api/payments/checkout",
+            {"paymentId": str(payment.id), "email": self.customer.email},
+        )
+
+        self.assertEqual(response.status_code, 503, response.content)
+        self.assertNotIn("timed out", response.content.decode("utf-8"))
+        payment.refresh_from_db()
+        self.assertEqual(payment.status, Payment.Status.PENDING)
+        self.assertEqual(payment.provider_ref, "")
+
+    @override_settings(PAYMENT_PROVIDER="xendit", XENDIT_SECRET_KEY="unit-test-key")
+    @patch("commerce.xendit.urlopen")
+    def test_xendit_unreadable_provider_response_returns_a_safe_503(self, mock_urlopen):
+        self.add_line()
+        created = self.post("/api/checkout/create", {**self.checkout, "paymentMethod": "ewallet"})
+        self.assertEqual(created.status_code, 201, created.content)
+        payment = Payment.objects.get(pk=created.json()["payment"]["id"])
+        provider_response = MagicMock()
+        provider_response.read.return_value = b"<!doctype html><title>upstream failure</title>"
+        mock_urlopen.return_value.__enter__.return_value = provider_response
+
+        response = self.post(
+            "/api/payments/checkout",
+            {"paymentId": str(payment.id), "email": self.customer.email},
+        )
+
+        self.assertEqual(response.status_code, 503, response.content)
+        self.assertNotIn("<!doctype", response.content.decode("utf-8").lower())
+        payment.refresh_from_db()
+        self.assertEqual(payment.status, Payment.Status.PENDING)
+        self.assertEqual(payment.provider_ref, "")
 
     @override_settings(
         PAYMENT_PROVIDER="paymongo",
@@ -414,6 +475,14 @@ class FixedBugTests(TestCase):
             content_type="application/json",
         )
         self.assertEqual(patch.status_code, 400)
+
+    @skipUnless(connection.features.has_select_for_update, "requires a database that supports SELECT FOR UPDATE")
+    def test_checkout_with_postgres_row_locks_does_not_join_nullable_promo_code(self):
+        self.post("/api/cart/items", {"variantId": str(self.variant.id), "quantity": 1})
+
+        response = self.post("/api/checkout/create", self.checkout_body())
+
+        self.assertEqual(response.status_code, 201, response.content)
 
     def test_order_status_cannot_jump_or_leave_a_final_state(self):
         self.post("/api/cart/items", {"variantId": str(self.variant.id), "quantity": 1})

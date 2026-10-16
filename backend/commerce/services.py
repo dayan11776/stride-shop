@@ -123,13 +123,19 @@ def create_order_from_cart(
     locked_items = list(
         CartItem.objects.select_for_update()
         .filter(cart=cart)
-        .select_related("variant__product", "cart__promo_code")
+        # ``promo_code`` is nullable. PostgreSQL refuses to lock the nullable
+        # side of the LEFT OUTER JOIN that select_related would create here.
+        # It is not needed for reserving the line items, so keep this locked
+        # query to non-null joins only.
+        .select_related("variant__product")
     )
     if not locked_items:
         raise ValidationError({"cart": "Your cart is empty."})
 
     # Re-read promo under the same transaction and calculate server-side prices.
-    cart = Cart.objects.select_for_update().select_related("promo_code").get(pk=cart.pk)
+    # Lock the cart itself without joining its optional promo relation. The
+    # promo is safely read lazily below after the cart row is locked.
+    cart = Cart.objects.select_for_update().get(pk=cart.pk)
     totals = calculate_cart_totals(cart, shipping_method)
     email = checkout["email"].lower()
     checkout_user = user if getattr(user, "is_authenticated", False) else None
