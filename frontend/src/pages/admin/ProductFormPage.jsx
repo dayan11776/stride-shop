@@ -7,11 +7,11 @@ import './productManagement.css'
 let localKeySequence = 0
 const newLocalKey = (kind) => `${kind}-${++localKeySequence}`
 const newVariant = () => ({ _clientKey: newLocalKey('variant'), sku: '', color_name: '', color_hex: '', size_eu: '', size_us: '', width: 'regular', price: '', sale_price: '', sale_starts_at: null, sale_ends_at: null, is_active: true, quantity_on_hand: '0', quantity_reserved: 0, low_stock_threshold: 5 })
-const newProduct = () => ({ name: '', slug: '', brand: '', category: '', audience: 'unisex', description: '', status: 'draft', images: [], variants: [newVariant()] })
+const newProduct = () => ({ name: '', slug: '', brand: '', category: '', audience: 'unisex', description: '', status: 'draft', is_example_stock: false, images: [], variants: [newVariant()] })
 const slugify = (value) => value.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
 
 function normalizeProduct(product) {
-  return { ...product, brand: product.brand?.id || product.brand || '', category: product.category?.id || product.category || '', images: product.images || [], variants: (product.variants || []).map((variant) => ({ ...newVariant(), ...variant, quantity_on_hand: String(variant.quantity_on_hand ?? 0), sale_price: variant.sale_price ?? '', size_us: variant.size_us ?? '' })) }
+  return { ...product, is_example_stock: product.is_example_stock === true, brand: product.brand?.id || product.brand || '', category: product.category?.id || product.category || '', images: product.images || [], variants: (product.variants || []).map((variant) => ({ ...newVariant(), ...variant, quantity_on_hand: String(variant.quantity_on_hand ?? 0), sale_price: variant.sale_price ?? '', size_us: variant.size_us ?? '' })) }
 }
 
 function readableErrors(error) {
@@ -151,8 +151,8 @@ export function Component() {
     setErrors([])
     setSaving(true)
     try {
-      const values = { name: form.name.trim(), slug: form.slug.trim(), brand: form.brand, category: form.category, audience: form.audience, description: form.description || '', status: form.status }
-      const body = editing ? Object.fromEntries(Object.entries(values).filter(([key, value]) => value !== (initialProduct[key] || ''))) : values
+      const values = { name: form.name.trim(), slug: form.slug.trim(), brand: form.brand, category: form.category, audience: form.audience, description: form.description || '', status: form.status, is_example_stock: form.is_example_stock }
+      const body = editing ? Object.fromEntries(Object.entries(values).filter(([key, value]) => value !== (initialProduct[key] ?? ''))) : values
       const images = form.images.map(imagePayload)
       const variants = form.variants.map(variantPayload)
       const initialImages = initialProduct?.images.map(imagePayload) || []
@@ -211,6 +211,8 @@ export function Component() {
           </div></section>
           <section className="surface product-admin__card"><div className="product-admin__card-head"><h2>Variants &amp; inventory</h2><button className="product-admin__action" type="button" onClick={() => update('variants', [...form.variants, newVariant()])}>+ Add variant</button></div>
             <p className="product-admin__hint">Each colour and size has its own SKU, price, and on-hand stock. Reserved stock is already held for orders.</p>
+            <label className="mt-4 flex items-start gap-2 text-sm font-semibold"><input type="checkbox" checked={form.is_example_stock} onChange={(event) => update('is_example_stock', event.target.checked)} /> Stock quantities are examples (not verified)</label>
+            <p className="product-admin__hint">Customers will see an example-stock warning. Uncheck only after verifying the available sizes and stock for every variant.</p>
             <div className="mt-4">{form.variants.map((variant, index) => <div className="product-admin__variant" key={variant.id ? `existing:${variant.id}` : variant._clientKey}>
               <div className="product-admin__variant-head"><strong>Variant {index + 1}{variant.is_active === false ? ' · Inactive' : ''}</strong><button className="product-admin__action" type="button" onClick={() => removeVariant(index)} aria-label={`Remove variant ${index + 1}`}>Remove</button></div>
               <div className="product-admin__variant-grid">

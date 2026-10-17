@@ -1,0 +1,1262 @@
+[
+  {
+    "name": "Adizero EVO SL Laceless LIGHTSTRIKEPRO Running Shoes",
+    "slug": "example-adidas-men-hq9534",
+    "brand": {
+      "name": "adidas",
+      "slug": "adidas"
+    },
+    "audience": "men",
+    "is_example_stock": true,
+    "description": "Reference product based on adidas Philippines. Listed price reflects an adidas reference price observed on 17 October 2026 and is not verified as STRIDE's actual selling price. Sizes and stock quantities are examples, not verified availability. Manufacturer reference: https://www.adidas.com.ph/adizero-evo-sl-laceless-lightstrikepro-running-shoes/HQ9534.html",
+    "fit_note": "The sizes shown are illustrative; confirm the actual sizes before purchase.",
+    "images": [
+      {
+        "url": "https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/70f198b292f8433791442853f0a62c56_9366/Adizero_EVO_SL_Laceless_LIGHTSTRIKEPRO_Running_Shoes_Beige_HQ9534_01_00_standard.jpg",
+        "alt_text": "Adizero EVO SL Laceless LIGHTSTRIKEPRO Running Shoes, Beige",
+        "is_primary": true
+      }
+    ],
+    "variants": [
+      {
+        "sku": "EXAMPLE-ADIDAS-MEN-HQ9534-40",
+        "color_name": "Beige",
+        "size_eu": "40.0",
+        "price": "9500.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-MEN-HQ9534-42",
+        "color_name": "Beige",
+        "size_eu": "42.0",
+        "price": "9500.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-MEN-HQ9534-44",
+        "color_name": "Beige",
+        "size_eu": "44.0",
+        "price": "9500.00",
+        "quantity_on_hand": 8
+      }
+    ]
+  },
+  {
+    "name": "Adizero Adios 9 Running Shoes",
+    "slug": "example-adidas-men-kh9103",
+    "brand": {
+      "name": "adidas",
+      "slug": "adidas"
+    },
+    "audience": "men",
+    "is_example_stock": true,
+    "description": "Reference product based on adidas Philippines. Listed price reflects an adidas reference price observed on 17 October 2026 and is not verified as STRIDE's actual selling price. Sizes and stock quantities are examples, not verified availability. Manufacturer reference: https://www.adidas.com.ph/adizero-adios-9-running-shoes/KH9103.html",
+    "fit_note": "The sizes shown are illustrative; confirm the actual sizes before purchase.",
+    "images": [
+      {
+        "url": "https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/e8d6ed3a62e14fb786639f8e1941123a_9366/Adizero_Adios_9_Running_Shoes_Blue_KH9103_01_00_standard.jpg",
+        "alt_text": "Adizero Adios 9 Running Shoes, Blue",
+        "is_primary": true
+      }
+    ],
+    "variants": [
+      {
+        "sku": "EXAMPLE-ADIDAS-MEN-KH9103-40",
+        "color_name": "Blue",
+        "size_eu": "40.0",
+        "price": "7500.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-MEN-KH9103-42",
+        "color_name": "Blue",
+        "size_eu": "42.0",
+        "price": "7500.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-MEN-KH9103-44",
+        "color_name": "Blue",
+        "size_eu": "44.0",
+        "price": "7500.00",
+        "quantity_on_hand": 8
+      }
+    ]
+  },
+  {
+    "name": "Adizero Adios Pro 5 Running Shoes",
+    "slug": "example-adidas-men-ki8294",
+    "brand": {
+      "name": "adidas",
+      "slug": "adidas"
+    },
+    "audience": "men",
+    "is_example_stock": true,
+    "description": "Reference product based on adidas Philippines. Listed price reflects an adidas reference price observed on 17 October 2026 and is not verified as STRIDE's actual selling price. Sizes and stock quantities are examples, not verified availability. Manufacturer reference: https://www.adidas.com.ph/adizero-adios-pro-5-running-shoes/KI8294.html",
+    "fit_note": "The sizes shown are illustrative; confirm the actual sizes before purchase.",
+    "images": [
+      {
+        "url": "https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/bb2d705904ad4e20a6211a2c2c19cdb7_9366/ADIZERO_ADIOS_PRO_5_Running_Shoes_Pink_KI8294_01_00_standard.jpg",
+        "alt_text": "Adizero Adios Pro 5 Running Shoes, Pink",
+        "is_primary": true
+      }
+    ],
+    "variants": [
+      {
+        "sku": "EXAMPLE-ADIDAS-MEN-KI8294-40",
+        "color_name": "Pink",
+        "size_eu": "40.0",
+        "price": "15000.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-MEN-KI8294-42",
+        "color_name": "Pink",
+        "size_eu": "42.0",
+        "price": "15000.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-MEN-KI8294-44",
+        "color_name": "Pink",
+        "size_eu": "44.0",
+        "price": "15000.00",
+        "quantity_on_hand": 8
+      }
+    ]
+  },
+  {
+    "name": "Adizero EVO SL EXO Shoes",
+    "slug": "example-adidas-men-kj0427",
+    "brand": {
+      "name": "adidas",
+      "slug": "adidas"
+    },
+    "audience": "men",
+    "is_example_stock": true,
+    "description": "Reference product based on adidas Philippines. Listed price reflects an adidas reference price observed on 17 October 2026 and is not verified as STRIDE's actual selling price. Sizes and stock quantities are examples, not verified availability. Manufacturer reference: https://www.adidas.com.ph/adizero-evo-sl-exo-shoes/KJ0427.html",
+    "fit_note": "The sizes shown are illustrative; confirm the actual sizes before purchase.",
+    "images": [
+      {
+        "url": "https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/7450f0eb67304e26b9e9fa896ecc22aa_9366/ADIZERO_EVO_SL_EXO_Shoes_Grey_KJ0427_01_00_standard.jpg",
+        "alt_text": "Adizero EVO SL EXO Shoes, Grey",
+        "is_primary": true
+      }
+    ],
+    "variants": [
+      {
+        "sku": "EXAMPLE-ADIDAS-MEN-KJ0427-40",
+        "color_name": "Grey",
+        "size_eu": "40.0",
+        "price": "9000.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-MEN-KJ0427-42",
+        "color_name": "Grey",
+        "size_eu": "42.0",
+        "price": "9000.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-MEN-KJ0427-44",
+        "color_name": "Grey",
+        "size_eu": "44.0",
+        "price": "9000.00",
+        "quantity_on_hand": 8
+      }
+    ]
+  },
+  {
+    "name": "Hyperboost Edge Running Shoes",
+    "slug": "example-adidas-men-kj0817",
+    "brand": {
+      "name": "adidas",
+      "slug": "adidas"
+    },
+    "audience": "men",
+    "is_example_stock": true,
+    "description": "Reference product based on adidas Philippines. Listed price reflects an adidas reference price observed on 17 October 2026 and is not verified as STRIDE's actual selling price. Sizes and stock quantities are examples, not verified availability. Manufacturer reference: https://www.adidas.com.ph/hyperboost-edge-running-shoes/KJ0817.html",
+    "fit_note": "The sizes shown are illustrative; confirm the actual sizes before purchase.",
+    "images": [
+      {
+        "url": "https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/33077e7ea1e74eb1a387b36208d65af4_9366/HYPERBOOST_EDGE_Running_Shoes_Grey_KJ0817_HM1.jpg",
+        "alt_text": "Hyperboost Edge Running Shoes, Grey",
+        "is_primary": true
+      }
+    ],
+    "variants": [
+      {
+        "sku": "EXAMPLE-ADIDAS-MEN-KJ0817-40",
+        "color_name": "Grey",
+        "size_eu": "40.0",
+        "price": "11000.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-MEN-KJ0817-42",
+        "color_name": "Grey",
+        "size_eu": "42.0",
+        "price": "11000.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-MEN-KJ0817-44",
+        "color_name": "Grey",
+        "size_eu": "44.0",
+        "price": "11000.00",
+        "quantity_on_hand": 8
+      }
+    ]
+  },
+  {
+    "name": "Duramo SL 2 Running Shoes",
+    "slug": "example-adidas-men-ki3159",
+    "brand": {
+      "name": "adidas",
+      "slug": "adidas"
+    },
+    "audience": "men",
+    "is_example_stock": true,
+    "description": "Reference product based on adidas Philippines. Listed price reflects an adidas reference price observed on 17 October 2026 and is not verified as STRIDE's actual selling price. Sizes and stock quantities are examples, not verified availability. Manufacturer reference: https://www.adidas.com.ph/duramo-sl-2-running-shoes/KI3159.html",
+    "fit_note": "The sizes shown are illustrative; confirm the actual sizes before purchase.",
+    "images": [
+      {
+        "url": "https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/2834f473b6b34153846ce2a6cf6c2f7d_9366/Duramo_SL_2_Running_Shoes_Beige_KI3159_01_00_standard.jpg",
+        "alt_text": "Duramo SL 2 Running Shoes, Beige",
+        "is_primary": true
+      }
+    ],
+    "variants": [
+      {
+        "sku": "EXAMPLE-ADIDAS-MEN-KI3159-40",
+        "color_name": "Beige",
+        "size_eu": "40.0",
+        "price": "3900.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-MEN-KI3159-42",
+        "color_name": "Beige",
+        "size_eu": "42.0",
+        "price": "3900.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-MEN-KI3159-44",
+        "color_name": "Beige",
+        "size_eu": "44.0",
+        "price": "3900.00",
+        "quantity_on_hand": 8
+      }
+    ]
+  },
+  {
+    "name": "Supernova Glide Running Shoes",
+    "slug": "example-adidas-men-kj1877",
+    "brand": {
+      "name": "adidas",
+      "slug": "adidas"
+    },
+    "audience": "men",
+    "is_example_stock": true,
+    "description": "Reference product based on adidas Philippines. Listed price reflects an adidas reference price observed on 17 October 2026 and is not verified as STRIDE's actual selling price. Sizes and stock quantities are examples, not verified availability. Manufacturer reference: https://www.adidas.com.ph/supernova-glide-running-shoes/KJ1877.html",
+    "fit_note": "The sizes shown are illustrative; confirm the actual sizes before purchase.",
+    "images": [
+      {
+        "url": "https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/22ec0064070548db82b6a73ce2894993_9366/SUPERNOVA_GLIDE_RUNNING_SHOES_Blue_KJ1877_HM1.jpg",
+        "alt_text": "Supernova Glide Running Shoes, Blue",
+        "is_primary": true
+      }
+    ],
+    "variants": [
+      {
+        "sku": "EXAMPLE-ADIDAS-MEN-KJ1877-40",
+        "color_name": "Blue",
+        "size_eu": "40.0",
+        "price": "6500.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-MEN-KJ1877-42",
+        "color_name": "Blue",
+        "size_eu": "42.0",
+        "price": "6500.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-MEN-KJ1877-44",
+        "color_name": "Blue",
+        "size_eu": "44.0",
+        "price": "6500.00",
+        "quantity_on_hand": 8
+      }
+    ]
+  },
+  {
+    "name": "Terrex Agravic 4 Trail Running Shoes",
+    "slug": "example-adidas-men-kj3786",
+    "brand": {
+      "name": "adidas",
+      "slug": "adidas"
+    },
+    "audience": "men",
+    "is_example_stock": true,
+    "description": "Reference product based on adidas Philippines. Listed price reflects an adidas reference price observed on 17 October 2026 and is not verified as STRIDE's actual selling price. Sizes and stock quantities are examples, not verified availability. Manufacturer reference: https://www.adidas.com.ph/terrex-agravic-4-trail-running-shoes/KJ3786.html",
+    "fit_note": "The sizes shown are illustrative; confirm the actual sizes before purchase.",
+    "images": [
+      {
+        "url": "https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/7a52fec334874b88b6354a4cb8baaed6_9366/Terrex_Agravic_4_Trail_Running_Shoes_Grey_KJ3786_01_00_standard.jpg",
+        "alt_text": "Terrex Agravic 4 Trail Running Shoes, Grey",
+        "is_primary": true
+      }
+    ],
+    "variants": [
+      {
+        "sku": "EXAMPLE-ADIDAS-MEN-KJ3786-40",
+        "color_name": "Grey",
+        "size_eu": "40.0",
+        "price": "7000.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-MEN-KJ3786-42",
+        "color_name": "Grey",
+        "size_eu": "42.0",
+        "price": "7000.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-MEN-KJ3786-44",
+        "color_name": "Grey",
+        "size_eu": "44.0",
+        "price": "7000.00",
+        "quantity_on_hand": 8
+      }
+    ]
+  },
+  {
+    "name": "Galaxy 8 Running Shoes",
+    "slug": "example-adidas-men-ki7977",
+    "brand": {
+      "name": "adidas",
+      "slug": "adidas"
+    },
+    "audience": "men",
+    "is_example_stock": true,
+    "description": "Reference product based on adidas Philippines. Listed price reflects an adidas reference price observed on 17 October 2026 and is not verified as STRIDE's actual selling price. Sizes and stock quantities are examples, not verified availability. Manufacturer reference: https://www.adidas.com.ph/galaxy-8-running-shoes/KI7977.html",
+    "fit_note": "The sizes shown are illustrative; confirm the actual sizes before purchase.",
+    "images": [
+      {
+        "url": "https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/56a1beb6b9614eb8bc244d5d6e65edf2_9366/GALAXY_8_RUNNING_SHOES_Blue_KI7977_HM1.jpg",
+        "alt_text": "Galaxy 8 Running Shoes, Blue",
+        "is_primary": true
+      }
+    ],
+    "variants": [
+      {
+        "sku": "EXAMPLE-ADIDAS-MEN-KI7977-40",
+        "color_name": "Blue",
+        "size_eu": "40.0",
+        "price": "3300.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-MEN-KI7977-42",
+        "color_name": "Blue",
+        "size_eu": "42.0",
+        "price": "3300.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-MEN-KI7977-44",
+        "color_name": "Blue",
+        "size_eu": "44.0",
+        "price": "3300.00",
+        "quantity_on_hand": 8
+      }
+    ]
+  },
+  {
+    "name": "Adizero Boston 13 Running Shoes",
+    "slug": "example-adidas-men-ki4776",
+    "brand": {
+      "name": "adidas",
+      "slug": "adidas"
+    },
+    "audience": "men",
+    "is_example_stock": true,
+    "description": "Reference product based on adidas Philippines. Listed price reflects an adidas reference price observed on 17 October 2026 and is not verified as STRIDE's actual selling price. Sizes and stock quantities are examples, not verified availability. Manufacturer reference: https://www.adidas.com.ph/adizero-boston-13-running-shoes/KI4776.html",
+    "fit_note": "The sizes shown are illustrative; confirm the actual sizes before purchase.",
+    "images": [
+      {
+        "url": "https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/753efeb5c9a14ff6b27a553c275c39fe_9366/Adizero_Boston_13_Running_Shoes_Blue_KI4776_HM1.jpg",
+        "alt_text": "Adizero Boston 13 Running Shoes, Blue",
+        "is_primary": true
+      }
+    ],
+    "variants": [
+      {
+        "sku": "EXAMPLE-ADIDAS-MEN-KI4776-40",
+        "color_name": "Blue",
+        "size_eu": "40.0",
+        "price": "8500.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-MEN-KI4776-42",
+        "color_name": "Blue",
+        "size_eu": "42.0",
+        "price": "8500.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-MEN-KI4776-44",
+        "color_name": "Blue",
+        "size_eu": "44.0",
+        "price": "8500.00",
+        "quantity_on_hand": 8
+      }
+    ]
+  },
+  {
+    "name": "Galaxy 7 Running Shoes",
+    "slug": "example-adidas-women-jq3324",
+    "brand": {
+      "name": "adidas",
+      "slug": "adidas"
+    },
+    "audience": "women",
+    "is_example_stock": true,
+    "description": "Reference product based on adidas Philippines. Listed price reflects an adidas reference price observed on 17 October 2026 and is not verified as STRIDE's actual selling price. Sizes and stock quantities are examples, not verified availability. Manufacturer reference: https://www.adidas.com.ph/galaxy-7-running-shoes/JQ3324.html",
+    "fit_note": "The sizes shown are illustrative; confirm the actual sizes before purchase.",
+    "images": [
+      {
+        "url": "https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/969e72a69f1c418b863e39f6e2fe1e32_9366/Galaxy_7_Running_Shoes_Purple_JQ3324_HM1.jpg",
+        "alt_text": "Galaxy 7 Running Shoes, Purple",
+        "is_primary": true
+      }
+    ],
+    "variants": [
+      {
+        "sku": "EXAMPLE-ADIDAS-WOMEN-JQ3324-36",
+        "color_name": "Purple",
+        "size_eu": "36.0",
+        "price": "3300.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-WOMEN-JQ3324-38",
+        "color_name": "Purple",
+        "size_eu": "38.0",
+        "price": "3300.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-WOMEN-JQ3324-40",
+        "color_name": "Purple",
+        "size_eu": "40.0",
+        "price": "3300.00",
+        "quantity_on_hand": 8
+      }
+    ]
+  },
+  {
+    "name": "Galaxy 6 Shoes",
+    "slug": "example-adidas-women-ie8150",
+    "brand": {
+      "name": "adidas",
+      "slug": "adidas"
+    },
+    "audience": "women",
+    "is_example_stock": true,
+    "description": "Reference product based on adidas Philippines. Listed price reflects an adidas reference price observed on 17 October 2026 and is not verified as STRIDE's actual selling price. Sizes and stock quantities are examples, not verified availability. Manufacturer reference: https://www.adidas.com.ph/galaxy-6-shoes/IE8150.html",
+    "fit_note": "The sizes shown are illustrative; confirm the actual sizes before purchase.",
+    "images": [
+      {
+        "url": "https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/6a46525aaaad4e34828337dc2895a263_9366/Galaxy_6_Shoes_White_IE8150_01_standard.jpg",
+        "alt_text": "Galaxy 6 Shoes, White",
+        "is_primary": true
+      }
+    ],
+    "variants": [
+      {
+        "sku": "EXAMPLE-ADIDAS-WOMEN-IE8150-36",
+        "color_name": "White",
+        "size_eu": "36.0",
+        "price": "3500.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-WOMEN-IE8150-38",
+        "color_name": "White",
+        "size_eu": "38.0",
+        "price": "3500.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-WOMEN-IE8150-40",
+        "color_name": "White",
+        "size_eu": "40.0",
+        "price": "3500.00",
+        "quantity_on_hand": 8
+      }
+    ]
+  },
+  {
+    "name": "Adizero EVO SL ZIP NAKED CPH W Shoes",
+    "slug": "example-adidas-women-lc1125",
+    "brand": {
+      "name": "adidas",
+      "slug": "adidas"
+    },
+    "audience": "women",
+    "is_example_stock": true,
+    "description": "Reference product based on adidas Philippines. Listed price reflects an adidas reference price observed on 17 October 2026 and is not verified as STRIDE's actual selling price. Sizes and stock quantities are examples, not verified availability. Manufacturer reference: https://www.adidas.com.ph/adizero-evo-sl-zip-naked-cph-w-shoes/LC1125.html",
+    "fit_note": "The sizes shown are illustrative; confirm the actual sizes before purchase.",
+    "images": [
+      {
+        "url": "https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/46ada444a6e944aa944b2c23eb4b1d6f_9366/Adizero_EVO_SL_ZIP_NAKED_CPH_W_Shoes_Pink_LC1125_01_00_standard.jpg",
+        "alt_text": "Adizero EVO SL ZIP NAKED CPH W Shoes, Pink",
+        "is_primary": true
+      }
+    ],
+    "variants": [
+      {
+        "sku": "EXAMPLE-ADIDAS-WOMEN-LC1125-36",
+        "color_name": "Pink",
+        "size_eu": "36.0",
+        "price": "8000.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-WOMEN-LC1125-38",
+        "color_name": "Pink",
+        "size_eu": "38.0",
+        "price": "8000.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-WOMEN-LC1125-40",
+        "color_name": "Pink",
+        "size_eu": "40.0",
+        "price": "8000.00",
+        "quantity_on_hand": 8
+      }
+    ]
+  },
+  {
+    "name": "Adizero EVO SL Hermanos Koumori Shoes",
+    "slug": "example-adidas-women-kk2052",
+    "brand": {
+      "name": "adidas",
+      "slug": "adidas"
+    },
+    "audience": "women",
+    "is_example_stock": true,
+    "description": "Reference product based on adidas Philippines. Listed price reflects an adidas reference price observed on 17 October 2026 and is not verified as STRIDE's actual selling price. Sizes and stock quantities are examples, not verified availability. Manufacturer reference: https://www.adidas.com.ph/adizero-evo-sl-hermanos-koumori-shoes/KK2052.html",
+    "fit_note": "The sizes shown are illustrative; confirm the actual sizes before purchase.",
+    "images": [
+      {
+        "url": "https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/3e4185e27533462fb38ddd2be4386258_9366/Adizero_EVO_SL_Hermanos_Koumori_Shoes_Brown_KK2052_01_00_standard.jpg",
+        "alt_text": "Adizero EVO SL Hermanos Koumori Shoes, Brown",
+        "is_primary": true
+      }
+    ],
+    "variants": [
+      {
+        "sku": "EXAMPLE-ADIDAS-WOMEN-KK2052-36",
+        "color_name": "Brown",
+        "size_eu": "36.0",
+        "price": "8900.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-WOMEN-KK2052-38",
+        "color_name": "Brown",
+        "size_eu": "38.0",
+        "price": "8900.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-WOMEN-KK2052-40",
+        "color_name": "Brown",
+        "size_eu": "40.0",
+        "price": "8900.00",
+        "quantity_on_hand": 8
+      }
+    ]
+  },
+  {
+    "name": "Adizero EVO SL ZIP Shoes",
+    "slug": "example-adidas-women-ki4797",
+    "brand": {
+      "name": "adidas",
+      "slug": "adidas"
+    },
+    "audience": "women",
+    "is_example_stock": true,
+    "description": "Reference product based on adidas Philippines. Listed price reflects an adidas reference price observed on 17 October 2026 and is not verified as STRIDE's actual selling price. Sizes and stock quantities are examples, not verified availability. Manufacturer reference: https://www.adidas.com.ph/adizero-evo-sl-zip-shoes/KI4797.html",
+    "fit_note": "The sizes shown are illustrative; confirm the actual sizes before purchase.",
+    "images": [
+      {
+        "url": "https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/9fa4cd0dfa4b47769e8fc26be9d8fd30_9366/Adizero_EVO_SL_ZIP_Shoes_Black_KI4797_01_00_standard.jpg",
+        "alt_text": "Adizero EVO SL ZIP Shoes, Black",
+        "is_primary": true
+      }
+    ],
+    "variants": [
+      {
+        "sku": "EXAMPLE-ADIDAS-WOMEN-KI4797-36",
+        "color_name": "Black",
+        "size_eu": "36.0",
+        "price": "9500.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-WOMEN-KI4797-38",
+        "color_name": "Black",
+        "size_eu": "38.0",
+        "price": "9500.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-WOMEN-KI4797-40",
+        "color_name": "Black",
+        "size_eu": "40.0",
+        "price": "9500.00",
+        "quantity_on_hand": 8
+      }
+    ]
+  },
+  {
+    "name": "Runfalcon 5 TR Running Shoes",
+    "slug": "example-adidas-women-jq6965",
+    "brand": {
+      "name": "adidas",
+      "slug": "adidas"
+    },
+    "audience": "women",
+    "is_example_stock": true,
+    "description": "Reference product based on adidas Philippines. Listed price reflects an adidas reference price observed on 17 October 2026 and is not verified as STRIDE's actual selling price. Sizes and stock quantities are examples, not verified availability. Manufacturer reference: https://www.adidas.com.ph/runfalcon-5-tr-running-shoes/JQ6965.html",
+    "fit_note": "The sizes shown are illustrative; confirm the actual sizes before purchase.",
+    "images": [
+      {
+        "url": "https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/93bb5ccee6ee4c68a9246bfedf464092_9366/Runfalcon_5_TR_Running_Shoes_Grey_JQ6965_HM1.jpg",
+        "alt_text": "Runfalcon 5 TR Running Shoes, Grey",
+        "is_primary": true
+      }
+    ],
+    "variants": [
+      {
+        "sku": "EXAMPLE-ADIDAS-WOMEN-JQ6965-36",
+        "color_name": "Grey",
+        "size_eu": "36.0",
+        "price": "3800.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-WOMEN-JQ6965-38",
+        "color_name": "Grey",
+        "size_eu": "38.0",
+        "price": "3800.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-WOMEN-JQ6965-40",
+        "color_name": "Grey",
+        "size_eu": "40.0",
+        "price": "3800.00",
+        "quantity_on_hand": 8
+      }
+    ]
+  },
+  {
+    "name": "Adizero Adios Pro 4 Shoes",
+    "slug": "example-adidas-women-jq1690",
+    "brand": {
+      "name": "adidas",
+      "slug": "adidas"
+    },
+    "audience": "women",
+    "is_example_stock": true,
+    "description": "Reference product based on adidas Philippines. Listed price reflects an adidas reference price observed on 17 October 2026 and is not verified as STRIDE's actual selling price. Sizes and stock quantities are examples, not verified availability. Manufacturer reference: https://www.adidas.com.ph/adizero-adios-pro-4-shoes/JQ1690.html",
+    "fit_note": "The sizes shown are illustrative; confirm the actual sizes before purchase.",
+    "images": [
+      {
+        "url": "https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/0c2ed18f424446adb1be99f69198f330_9366/Adizero_Adios_Pro_4_Shoes_Yellow_JQ1690_HM1.jpg",
+        "alt_text": "Adizero Adios Pro 4 Shoes, Yellow",
+        "is_primary": true
+      }
+    ],
+    "variants": [
+      {
+        "sku": "EXAMPLE-ADIDAS-WOMEN-JQ1690-36",
+        "color_name": "Yellow",
+        "size_eu": "36.0",
+        "price": "13000.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-WOMEN-JQ1690-38",
+        "color_name": "Yellow",
+        "size_eu": "38.0",
+        "price": "13000.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-WOMEN-JQ1690-40",
+        "color_name": "Yellow",
+        "size_eu": "40.0",
+        "price": "13000.00",
+        "quantity_on_hand": 8
+      }
+    ]
+  },
+  {
+    "name": "Adizero Pacer Shoes",
+    "slug": "example-adidas-women-kz8976",
+    "brand": {
+      "name": "adidas",
+      "slug": "adidas"
+    },
+    "audience": "women",
+    "is_example_stock": true,
+    "description": "Reference product based on adidas Philippines. Listed price reflects an adidas reference price observed on 17 October 2026 and is not verified as STRIDE's actual selling price. Sizes and stock quantities are examples, not verified availability. Manufacturer reference: https://www.adidas.com.ph/adizero-pacer-shoes/KZ8976.html",
+    "fit_note": "The sizes shown are illustrative; confirm the actual sizes before purchase.",
+    "images": [
+      {
+        "url": "https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/a6f8f4d3ccb0439c9739a5c42a72da7c_9366/Adizero_Pacer_Shoes_Blue_KZ8976_01_00_standard.jpg",
+        "alt_text": "Adizero Pacer Shoes, Blue",
+        "is_primary": true
+      }
+    ],
+    "variants": [
+      {
+        "sku": "EXAMPLE-ADIDAS-WOMEN-KZ8976-36",
+        "color_name": "Blue",
+        "size_eu": "36.0",
+        "price": "4900.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-WOMEN-KZ8976-38",
+        "color_name": "Blue",
+        "size_eu": "38.0",
+        "price": "4900.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-WOMEN-KZ8976-40",
+        "color_name": "Blue",
+        "size_eu": "40.0",
+        "price": "4900.00",
+        "quantity_on_hand": 8
+      }
+    ]
+  },
+  {
+    "name": "ZENBOOST Shoes",
+    "slug": "example-adidas-women-ih9500",
+    "brand": {
+      "name": "adidas",
+      "slug": "adidas"
+    },
+    "audience": "women",
+    "is_example_stock": true,
+    "description": "Reference product based on adidas Philippines. Listed price reflects an adidas reference price observed on 17 October 2026 and is not verified as STRIDE's actual selling price. Sizes and stock quantities are examples, not verified availability. Manufacturer reference: https://www.adidas.com.ph/zenboost-shoes/IH9500.html",
+    "fit_note": "The sizes shown are illustrative; confirm the actual sizes before purchase.",
+    "images": [
+      {
+        "url": "https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/4b7aaa9a7e8a463fad6e90389c498ce0_9366/ZENBOOST_Shoes_White_IH9500_01_00_standard.jpg",
+        "alt_text": "ZENBOOST Shoes, White",
+        "is_primary": true
+      }
+    ],
+    "variants": [
+      {
+        "sku": "EXAMPLE-ADIDAS-WOMEN-IH9500-36",
+        "color_name": "White",
+        "size_eu": "36.0",
+        "price": "5500.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-WOMEN-IH9500-38",
+        "color_name": "White",
+        "size_eu": "38.0",
+        "price": "5500.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-WOMEN-IH9500-40",
+        "color_name": "White",
+        "size_eu": "40.0",
+        "price": "5500.00",
+        "quantity_on_hand": 8
+      }
+    ]
+  },
+  {
+    "name": "Duramo Speed 2 Running Shoes",
+    "slug": "example-adidas-women-jq0619",
+    "brand": {
+      "name": "adidas",
+      "slug": "adidas"
+    },
+    "audience": "women",
+    "is_example_stock": true,
+    "description": "Reference product based on adidas Philippines. Listed price reflects an adidas reference price observed on 17 October 2026 and is not verified as STRIDE's actual selling price. Sizes and stock quantities are examples, not verified availability. Manufacturer reference: https://www.adidas.com.ph/duramo-speed-2-running-shoes/JQ0619.html",
+    "fit_note": "The sizes shown are illustrative; confirm the actual sizes before purchase.",
+    "images": [
+      {
+        "url": "https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/4da2bc3ea7f44539aad9562a1c6ac991_9366/Duramo_Speed_2_Running_Shoes_White_JQ0619_01_00_standard.jpg",
+        "alt_text": "Duramo Speed 2 Running Shoes, White",
+        "is_primary": true
+      }
+    ],
+    "variants": [
+      {
+        "sku": "EXAMPLE-ADIDAS-WOMEN-JQ0619-36",
+        "color_name": "White",
+        "size_eu": "36.0",
+        "price": "4500.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-WOMEN-JQ0619-38",
+        "color_name": "White",
+        "size_eu": "38.0",
+        "price": "4500.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-WOMEN-JQ0619-40",
+        "color_name": "White",
+        "size_eu": "40.0",
+        "price": "4500.00",
+        "quantity_on_hand": 8
+      }
+    ]
+  },
+  {
+    "name": "Samba OG Shoes",
+    "slug": "example-adidas-kids-ie3676",
+    "brand": {
+      "name": "adidas",
+      "slug": "adidas"
+    },
+    "audience": "kids",
+    "is_example_stock": true,
+    "description": "Reference product based on adidas Philippines. Listed price reflects an adidas reference price observed on 17 October 2026 and is not verified as STRIDE's actual selling price. Sizes and stock quantities are examples, not verified availability. Manufacturer reference: https://www.adidas.com.ph/samba-og-shoes/IE3676.html",
+    "fit_note": "The sizes shown are illustrative; confirm the actual sizes before purchase.",
+    "images": [
+      {
+        "url": "https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/31f1ef34bf4446b8a7da7840d0e8b743_9366/Samba_OG_Shoes_Black_IE3676_01_standard.jpg",
+        "alt_text": "Samba OG Shoes, Black",
+        "is_primary": true
+      }
+    ],
+    "variants": [
+      {
+        "sku": "EXAMPLE-ADIDAS-KIDS-IE3676-30",
+        "color_name": "Black",
+        "size_eu": "30.0",
+        "price": "4300.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-KIDS-IE3676-32",
+        "color_name": "Black",
+        "size_eu": "32.0",
+        "price": "4300.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-KIDS-IE3676-34",
+        "color_name": "Black",
+        "size_eu": "34.0",
+        "price": "4300.00",
+        "quantity_on_hand": 8
+      }
+    ]
+  },
+  {
+    "name": "Anthony Edwards 3 Junior Shoes",
+    "slug": "example-adidas-kids-kh8580",
+    "brand": {
+      "name": "adidas",
+      "slug": "adidas"
+    },
+    "audience": "kids",
+    "is_example_stock": true,
+    "description": "Reference product based on adidas Philippines. Listed price reflects an adidas reference price observed on 17 October 2026 and is not verified as STRIDE's actual selling price. Sizes and stock quantities are examples, not verified availability. Manufacturer reference: https://www.adidas.com.ph/anthony-edwards-3-junior-shoes/KH8580.html",
+    "fit_note": "The sizes shown are illustrative; confirm the actual sizes before purchase.",
+    "images": [
+      {
+        "url": "https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/96e85f330de44dd2904546cf67a4f833_9366/ANTHONY_EDWARDS_3_JUNIOR_Shoes_Blue_KH8580_01_00_standard.jpg",
+        "alt_text": "Anthony Edwards 3 Junior Shoes, Blue",
+        "is_primary": true
+      }
+    ],
+    "variants": [
+      {
+        "sku": "EXAMPLE-ADIDAS-KIDS-KH8580-36",
+        "color_name": "Blue",
+        "size_eu": "36.0",
+        "price": "6000.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-KIDS-KH8580-37",
+        "color_name": "Blue",
+        "size_eu": "37.0",
+        "price": "6000.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-KIDS-KH8580-38",
+        "color_name": "Blue",
+        "size_eu": "38.0",
+        "price": "6000.00",
+        "quantity_on_hand": 8
+      }
+    ]
+  },
+  {
+    "name": "VL MOVE EL C Shoes",
+    "slug": "example-adidas-kids-kh9756",
+    "brand": {
+      "name": "adidas",
+      "slug": "adidas"
+    },
+    "audience": "kids",
+    "is_example_stock": true,
+    "description": "Reference product based on adidas Philippines. Listed price reflects an adidas reference price observed on 17 October 2026 and is not verified as STRIDE's actual selling price. Sizes and stock quantities are examples, not verified availability. Manufacturer reference: https://www.adidas.com.ph/vl-move-el-c-shoes/KH9756.html",
+    "fit_note": "The sizes shown are illustrative; confirm the actual sizes before purchase.",
+    "images": [
+      {
+        "url": "https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/1a798fc414084b03bc401d154012316d_9366/VL_MOVE_EL_C_Shoes_White_KH9756_01_00_standard.jpg",
+        "alt_text": "VL MOVE EL C Shoes, White",
+        "is_primary": true
+      }
+    ],
+    "variants": [
+      {
+        "sku": "EXAMPLE-ADIDAS-KIDS-KH9756-30",
+        "color_name": "White",
+        "size_eu": "30.0",
+        "price": "2100.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-KIDS-KH9756-32",
+        "color_name": "White",
+        "size_eu": "32.0",
+        "price": "2100.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-KIDS-KH9756-34",
+        "color_name": "White",
+        "size_eu": "34.0",
+        "price": "2100.00",
+        "quantity_on_hand": 8
+      }
+    ]
+  },
+  {
+    "name": "Runfalcon 6 Shoes Children",
+    "slug": "example-adidas-kids-ki1768",
+    "brand": {
+      "name": "adidas",
+      "slug": "adidas"
+    },
+    "audience": "kids",
+    "is_example_stock": true,
+    "description": "Reference product based on adidas Philippines. Listed price reflects an adidas reference price observed on 17 October 2026 and is not verified as STRIDE's actual selling price. Sizes and stock quantities are examples, not verified availability. Manufacturer reference: https://www.adidas.com.ph/runfalcon-6-shoes-children/KI1768.html",
+    "fit_note": "The sizes shown are illustrative; confirm the actual sizes before purchase.",
+    "images": [
+      {
+        "url": "https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/32c68ce485a845eba30dd9e7452dca14_9366/Runfalcon_6_Shoes_Children_Black_KI1768_HM1.jpg",
+        "alt_text": "Runfalcon 6 Shoes Children, Black",
+        "is_primary": true
+      }
+    ],
+    "variants": [
+      {
+        "sku": "EXAMPLE-ADIDAS-KIDS-KI1768-30",
+        "color_name": "Black",
+        "size_eu": "30.0",
+        "price": "3200.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-KIDS-KI1768-32",
+        "color_name": "Black",
+        "size_eu": "32.0",
+        "price": "3200.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-KIDS-KI1768-34",
+        "color_name": "Black",
+        "size_eu": "34.0",
+        "price": "3200.00",
+        "quantity_on_hand": 8
+      }
+    ]
+  },
+  {
+    "name": "Tensaur Run 4.0 Shoes Children",
+    "slug": "example-adidas-kids-kj6694",
+    "brand": {
+      "name": "adidas",
+      "slug": "adidas"
+    },
+    "audience": "kids",
+    "is_example_stock": true,
+    "description": "Reference product based on adidas Philippines. Listed price reflects an adidas reference price observed on 17 October 2026 and is not verified as STRIDE's actual selling price. Sizes and stock quantities are examples, not verified availability. Manufacturer reference: https://www.adidas.com.ph/tensaur-run-4.0-shoes-children/KJ6694.html",
+    "fit_note": "The sizes shown are illustrative; confirm the actual sizes before purchase.",
+    "images": [
+      {
+        "url": "https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/7237de013322437fb5fa93c41e59bc07_9366/TENSAUR_RUN_4.0_SHOES_CHILDREN_White_KJ6694_01_00_standard.jpg",
+        "alt_text": "Tensaur Run 4.0 Shoes Children, White",
+        "is_primary": true
+      }
+    ],
+    "variants": [
+      {
+        "sku": "EXAMPLE-ADIDAS-KIDS-KJ6694-30",
+        "color_name": "White",
+        "size_eu": "30.0",
+        "price": "2600.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-KIDS-KJ6694-32",
+        "color_name": "White",
+        "size_eu": "32.0",
+        "price": "2600.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-KIDS-KJ6694-34",
+        "color_name": "White",
+        "size_eu": "34.0",
+        "price": "2600.00",
+        "quantity_on_hand": 8
+      }
+    ]
+  },
+  {
+    "name": "Tensaur Sport 3.0 CF K Shoes",
+    "slug": "example-adidas-kids-jq1840",
+    "brand": {
+      "name": "adidas",
+      "slug": "adidas"
+    },
+    "audience": "kids",
+    "is_example_stock": true,
+    "description": "Reference product based on adidas Philippines. Listed price reflects an adidas reference price observed on 17 October 2026 and is not verified as STRIDE's actual selling price. Sizes and stock quantities are examples, not verified availability. Manufacturer reference: https://www.adidas.com.ph/tensaur-sport-3.0-cf-k-shoes/JQ1840.html",
+    "fit_note": "The sizes shown are illustrative; confirm the actual sizes before purchase.",
+    "images": [
+      {
+        "url": "https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/a81c16a81dbb44918c3af04f02f4a0d9_9366/Tensaur_Sport_3.0_CF_K_Shoes_White_JQ1840_01_00_standard.jpg",
+        "alt_text": "Tensaur Sport 3.0 CF K Shoes, White",
+        "is_primary": true
+      }
+    ],
+    "variants": [
+      {
+        "sku": "EXAMPLE-ADIDAS-KIDS-JQ1840-30",
+        "color_name": "White",
+        "size_eu": "30.0",
+        "price": "1800.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-KIDS-JQ1840-32",
+        "color_name": "White",
+        "size_eu": "32.0",
+        "price": "1800.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-KIDS-JQ1840-34",
+        "color_name": "White",
+        "size_eu": "34.0",
+        "price": "1800.00",
+        "quantity_on_hand": 8
+      }
+    ]
+  },
+  {
+    "name": "Fortarun 4.0 Shoes Kids",
+    "slug": "example-adidas-kids-jq5193",
+    "brand": {
+      "name": "adidas",
+      "slug": "adidas"
+    },
+    "audience": "kids",
+    "is_example_stock": true,
+    "description": "Reference product based on adidas Philippines. Listed price reflects an adidas reference price observed on 17 October 2026 and is not verified as STRIDE's actual selling price. Sizes and stock quantities are examples, not verified availability. Manufacturer reference: https://www.adidas.com.ph/fortarun-4.0-shoes-kids/JQ5193.html",
+    "fit_note": "The sizes shown are illustrative; confirm the actual sizes before purchase.",
+    "images": [
+      {
+        "url": "https://assets.adidas.com/images/w_600%2Cf_auto%2Cq_auto/7611598d775a4f36bf33ca4e083f7552_9366/Fortarun_4.0_Shoes_Kids_Black_JQ5193_01_00_standard.jpg",
+        "alt_text": "Fortarun 4.0 Shoes Kids, Black",
+        "is_primary": true
+      }
+    ],
+    "variants": [
+      {
+        "sku": "EXAMPLE-ADIDAS-KIDS-JQ5193-30",
+        "color_name": "Black",
+        "size_eu": "30.0",
+        "price": "2700.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-KIDS-JQ5193-32",
+        "color_name": "Black",
+        "size_eu": "32.0",
+        "price": "2700.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-KIDS-JQ5193-34",
+        "color_name": "Black",
+        "size_eu": "34.0",
+        "price": "2700.00",
+        "quantity_on_hand": 8
+      }
+    ]
+  },
+  {
+    "name": "adidas Disney Mickey Mouse Grand Court Shoes Kids",
+    "slug": "example-adidas-kids-ki9191",
+    "brand": {
+      "name": "adidas",
+      "slug": "adidas"
+    },
+    "audience": "kids",
+    "is_example_stock": true,
+    "description": "Reference product based on adidas Philippines. Listed price reflects an adidas reference price observed on 17 October 2026 and is not verified as STRIDE's actual selling price. Sizes and stock quantities are examples, not verified availability. Manufacturer reference: https://www.adidas.com.ph/adidas-disney-mickey-mouse-grand-court-shoes-kids/KI9191.html",
+    "fit_note": "The sizes shown are illustrative; confirm the actual sizes before purchase.",
+    "images": [
+      {
+        "url": "https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/4596b331b0e34df1b447d0b6c7ca905f_9366/ADIDAS_DISNEY_MICKEY_MOUSE_GRAND_COURT_SHOES_KIDS_White_KI9191_01_00_standard.jpg",
+        "alt_text": "adidas Disney Mickey Mouse Grand Court Shoes Kids, White",
+        "is_primary": true
+      }
+    ],
+    "variants": [
+      {
+        "sku": "EXAMPLE-ADIDAS-KIDS-KI9191-30",
+        "color_name": "White",
+        "size_eu": "30.0",
+        "price": "3500.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-KIDS-KI9191-32",
+        "color_name": "White",
+        "size_eu": "32.0",
+        "price": "3500.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-KIDS-KI9191-34",
+        "color_name": "White",
+        "size_eu": "34.0",
+        "price": "3500.00",
+        "quantity_on_hand": 8
+      }
+    ]
+  },
+  {
+    "name": "adidas Disney VL Court 3.0 Shoes Children",
+    "slug": "example-adidas-kids-ki9175",
+    "brand": {
+      "name": "adidas",
+      "slug": "adidas"
+    },
+    "audience": "kids",
+    "is_example_stock": true,
+    "description": "Reference product based on adidas Philippines. Listed price reflects an adidas reference price observed on 17 October 2026 and is not verified as STRIDE's actual selling price. Sizes and stock quantities are examples, not verified availability. Manufacturer reference: https://www.adidas.com.ph/adidas-disney-vl-court-3.0-shoes-children/KI9175.html",
+    "fit_note": "The sizes shown are illustrative; confirm the actual sizes before purchase.",
+    "images": [
+      {
+        "url": "https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/263f942319b14cd7802dca0202ee3f1f_9366/ADIDAS_DISNEY_VL_COURT_3.0_SHOES_CHILDREN_White_KI9175_01_00_standard.jpg",
+        "alt_text": "adidas Disney VL Court 3.0 Shoes Children, White",
+        "is_primary": true
+      }
+    ],
+    "variants": [
+      {
+        "sku": "EXAMPLE-ADIDAS-KIDS-KI9175-30",
+        "color_name": "White",
+        "size_eu": "30.0",
+        "price": "3800.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-KIDS-KI9175-32",
+        "color_name": "White",
+        "size_eu": "32.0",
+        "price": "3800.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-KIDS-KI9175-34",
+        "color_name": "White",
+        "size_eu": "34.0",
+        "price": "3800.00",
+        "quantity_on_hand": 8
+      }
+    ]
+  },
+  {
+    "name": "adidas Disney Princess Superstar II Comfort Closure Shoes",
+    "slug": "example-adidas-kids-kj7476",
+    "brand": {
+      "name": "adidas",
+      "slug": "adidas"
+    },
+    "audience": "kids",
+    "is_example_stock": true,
+    "description": "Reference product based on adidas Philippines. Listed price reflects an adidas reference price observed on 17 October 2026 and is not verified as STRIDE's actual selling price. Sizes and stock quantities are examples, not verified availability. Manufacturer reference: https://www.adidas.com.ph/adidas-disney-princess-superstar-ii-comfort-closure-shoes/KJ7476.html",
+    "fit_note": "The sizes shown are illustrative; confirm the actual sizes before purchase.",
+    "images": [
+      {
+        "url": "https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/4c785fdf9e57446ab4f878704949faeb_9366/adidas_Disney_Princess_SUPERSTAR_II_COMFORT_CLOSURE_SHOES_White_KJ7476_01_00_standard.jpg",
+        "alt_text": "adidas Disney Princess Superstar II Comfort Closure Shoes, White",
+        "is_primary": true
+      }
+    ],
+    "variants": [
+      {
+        "sku": "EXAMPLE-ADIDAS-KIDS-KJ7476-30",
+        "color_name": "White",
+        "size_eu": "30.0",
+        "price": "3300.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-KIDS-KJ7476-32",
+        "color_name": "White",
+        "size_eu": "32.0",
+        "price": "3300.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-ADIDAS-KIDS-KJ7476-34",
+        "color_name": "White",
+        "size_eu": "34.0",
+        "price": "3300.00",
+        "quantity_on_hand": 8
+      }
+    ]
+  }
+]

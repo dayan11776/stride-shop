@@ -323,7 +323,7 @@ class WishlistView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        items = WishlistItem.objects.filter(user=request.user, product__status=Product.Status.ACTIVE, product__recycled_at__isnull=True).select_related("product__brand", "product__category").prefetch_related("product__variants", "product__images")
+        items = WishlistItem.objects.filter(user=request.user, product__status=Product.Status.ACTIVE, product__recycled_at__isnull=True).select_related("product__brand", "product__category").prefetch_related("product__variants__inventory", "product__images")
         return Response(WishlistItemSerializer(items, many=True).data)
 
     def post(self, request):
@@ -332,7 +332,7 @@ class WishlistView(APIView):
             raise ValidationError({"productId": "A product is required."})
         product = get_object_or_404(Product, pk=product_id, status=Product.Status.ACTIVE, recycled_at__isnull=True)
         item, created = WishlistItem.objects.get_or_create(user=request.user, product=product)
-        item = WishlistItem.objects.select_related("product__brand", "product__category").prefetch_related("product__variants", "product__images").get(pk=item.pk)
+        item = WishlistItem.objects.select_related("product__brand", "product__category").prefetch_related("product__variants__inventory", "product__images").get(pk=item.pk)
         return Response(WishlistItemSerializer(item).data, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
 
 

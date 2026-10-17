@@ -56,6 +56,8 @@ class Product(TimeStampedUUIDModel):
     fit_note = models.TextField(blank=True)
     status = models.CharField(max_length=10, choices=Status.choices, default=Status.DRAFT)
     is_new_arrival = models.BooleanField(default=False)
+    # Example quantities are not verified stock and must be labelled as such.
+    is_example_stock = models.BooleanField(default=False)
     # Separate from status: an archived product is not necessarily in the bin.
     # Keeping the row and its relations preserves order history and makes the
     # operation reversible.
