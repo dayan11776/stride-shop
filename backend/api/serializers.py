@@ -140,12 +140,14 @@ class ProductCardSerializer(serializers.ModelSerializer):
     salePrice = serializers.SerializerMethodField()
     image = serializers.SerializerMethodField()
     isNew = serializers.BooleanField(source="is_new_arrival", read_only=True)
+    isExampleStock = serializers.BooleanField(source="is_example_stock", read_only=True)
     sizes = serializers.SerializerMethodField()
+    availableQuantity = serializers.SerializerMethodField()
     reviewAverage = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
-        fields = ("id", "slug", "name", "brand", "brandSlug", "category", "categorySlug", "audience", "price", "salePrice", "image", "isNew", "sizes", "reviewAverage")
+        fields = ("id", "slug", "name", "brand", "brandSlug", "category", "categorySlug", "audience", "price", "salePrice", "image", "isNew", "isExampleStock", "sizes", "availableQuantity", "reviewAverage")
 
     def _variants(self, obj):
         return [variant for variant in obj.variants.all() if variant.is_active]
@@ -180,6 +182,17 @@ class ProductCardSerializer(serializers.ModelSerializer):
 
     def get_sizes(self, obj):
         return sorted({number(variant.size_eu) for variant in self._variants(obj)})
+
+    def get_availableQuantity(self, obj):
+        # A card represents all active sizes/colours, so its count is the sum
+        # shoppers can actually buy after existing reservations are excluded.
+        total = 0
+        for variant in self._variants(obj):
+            try:
+                total += max(variant.inventory.available, 0)
+            except ProductVariant.inventory.RelatedObjectDoesNotExist:
+                continue
+        return total
 
     def get_reviewAverage(self, obj):
         # Annotated values avoid a query per card; the fallback keeps direct use handy.
@@ -610,7 +623,7 @@ class AdminProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ("id", "brand", "brand_name", "category", "category_name", "name", "slug", "description", "materials", "audience", "fit_note", "status", "is_new_arrival", "recycled_at", "created_at", "updated_at", "images", "variants", "remove_image_ids", "remove_variant_ids")
+        fields = ("id", "brand", "brand_name", "category", "category_name", "name", "slug", "description", "materials", "audience", "fit_note", "status", "is_new_arrival", "is_example_stock", "recycled_at", "created_at", "updated_at", "images", "variants", "remove_image_ids", "remove_variant_ids")
         read_only_fields = ("id", "recycled_at", "created_at", "updated_at")
 
     def validate(self, attrs):

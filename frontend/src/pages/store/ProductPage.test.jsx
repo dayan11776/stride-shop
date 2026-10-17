@@ -36,6 +36,8 @@ test('selecting a colour and size adds the matching active variant and price', (
   expect(within(sizes).queryByRole('button', { name: '41' })).toBeNull()
   fireEvent.click(within(sizes).getByRole('button', { name: '40' }))
   expect(screen.getByText(/1,790\.5/)).toBeTruthy()
+  expect(screen.getByText('2 pairs available in this option.')).toBeTruthy()
+  expect(screen.queryByText(/Example sizes and stock are not verified/)).toBeNull()
   fireEvent.click(screen.getByRole('button', { name: /Add to bag/i }))
   expect(useCartStore.getState().items[0].variantId).toBe('black-40')
   expect(selectSubtotal(useCartStore.getState())).toBe(1790.5)
@@ -46,4 +48,26 @@ test('cannot add a live product when all variants are unavailable', () => {
   showProduct()
   expect(screen.getByText('No sizes are currently available.')).toBeTruthy()
   expect(screen.getByRole('button', { name: /Add to bag/i }).disabled).toBe(true)
+})
+
+test('warns that example sizes and stock are unverified before and after selecting a size', () => {
+  useProduct.mockReturnValue({ data: { ...product, isExampleStock: true }, isLoading: false, isError: false })
+  showProduct()
+  expect(screen.getByText('Example sizes and stock are not verified. Please confirm availability with the store.')).toBeTruthy()
+  fireEvent.click(within(screen.getByRole('group', { name: 'Select shoe size' })).getByRole('button', { name: '40' }))
+  expect(screen.getByText('Example stock: 3 pairs for this option (not verified).')).toBeTruthy()
+})
+
+test('uses the placeholder when a product image fails, and tries the next colour image', () => {
+  useProduct.mockReturnValue({ data: { ...product, images: [
+    { colorName: 'Sage', url: '/sage.jpg' },
+    { colorName: 'Black', url: '/black.jpg' },
+  ] }, isLoading: false, isError: false })
+  const { container } = showProduct()
+  expect(screen.getByAltText('Runner').getAttribute('src')).toBe('/sage.jpg')
+  fireEvent.error(screen.getByAltText('Runner'))
+  expect(screen.getByAltText('Product image unavailable').getAttribute('src')).toBe('/images/product-placeholder.svg')
+  expect([...container.querySelectorAll('img')].every((img) => img.getAttribute('src') === '/images/product-placeholder.svg')).toBe(true)
+  fireEvent.click(within(screen.getByRole('group', { name: 'Select colour' })).getByRole('button', { name: 'Black' }))
+  expect(screen.getByAltText('Runner').getAttribute('src')).toBe('/black.jpg')
 })

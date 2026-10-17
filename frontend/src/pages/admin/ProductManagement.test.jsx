@@ -31,6 +31,7 @@ test('creates a product with the chosen image URL and variant', async () => {
   })
   renderForm('/admin/products/new')
   fireEvent.change(await screen.findByLabelText('Product name *'), { target: { value: 'Everyday Runner' } })
+  expect(screen.getByRole('checkbox', { name: 'Stock quantities are examples (not verified)' }).checked).toBe(false)
   fireEvent.change(screen.getByLabelText('Brand *'), { target: { value: brand.id } })
   fireEvent.change(screen.getByLabelText('Category *'), { target: { value: category.id } })
   fireEvent.change(screen.getByLabelText('Colour *'), { target: { value: 'Sage' } })
@@ -44,7 +45,25 @@ test('creates a product with the chosen image URL and variant', async () => {
   fireEvent.click(screen.getByRole('button', { name: 'Publish product' }))
   await screen.findByText('Returned to product control')
   const [, options] = api.mock.calls.find(([path, opts]) => path === '/staff/products' && opts?.method === 'POST')
-  expect(options.body).toMatchObject({ name: 'Everyday Runner', slug: 'everyday-runner', brand: brand.id, category: category.id, status: 'active', images: [{ url: 'https://example.com/shoe.jpg', is_primary: true }], variants: [{ sku: 'RUN-40', color_name: 'Sage', size_eu: '40', quantity_on_hand: 12 }] })
+  expect(options.body).toMatchObject({ name: 'Everyday Runner', slug: 'everyday-runner', brand: brand.id, category: category.id, status: 'active', is_example_stock: false, images: [{ url: 'https://example.com/shoe.jpg', is_primary: true }], variants: [{ sku: 'RUN-40', color_name: 'Sage', size_eu: '40', quantity_on_hand: 12 }] })
+})
+
+test.each([[true, false], [false, true]])('editing can change the example-stock flag from %s to %s', async (initial, updated) => {
+  api.mockImplementation((path, options = {}) => {
+    if (path === '/brands') return Promise.resolve([brand])
+    if (path === '/categories') return Promise.resolve([category])
+    if (path === '/staff/products/product-1' && !options.method) return Promise.resolve({ ...product, is_example_stock: initial })
+    if (path === '/staff/products/product-1' && options.method === 'PATCH') return Promise.resolve(product)
+    return Promise.reject(new Error('Unexpected request'))
+  })
+  renderForm('/admin/product-control/product-1/edit')
+  const checkbox = await screen.findByRole('checkbox', { name: 'Stock quantities are examples (not verified)' })
+  expect(checkbox.checked).toBe(initial)
+  fireEvent.click(checkbox)
+  fireEvent.click(screen.getByRole('button', { name: 'Save changes' }))
+  await screen.findByText('Returned to product control')
+  const [, options] = api.mock.calls.find(([path, opts]) => path === '/staff/products/product-1' && opts?.method === 'PATCH')
+  expect(options.body).toEqual({ is_example_stock: updated })
 })
 
 test('editing product details omits unchanged image and variant collections', async () => {
