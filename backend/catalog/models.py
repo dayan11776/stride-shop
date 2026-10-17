@@ -56,6 +56,10 @@ class Product(TimeStampedUUIDModel):
     fit_note = models.TextField(blank=True)
     status = models.CharField(max_length=10, choices=Status.choices, default=Status.DRAFT)
     is_new_arrival = models.BooleanField(default=False)
+    # Separate from status: an archived product is not necessarily in the bin.
+    # Keeping the row and its relations preserves order history and makes the
+    # operation reversible.
+    recycled_at = models.DateTimeField(null=True, blank=True, db_index=True)
 
     class Meta:
         db_table = "products"

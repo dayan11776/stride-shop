@@ -8,8 +8,8 @@ from decimal import Decimal
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.core.exceptions import ValidationError as DjangoValidationError
-from django.db import transaction
-from django.db.models import Count, F, Q, Sum
+from django.db import IntegrityError, transaction
+from django.db.models import Count, F, Prefetch, Q, Sum
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.decorators import method_decorator
@@ -225,7 +225,7 @@ class ProductListView(APIView):
 
     def get_queryset(self):
         query = self.request.query_params
-        products = Product.objects.filter(status=Product.Status.ACTIVE).select_related("brand", "category").prefetch_related("variants__inventory", "images")
+        products = Product.objects.filter(status=Product.Status.ACTIVE, recycled_at__isnull=True).select_related("brand", "category").prefetch_related("variants__inventory", "images")
         audience = query.get("audience")
         if audience:
             products = products.filter(audience=audience)
@@ -252,9 +252,9 @@ class ProductDetailView(APIView):
 
     def get(self, request, slug):
         product = get_object_or_404(
-            Product.objects.filter(status=Product.Status.ACTIVE)
+            Product.objects.filter(status=Product.Status.ACTIVE, recycled_at__isnull=True)
             .select_related("brand", "category")
-            .prefetch_related("variants__inventory", "images"),
+            .prefetch_related(Prefetch("variants", queryset=ProductVariant.objects.filter(is_active=True).select_related("inventory")), "images"),
             slug=slug,
         )
         return Response(ProductDetailSerializer(product).data)
@@ -288,7 +288,7 @@ class ProductReviewListView(APIView):
     permission_classes = [AllowAny]
 
     def get_product(self, slug):
-        return get_object_or_404(Product, slug=slug, status=Product.Status.ACTIVE)
+        return get_object_or_404(Product, slug=slug, status=Product.Status.ACTIVE, recycled_at__isnull=True)
 
     def get(self, request, slug):
         product = self.get_product(slug)
@@ -323,14 +323,14 @@ class WishlistView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        items = WishlistItem.objects.filter(user=request.user).select_related("product__brand", "product__category").prefetch_related("product__variants", "product__images")
+        items = WishlistItem.objects.filter(user=request.user, product__status=Product.Status.ACTIVE, product__recycled_at__isnull=True).select_related("product__brand", "product__category").prefetch_related("product__variants", "product__images")
         return Response(WishlistItemSerializer(items, many=True).data)
 
     def post(self, request):
         product_id = request.data.get("productId") or request.data.get("product_id")
         if not product_id:
             raise ValidationError({"productId": "A product is required."})
-        product = get_object_or_404(Product, pk=product_id, status=Product.Status.ACTIVE)
+        product = get_object_or_404(Product, pk=product_id, status=Product.Status.ACTIVE, recycled_at__isnull=True)
         item, created = WishlistItem.objects.get_or_create(user=request.user, product=product)
         item = WishlistItem.objects.select_related("product__brand", "product__category").prefetch_related("product__variants", "product__images").get(pk=item.pk)
         return Response(WishlistItemSerializer(item).data, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
@@ -851,34 +851,100 @@ class ContactView(APIView):
 class AdminProductViewSet(viewsets.ModelViewSet):
     permission_classes = [IsTeamMember]
     serializer_class = AdminProductSerializer
-    queryset = Product.objects.select_related("brand", "category").all()
+    queryset = Product.objects.select_related("brand", "category").prefetch_related("images", "variants__inventory")
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if self.action == "list":
+            return queryset.filter(recycled_at__isnull=not is_true(self.request.query_params.get("recycled")))
+        return queryset
+
+    def get_object(self):
+        # Lock the product for mutations so a concurrent edit cannot publish a
+        # product while another administrator is moving it to the bin.
+        if self.request.method in {"PATCH", "PUT", "DELETE", "POST"}:
+            obj = get_object_or_404(Product.objects.select_for_update(), pk=self.kwargs["pk"])
+            self.check_object_permissions(self.request, obj)
+            if self.action != "restore" and obj.recycled_at:
+                raise NotFound("This product is in the recycle bin.")
+            return obj
+        return super().get_object()
+
+    @transaction.atomic
     def perform_create(self, serializer):
         product = serializer.save()
-        audit(self.request, "created", "product", product.pk, serializer.validated_data)
+        audit(self.request, "created", "product", product.pk, {"name": product.name, "status": product.status})
 
+    @transaction.atomic
     def perform_update(self, serializer):
         product = serializer.save()
-        audit(self.request, "updated", "product", product.pk, serializer.validated_data)
+        audit(self.request, "updated", "product", product.pk, {"name": product.name, "status": product.status})
 
+    @transaction.atomic
     def perform_destroy(self, instance):
-        audit(self.request, "deleted", "product", instance.pk)
-        instance.delete()
+        instance.recycled_at = timezone.now()
+        instance.status = Product.Status.DRAFT
+        instance.save(update_fields=["recycled_at", "status", "updated_at"])
+        audit(self.request, "recycled", "product", instance.pk)
+
+    @transaction.atomic
+    def update(self, request, *args, **kwargs):
+        try:
+            # The savepoint makes duplicate SKU/slug races a useful 400 while
+            # rolling back every part of the aggregate.
+            with transaction.atomic():
+                return super().update(request, *args, **kwargs)
+        except IntegrityError as exc:
+            raise ValidationError({"detail": "The product, SKU, or variant already exists. Review the details and try again."}) from exc
+
+    @transaction.atomic
+    def create(self, request, *args, **kwargs):
+        try:
+            with transaction.atomic():
+                return super().create(request, *args, **kwargs)
+        except IntegrityError as exc:
+            raise ValidationError({"detail": "The product, SKU, or variant already exists. Review the details and try again."}) from exc
+
+    @transaction.atomic
+    def destroy(self, request, *args, **kwargs):
+        return super().destroy(request, *args, **kwargs)
+
+    @action(detail=True, methods=["post"])
+    @transaction.atomic
+    def restore(self, request, pk=None):
+        product = self.get_object()
+        if not product.recycled_at:
+            raise ValidationError({"detail": "This product is not in the recycle bin."})
+        product.recycled_at = None
+        product.status = Product.Status.DRAFT
+        product.save(update_fields=["recycled_at", "status", "updated_at"])
+        audit(request, "restored", "product", product.pk, {"status": "draft"})
+        return Response(self.get_serializer(product).data)
 
 
 class AdminVariantViewSet(viewsets.ModelViewSet):
     permission_classes = [IsTeamMember]
     serializer_class = AdminProductVariantSerializer
-    queryset = ProductVariant.objects.select_related("product").all()
+    queryset = ProductVariant.objects.select_related("product").filter(product__recycled_at__isnull=True)
 
+    @transaction.atomic
     def perform_create(self, serializer):
         variant = serializer.save()
         Inventory.objects.get_or_create(variant=variant)
         audit(self.request, "created", "product_variant", variant.pk)
 
+    @transaction.atomic
     def perform_update(self, serializer):
         variant = serializer.save()
-        audit(self.request, "updated", "product_variant", variant.pk, serializer.validated_data)
+        audit(self.request, "updated", "product_variant", variant.pk, {"sku": variant.sku})
+
+    @transaction.atomic
+    def perform_destroy(self, instance):
+        # Historical orders and carts refer to variant IDs, so this is a
+        # reversible deactivation rather than a physical delete.
+        instance.is_active = False
+        instance.save(update_fields=["is_active"])
+        audit(self.request, "deactivated", "product_variant", instance.pk)
 
 
 class AdminPromoCodeViewSet(viewsets.ModelViewSet):
