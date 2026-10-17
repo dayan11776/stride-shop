@@ -29,5 +29,12 @@ export const useCartStore = create(
     { name: 'stride-cart' },
   ),
 )
+// Persisted carts created before variants were stored keep the product-price
+// fallback, but a selected size/colour always uses its own current price.
+export const priceForItem = (item) => {
+  const variant = item?.variant
+  const price = variant?.currentPrice ?? variant?.current_price ?? variant?.salePrice ?? variant?.sale_price ?? variant?.price ?? unitPrice(item.product)
+  return Number(price) || 0
+}
 export const selectCount = (s) => s.items.reduce((n, i) => n + i.qty, 0)
-export const selectSubtotal = (s) => s.items.reduce((sum, i) => sum + unitPrice(i.product) * i.qty, 0)
+export const selectSubtotal = (s) => s.items.reduce((sum, i) => sum + priceForItem(i) * i.qty, 0)
