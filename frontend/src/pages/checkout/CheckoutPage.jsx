@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
-import { useCartStore, selectSubtotal } from '@/features/cart/cartStore'
+import { useCartStore, selectSubtotal, priceForItem } from '@/features/cart/cartStore'
 import { useAuthStore } from '@/features/auth/authStore'
 import { api, listFrom, payloadFrom, USE_MOCK } from '@/lib/apiClient'
-import { formatPeso, unitPrice } from '@/lib/format'
+import { formatPeso } from '@/lib/format'
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
 
@@ -26,7 +26,7 @@ function forgetPendingPayment(paymentId) {
   if (paymentId && typeof window !== 'undefined') window.sessionStorage.removeItem(pendingPaymentKey(paymentId))
 }
 
-async function synchronizeCart(items, promoCode) {
+export async function synchronizeCart(items, promoCode) {
   const currentCart = payloadFrom(await api('/cart'))
   const currentItems = listFrom(currentCart)
   const desiredVariantIds = new Set(items.map((item) => String(item.variantId)))
@@ -48,6 +48,33 @@ async function synchronizeCart(items, promoCode) {
   else await api('/cart/promo', { method: 'DELETE' })
 }
 
+// Compare server-authoritative line and order amounts, including discounts
+// and shipping, so a changed price is never silently accepted by this screen.
+export function quoteSignature(quote) {
+  return JSON.stringify({
+    items: (quote?.items ?? []).map((line) => ({
+      variantId: String(line.variant?.id), quantity: Number(line.quantity), unitPrice: Number(line.unitPrice),
+    })).sort((a, b) => a.variantId.localeCompare(b.variantId)),
+    subtotal: Number(quote?.subtotal),
+    discountTotal: Number(quote?.discountTotal),
+    shippingFee: Number(quote?.shippingFee),
+    taxTotal: Number(quote?.taxTotal),
+    grandTotal: Number(quote?.grandTotal),
+  })
+}
+
+function ensureQuoteMatchesItems(quote, items) {
+  const totals = ['subtotal', 'discountTotal', 'shippingFee', 'taxTotal', 'grandTotal']
+  if (!Array.isArray(quote?.items) || totals.some((field) => quote[field] == null || !Number.isFinite(Number(quote[field])))
+    || quote.items.some((line) => line.unitPrice == null || line.lineTotal == null || !Number.isFinite(Number(line.unitPrice)) || !Number.isFinite(Number(line.lineTotal)))) {
+    throw new Error('Your order total could not be confirmed. Please try again.')
+  }
+  const expected = items.map((item) => [String(item.variantId), Number(item.qty)]).sort(([a], [b]) => a.localeCompare(b))
+  const actual = (quote?.items ?? []).map((item) => [String(item.variant?.id), Number(item.quantity)]).sort(([a], [b]) => a.localeCompare(b))
+  if (JSON.stringify(expected) !== JSON.stringify(actual)) throw new Error('Your bag could not be confirmed. Please review it and try again.')
+  return quote
+}
+
 export function Component() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
@@ -57,8 +84,15 @@ export function Component() {
   const subtotal = useCartStore(selectSubtotal)
   const user = useAuthStore((state) => state.user)
   const [method, setMethod] = useState('ewallet')
-  const [shippingMethods, setShippingMethods] = useState(mockShipping)
-  const [shippingId, setShippingId] = useState(mockShipping[0].id)
+  const [shippingMethods, setShippingMethods] = useState(USE_MOCK ? mockShipping : [])
+  const [shippingId, setShippingId] = useState(USE_MOCK ? mockShipping[0].id : '')
+  const [shippingLoading, setShippingLoading] = useState(!USE_MOCK)
+  const [shippingError, setShippingError] = useState('')
+  const [quote, setQuote] = useState(null)
+  const [quoteBusy, setQuoteBusy] = useState(!USE_MOCK)
+  const [quoteError, setQuoteError] = useState('')
+  const [quoteRetry, setQuoteRetry] = useState(0)
+  const quoteQueue = useRef(Promise.resolve())
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const cancelledPaymentId = searchParams.get('paymentCancelled') || ''
@@ -69,13 +103,17 @@ export function Component() {
 
   useEffect(() => {
     if (USE_MOCK) return
+    let active = true
     api('/shipping-methods').then((data) => {
       const options = listFrom(data)
-      if (options.length) {
+      if (!options.length) throw new Error('No delivery methods are available right now.')
+      if (active) {
         setShippingMethods(options)
         setShippingId(String(options[0].id))
       }
-    }).catch(() => {})
+    }).catch((reason) => { if (active) setShippingError(reason.message || 'Delivery options could not be loaded.') })
+      .finally(() => { if (active) setShippingLoading(false) })
+    return () => { active = false }
   }, [])
 
   useEffect(() => {
@@ -88,7 +126,27 @@ export function Component() {
     () => shippingMethods.find((item) => String(item.id) === String(shippingId)) ?? shippingMethods[0],
     [shippingId, shippingMethods],
   )
-  const shipping = subtotal >= 3500 ? 0 : Number(selectedShipping?.baseFee ?? selectedShipping?.base_fee ?? 180)
+  const mockShippingFee = subtotal >= 3500 ? 0 : Number(selectedShipping?.baseFee ?? selectedShipping?.base_fee ?? 180)
+
+  useEffect(() => {
+    if (USE_MOCK || cancelledPaymentId || !items.length || shippingLoading || !shippingId) return
+    let active = true
+    setQuote(null)
+    setQuoteError('')
+    setQuoteBusy(true)
+    const nextQuote = quoteQueue.current.catch(() => {}).then(async () => {
+      if (!active) return null
+      if (items.some((item) => !item.variantId)) throw new Error('One or more bag items need to be re-added before checkout so we can confirm their size and stock.')
+      await api('/csrf')
+      await synchronizeCart(items, promoCode)
+      return ensureQuoteMatchesItems(payloadFrom(await api('/checkout/quote', { method: 'POST', body: { shippingMethod: shippingId } })), items)
+    })
+    quoteQueue.current = nextQuote
+    nextQuote.then((data) => { if (active) setQuote(data) })
+      .catch((reason) => { if (active) setQuoteError(reason.message || 'Your order total could not be confirmed.') })
+      .finally(() => { if (active) setQuoteBusy(false) })
+    return () => { active = false }
+  }, [items, promoCode, shippingId, shippingLoading, cancelledPaymentId, quoteRetry])
 
   const resumePayment = async () => {
     if (!cancelEmail.trim()) {
@@ -153,13 +211,22 @@ export function Component() {
       if (USE_MOCK) {
         const orderNumber = `STR-${Math.floor(100000 + Math.random() * 899999)}`
         clear()
-        navigate(`/order-confirmation/${orderNumber}`, { state: { order: { orderNumber, email: values.email, grandTotal: subtotal + shipping } } })
+        navigate(`/order-confirmation/${orderNumber}`, { state: { order: { orderNumber, email: values.email, grandTotal: subtotal + mockShippingFee } } })
         return
       }
+      if (!quote || quoteBusy || shippingLoading || shippingError) throw new Error('Please wait until the current order total is confirmed.')
       const missingVariant = items.find((item) => !item.variantId)
       if (missingVariant) throw new Error('One or more bag items need to be re-added before checkout so we can confirm their size and stock.')
       await api('/csrf')
       await synchronizeCart(items, promoCode)
+      const latestQuote = ensureQuoteMatchesItems(payloadFrom(await api('/checkout/quote', {
+        method: 'POST', body: { shippingMethod: shippingId },
+      })), items)
+      if (quoteSignature(latestQuote) !== quoteSignature(quote)) {
+        setQuote(latestQuote)
+        setError('Your price, discount or delivery cost changed. Please review the updated total before placing your order.')
+        return
+      }
       const created = payloadFrom(await api('/checkout/create', {
         method: 'POST',
         body: {
@@ -174,6 +241,7 @@ export function Component() {
           shippingMethod: shippingId || selectedShipping?.name,
           paymentMethod: method,
           notes: values.note,
+          expectedTotal: Number(latestQuote.grandTotal).toFixed(2),
         },
       }))
       const order = created?.order ?? created
@@ -196,15 +264,41 @@ export function Component() {
       clear()
       navigate(`/order-confirmation/${orderNumber}`, { state: { order: { ...order, email: values.email, isGuest: !user } } })
     } catch (reason) {
-      setError(reason.message || 'Checkout could not be completed. Please try again.')
+      if (reason?.status === 400 && reason?.body && typeof reason.body === 'object' && ('expectedTotal' in reason.body || 'expected_total' in reason.body)) {
+        try {
+          const refreshed = ensureQuoteMatchesItems(payloadFrom(await api('/checkout/quote', {
+            method: 'POST', body: { shippingMethod: shippingId },
+          })), items)
+          setQuote(refreshed)
+          setError('Your order total changed. Please review the updated amount before placing your order.')
+        } catch (refreshError) {
+          setQuote(null)
+          setQuoteError(refreshError.message || 'Your updated order total could not be confirmed.')
+          setError('')
+        }
+      } else {
+        setError(reason.message || 'Checkout could not be completed. Please try again.')
+      }
     } finally {
       setBusy(false)
     }
   }
 
+  const displayedSubtotal = USE_MOCK ? subtotal : quote?.subtotal
+  const displayedShipping = USE_MOCK ? mockShippingFee : quote?.shippingFee
+  const displayedDiscount = USE_MOCK ? 0 : quote?.discountTotal
+  const displayedTax = USE_MOCK ? 0 : quote?.taxTotal
+  const displayedTotal = USE_MOCK ? subtotal + mockShippingFee : quote?.grandTotal
+  const displayMoney = (value) => value == null ? '—' : formatPeso(Number(value))
+
   return <section className="container section"><div className="mb-8 flex items-end justify-between gap-4"><div><p className="eyebrow">Almost there</p><h1 className="page-heading">Checkout</h1></div><Link className="text-sm font-semibold" to="/cart">← Return to bag</Link></div><form onSubmit={submit} className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_370px]"><div className="grid gap-8"><section className="surface p-5 sm:p-7"><h2 className="text-[31px]">Contact</h2><div className="form-grid mt-5"><label className="field-label form-full">Email address<input className="field" type="email" name="email" required defaultValue={user?.email ?? ''} autoComplete="email" /></label><label className="field-label">Full name<input className="field" name="fullName" required defaultValue={user?.fullName ?? ''} autoComplete="name" /></label><label className="field-label">Phone number<input className="field" name="phone" required autoComplete="tel" inputMode="tel" placeholder="09XX XXX XXXX" /></label></div></section>
     <section className="surface p-5 sm:p-7"><h2 className="text-[31px]">Delivery</h2><div className="form-grid mt-5"><label className="field-label form-full">Address<input className="field" name="address" required autoComplete="street-address" /></label><label className="field-label">City / municipality<input className="field" name="city" required autoComplete="address-level2" /></label><label className="field-label">Province<input className="field" name="province" required autoComplete="address-level1" /></label><label className="field-label">Postal code<input className="field" name="postalCode" required autoComplete="postal-code" /></label><label className="field-label form-full">Delivery note (optional)<input className="field" name="note" placeholder="Unit, landmark or instruction" /></label></div><label className="field-label mt-5">Delivery method<select className="field" value={shippingId} onChange={(event) => setShippingId(event.target.value)}>{shippingMethods.map((option) => <option key={option.id} value={option.id}>{option.name} — {Number(option.baseFee ?? option.base_fee) ? formatPeso(Number(option.baseFee ?? option.base_fee)) : 'Free'}</option>)}</select></label></section>
     <section className="surface p-5 sm:p-7"><h2 className="text-[31px]">Payment</h2><div className="mt-5 grid gap-3"><label className={`flex cursor-pointer items-center gap-3 rounded-ui border p-4 ${method === 'ewallet' ? 'border-[var(--olive)] bg-[#eef1e9]' : 'border-[var(--line)]'}`}><input type="radio" name="payment" checked={method === 'ewallet'} onChange={() => setMethod('ewallet')} /><span><b>Pay securely online</b><br /><span className="text-sm text-[var(--olive-gray)]">Cards, e-wallets, QR Ph and enabled local payment options.</span></span></label><label className={`flex cursor-pointer items-center gap-3 rounded-ui border p-4 ${method === 'cod' ? 'border-[var(--olive)] bg-[#eef1e9]' : 'border-[var(--line)]'}`}><input type="radio" name="payment" checked={method === 'cod'} onChange={() => setMethod('cod')} /><span><b>Cash on delivery</b><br /><span className="text-sm text-[var(--olive-gray)]">Available for selected locations.</span></span></label></div></section></div>
-    <aside className="surface p-5 lg:sticky lg:top-5"><h2 className="text-[31px]">Your order</h2><div className="mt-5 grid gap-4">{items.map((item) => <div className="grid grid-cols-[54px_1fr_auto] items-center gap-3" key={item.key}><img src={item.product.image} alt="" className="h-[54px] w-[54px] rounded-ui bg-sand object-cover mix-blend-multiply" /><span className="text-sm"><b className="block">{item.product.name}</b><span className="text-[var(--olive-gray)]">Size {item.size} · ×{item.qty}</span></span><b className="text-sm">{formatPeso(unitPrice(item.product) * item.qty)}</b></div>)}</div><div className="mt-6 grid gap-3 border-y border-[#262B1F22] py-5 text-sm"><p className="mb-0 flex justify-between"><span>Subtotal</span><b>{formatPeso(subtotal)}</b></p><p className="mb-0 flex justify-between"><span>Delivery</span><b>{shipping ? formatPeso(shipping) : 'Free'}</b></p></div><p className="my-5 flex justify-between text-lg"><b>Total</b><b>{formatPeso(subtotal + shipping)}</b></p>{error && <p className="status status-error" role="alert">{error}</p>}<Button className="w-full" type="submit" disabled={busy}>{busy ? 'Creating your order…' : method === 'ewallet' ? 'Continue to payment' : 'Place order'} <Icon name="arrow" size={17} /></Button><p className="mt-3 flex gap-2 text-xs leading-5 text-[var(--olive-gray)]"><Icon name="check" size={17} />Your payment information is handled securely by the selected payment provider. STRIDE does not store card details.</p></aside></form></section>
+    <aside className="surface p-5 lg:sticky lg:top-5"><h2 className="text-[31px]">Your order</h2><div className="mt-5 grid gap-4">{items.map((item) => {
+      const quotedLine = quote?.items?.find((line) => String(line.variant?.id) === String(item.variantId))
+      const lineTotal = USE_MOCK ? priceForItem(item) * item.qty : quotedLine?.lineTotal
+      const colorName = item.variant?.colorName ?? item.variant?.color_name
+      return <div className="grid grid-cols-[54px_1fr_auto] items-center gap-3" key={item.key}><img src={item.product.image} alt="" className="h-[54px] w-[54px] rounded-ui bg-sand object-cover mix-blend-multiply" /><span className="text-sm"><b className="block">{item.product.name}</b><span className="text-[var(--olive-gray)]">{colorName ? `${colorName} · ` : ''}EU size {item.size}{item.variant?.width && item.variant.width !== 'regular' ? ` · ${item.variant.width} width` : ''} · ×{item.qty}</span></span><b className="text-sm">{displayMoney(lineTotal)}</b></div>
+    })}</div><div className="mt-6 grid gap-3 border-y border-[#262B1F22] py-5 text-sm"><p className="mb-0 flex justify-between"><span>Subtotal</span><b>{displayMoney(displayedSubtotal)}</b></p>{Number(displayedDiscount) > 0 && <p className="mb-0 flex justify-between"><span>Discount</span><b>−{displayMoney(displayedDiscount)}</b></p>}<p className="mb-0 flex justify-between"><span>Delivery</span><b>{displayMoney(displayedShipping)}</b></p>{Number(displayedTax) > 0 && <p className="mb-0 flex justify-between"><span>Tax</span><b>{displayMoney(displayedTax)}</b></p>}</div><p className="my-5 flex justify-between text-lg"><b>Total</b><b>{displayMoney(displayedTotal)}</b></p>{(quoteBusy || shippingLoading) && <p className="mb-3 text-sm text-[var(--olive-gray)]" role="status">Confirming current prices and delivery…</p>}{shippingError && <p className="status status-error mb-3" role="alert">{shippingError} Please refresh to retry.</p>}{quoteError && <div className="mb-3"><p className="status status-error" role="alert">{quoteError}</p><button className="mt-2 text-sm font-semibold underline" type="button" onClick={() => setQuoteRetry((value) => value + 1)}>Retry order total</button></div>}{error && <p className="status status-error" role="alert">{error}</p>}<Button className="w-full" type="submit" disabled={busy || shippingLoading || quoteBusy || Boolean(shippingError) || (!USE_MOCK && !quote)}>{busy ? 'Creating your order…' : method === 'ewallet' ? 'Continue to payment' : 'Place order'} <Icon name="arrow" size={17} /></Button><p className="mt-3 flex gap-2 text-xs leading-5 text-[var(--olive-gray)]"><Icon name="check" size={17} />Your payment information is handled securely by the selected payment provider. STRIDE does not store card details.</p></aside></form></section>
 }
 

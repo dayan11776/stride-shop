@@ -30,7 +30,10 @@ export const sortByPrice = (list, dir) => [...list].sort((a, b) => (unitPrice(a)
 export function normalizeProduct(source = {}) {
   const variants = source.variants ?? source.product_variants ?? []
   const images = source.images ?? source.product_images ?? []
-  const image = source.image ?? source.image_url ?? source.primary_image ?? images[0]?.image ?? images[0]?.url ?? '/images/shoe1.jpg'
+  // The API returns an empty string when a product has no image. A neutral
+  // placeholder avoids both a broken image and showing an unrelated shoe.
+  const image = [source.image, source.image_url, source.primary_image, images[0]?.image, images[0]?.url]
+    .find((value) => typeof value === 'string' && value.trim()) || '/images/product-placeholder.svg'
   const brand = typeof source.brand === 'object' ? source.brand?.name : source.brand
   const audience = source.audience ?? source.category?.slug ?? source.category ?? 'men'
   const price = Number(source.price ?? source.base_price ?? 0)
