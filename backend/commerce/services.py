@@ -87,9 +87,10 @@ def calculate_discount(promo: PromoCode | None, subtotal: Decimal, shipping_fee:
     return discount, shipping_fee
 
 
-def calculate_cart_totals(cart: Cart, shipping_method: ShippingMethod | None = None) -> dict[str, Decimal]:
-    items = list(cart.items.select_related("variant__product").all())
-    subtotal = sum((get_unit_price(item.variant) * item.quantity for item in items), ZERO).quantize(Decimal("0.01"))
+def calculate_cart_totals(cart: Cart, shipping_method: ShippingMethod | None = None, *, items=None, prices=None) -> dict[str, Decimal]:
+    if items is None:
+        items = list(cart.items.select_related("variant__product").all())
+    subtotal = sum(((prices[item.variant_id] if prices is not None else get_unit_price(item.variant)) * item.quantity for item in items), ZERO).quantize(Decimal("0.01"))
     shipping_fee = shipping_method.base_fee if shipping_method else ZERO
     discount_total, shipping_fee = calculate_discount(cart.promo_code, subtotal, shipping_fee)
     tax_total = ZERO  # Philippine tax is included in displayed retail price for this MVP.
@@ -120,23 +121,36 @@ def create_order_from_cart(
     *, cart: Cart, checkout: dict[str, Any], shipping_method: ShippingMethod, user=None, payment_provider: str = ""
 ) -> tuple[Order, Payment]:
     """Snapshot a cart into an order and reserve inventory atomically."""
-    locked_items = list(
-        CartItem.objects.select_for_update()
-        .filter(cart=cart)
-        # ``promo_code`` is nullable. PostgreSQL refuses to lock the nullable
-        # side of the LEFT OUTER JOIN that select_related would create here.
-        # It is not needed for reserving the line items, so keep this locked
-        # query to non-null joins only.
-        .select_related("variant__product")
-    )
+    # Use a deterministic product -> variant -> inventory lock order shared
+    # with the staff editor. Never join the nullable promo in a locked query.
+    cart = Cart.objects.select_for_update().get(pk=cart.pk)
+    locked_items = list(CartItem.objects.select_for_update().filter(cart=cart).order_by("variant_id"))
     if not locked_items:
         raise ValidationError({"cart": "Your cart is empty."})
 
-    # Re-read promo under the same transaction and calculate server-side prices.
-    # Lock the cart itself without joining its optional promo relation. The
-    # promo is safely read lazily below after the cart row is locked.
-    cart = Cart.objects.select_for_update().get(pk=cart.pk)
-    totals = calculate_cart_totals(cart, shipping_method)
+    variant_ids = [item.variant_id for item in locked_items]
+    product_ids = ProductVariant.objects.filter(pk__in=variant_ids).values_list("product_id", flat=True)
+    products = {product.pk: product for product in Product.objects.select_for_update().filter(pk__in=product_ids).order_by("id")}
+    variants = {variant.pk: variant for variant in ProductVariant.objects.select_for_update().filter(pk__in=variant_ids).order_by("id")}
+    for item in locked_items:
+        variant = variants[item.variant_id]
+        variant.product = products[variant.product_id]
+        item.variant = variant
+        if not variant.is_active or variant.product.status != Product.Status.ACTIVE or variant.product.recycled_at:
+            raise ValidationError({"cart": f"{variant.sku} is no longer available."})
+
+    shipping_method = ShippingMethod.objects.select_for_update().filter(pk=shipping_method.pk, is_active=True).first()
+    if shipping_method is None:
+        raise ValidationError({"shippingMethod": "That shipping method is unavailable."})
+    if cart.promo_code_id:
+        cart.promo_code = PromoCode.objects.select_for_update().get(pk=cart.promo_code_id)
+    # A single price snapshot prevents a sale boundary or staff update from
+    # making the order total disagree with its item or payment snapshots.
+    prices = {item.variant_id: get_unit_price(item.variant) for item in locked_items}
+    totals = calculate_cart_totals(cart, shipping_method, items=locked_items, prices=prices)
+    expected_total = checkout.get("expected_total")
+    if expected_total is not None and expected_total != totals["grand_total"]:
+        raise ValidationError({"expectedTotal": "Your cart total changed. Please review the updated total and try again."})
     email = checkout["email"].lower()
     checkout_user = user if getattr(user, "is_authenticated", False) else None
     order = Order.objects.create(
@@ -160,14 +174,12 @@ def create_order_from_cart(
     OrderAddress.objects.create(order=order, type=OrderAddress.Type.BILLING, **address_fields)
 
     for cart_item in locked_items:
-        variant = ProductVariant.objects.select_for_update().select_related("product").get(pk=cart_item.variant_id)
-        if not variant.is_active or variant.product.status != Product.Status.ACTIVE:
-            raise ValidationError({"cart": f"{variant.sku} is no longer available."})
+        variant = cart_item.variant
         inventory, _ = Inventory.objects.select_for_update().get_or_create(variant=variant)
         if inventory.available < cart_item.quantity:
             raise ValidationError({"cart": f"Only {inventory.available} pairs of {variant.sku} remain."})
         Inventory.objects.filter(pk=inventory.pk).update(quantity_reserved=F("quantity_reserved") + cart_item.quantity)
-        unit_price = get_unit_price(variant)
+        unit_price = prices[variant.pk]
         OrderItem.objects.create(
             order=order,
             variant=variant,
@@ -191,7 +203,9 @@ def create_order_from_cart(
     OrderStatusHistory.objects.create(order=order, status=Order.Status.PENDING, changed_by=checkout_user)
     if cart.promo_code:
         PromoCode.objects.filter(pk=cart.promo_code_id).update(times_used=F("times_used") + 1)
-    CartItem.objects.filter(cart=cart).delete()
+    # Only remove the lines included in the snapshot, not new lines added to
+    # the cart while checkout was in progress.
+    CartItem.objects.filter(pk__in=[item.pk for item in locked_items]).delete()
     cart.promo_code = None
     cart.save(update_fields=["promo_code", "updated_at"])
     return order, payment
@@ -284,6 +298,8 @@ def max_cart_quantity(variant) -> int:
 
 
 def ensure_cart_quantity(variant, quantity: int) -> None:
+    if not variant.is_active or variant.product.status != Product.Status.ACTIVE or variant.product.recycled_at:
+        raise ValidationError({"quantity": "This product is no longer available."})
     cap = max_cart_quantity(variant)
     if quantity > cap:
         message = f"Only {cap} available in this size." if cap else "This size is out of stock."
