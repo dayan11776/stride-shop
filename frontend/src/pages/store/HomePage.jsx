@@ -131,6 +131,7 @@ function BrandSpotlight({ products, isLoading, isError, retry }) {
     </div>
     <div className="home-brand-stage" aria-live="polite" aria-busy={isLoading}>
       <span className={`home-brand-word${brand.length > 7 ? ' home-brand-word--long' : ''}`} aria-hidden="true">{brand}</span>
+      <span className="home-brand-label">{brand}</span>
       <div className="home-brand-image"><ProductImage product={product} fallbackIndex={index} caption /></div>
       <div className="home-brand-arrows">
         <CarouselArrow label="Previous brand" previous onClick={() => move(-1)} />
@@ -139,7 +140,6 @@ function BrandSpotlight({ products, isLoading, isError, retry }) {
       <div className="home-brand-bottom">
         <div><span className="home-brand-count">{String(index + 1).padStart(2, '0')} / {brands.length}</span><span className="home-brand-progress" aria-hidden="true" /></div>
         <div className="home-brand-caption">
-          <span className="sr-only">{brand}. </span>
           {isError ? <button type="button" className="home-text-button" onClick={retry}>Products unavailable · Try again</button> : !isLoading && !product ? <span className="home-brand-empty">Products coming soon</span> : null}
           <Link className="home-underlined-link" to={`/search?brand=${encodeURIComponent(brand)}`}>Shop this brand <Icon name="arrow" size={17} /></Link>
         </div>

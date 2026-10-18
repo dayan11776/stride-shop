@@ -62,9 +62,11 @@ test('all ten new arrivals remain reachable beyond the four visible thumbnails',
 test('brands carousel uses a matching product and an exact brand filter', () => {
   showHome()
   const section = screen.getByRole('region', { name: 'Shop by brand' })
+  expect(within(section).getByText('ADIDAS', { selector: '.home-brand-label' })).toBeTruthy()
   expect(within(section).getByRole('img', { name: 'Adidas Runner' }).getAttribute('src')).toBe('/adidas.jpg')
   expect(within(section).getByRole('link', { name: /shop this brand/i }).getAttribute('href')).toBe('/search?brand=ADIDAS')
   for (let count = 0; count < 4; count += 1) fireEvent.click(within(section).getByRole('button', { name: 'Next brand' }))
+  expect(within(section).getByText('ON', { selector: '.home-brand-label' })).toBeTruthy()
   expect(within(section).getByRole('img', { name: 'On Kids' }).getAttribute('src')).toBe('/on.jpg')
   expect(within(section).getByRole('link', { name: /shop this brand/i }).getAttribute('href')).toBe('/search?brand=ON')
   fireEvent.click(within(section).getByRole('button', { name: 'Next brand' }))
