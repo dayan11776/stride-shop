@@ -3,7 +3,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { beforeEach, expect, test, vi } from 'vitest'
 import { useCartStore } from '@/features/cart/cartStore'
 import { api } from '@/lib/apiClient'
-import { Component, quoteSignature } from './CheckoutPage'
+import { Component, mockShippingFee, quoteSignature } from './CheckoutPage'
 
 vi.mock('@/lib/apiClient', () => ({
   USE_MOCK: false,
@@ -114,4 +114,13 @@ test('quote comparison includes variant IDs, prices, quantities and totals', () 
   const first = { items: [{ variant: { id: 'v1' }, quantity: 1, unitPrice: 500 }], subtotal: 500, discountTotal: 0, shippingFee: 100, taxTotal: 0, grandTotal: 600 }
   expect(quoteSignature({ ...first, items: [{ variant: { id: 'v2' }, quantity: 1, unitPrice: 500 }] })).not.toBe(quoteSignature(first))
   expect(quoteSignature({ ...first, shippingFee: 120, grandTotal: 620 })).not.toBe(quoteSignature(first))
+})
+
+test('preview shipping matches the standard-delivery threshold and preserves express fees', () => {
+  const standard = { name: 'Standard delivery', baseFee: 150 }
+  const express = { name: 'Express delivery', baseFee: 295 }
+  expect(mockShippingFee(3499.99, standard)).toBe(150)
+  expect(mockShippingFee(3500, standard)).toBe(150)
+  expect(mockShippingFee(3500.01, standard)).toBe(0)
+  expect(mockShippingFee(5000, express)).toBe(295)
 })

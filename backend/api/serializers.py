@@ -197,8 +197,9 @@ class ProductCardSerializer(serializers.ModelSerializer):
 
     def get_reviewAverage(self, obj):
         # Annotated values avoid a query per card; the fallback keeps direct use handy.
-        value = getattr(obj, "review_average", None)
-        if value is None:
+        if hasattr(obj, "review_average"):
+            value = obj.review_average
+        else:
             value = obj.reviews.filter(status=Review.Status.PUBLISHED).aggregate(value=Avg("rating"))["value"]
         return round(float(value), 1) if value is not None else None
 

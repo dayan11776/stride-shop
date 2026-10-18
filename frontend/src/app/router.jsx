@@ -6,10 +6,11 @@ import { SupportLayout } from '@/layouts/SupportLayout'
 import { AdminLayout } from '@/layouts/AdminLayout'
 import { RequireAuth, RequireAdmin } from '@/features/auth/guards'
 import { RouteError } from '@/app/RouteError'
+import { AppRoot } from '@/app/AppRoot'
 
 // Every page is lazy-loaded, so each route is its own JavaScript chunk.
 // A page module exports `Component` (and optionally `loader`).
-export const router = createBrowserRouter([
+const routes = [
   {
     element: <StoreLayout />,
     errorElement: <RouteError />,
@@ -94,4 +95,6 @@ export const router = createBrowserRouter([
       },
     ],
   },
-])
+]
+
+export const router = createBrowserRouter([{ element: <AppRoot />, children: routes }])

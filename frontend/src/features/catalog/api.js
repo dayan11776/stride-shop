@@ -14,7 +14,7 @@ export async function getProducts(filters = {}) {
     (!filters.brand || p.brand?.trim().toLowerCase() === filters.brand.trim().toLowerCase()) &&
     (!filters.sale || p.salePrice != null) &&
     (!filters.isNew || p.isNew) &&
-    (!q || `${p.name} ${p.audience}`.toLowerCase().includes(q)))
+    (!q || `${p.name ?? ''} ${p.brand ?? ''} ${p.description ?? ''}`.toLowerCase().includes(q)))
 }
 
 export async function getProduct(slug) {

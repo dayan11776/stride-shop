@@ -9,6 +9,14 @@ import { Icon } from '@/components/ui/Icon'
 
 const mockShipping = [{ id: 'standard', name: 'Standard delivery', baseFee: 180, estDaysMin: 2, estDaysMax: 5 }]
 
+// The demo preview mirrors the live policy: standard delivery is free only
+// above ₱3,500, before any promotional discount; express keeps its base rate.
+export function mockShippingFee(subtotal, shippingMethod) {
+  const method = (shippingMethod?.name ?? 'Standard delivery').trim().toLowerCase()
+  const isStandard = method === 'standard' || method === 'standard delivery'
+  return isStandard && subtotal > 3500 ? 0 : Number(shippingMethod?.baseFee ?? shippingMethod?.base_fee ?? 180)
+}
+
 function pendingPaymentKey(paymentId) {
   return `stride.pending-payment.${paymentId}`
 }
@@ -126,7 +134,7 @@ export function Component() {
     () => shippingMethods.find((item) => String(item.id) === String(shippingId)) ?? shippingMethods[0],
     [shippingId, shippingMethods],
   )
-  const mockShippingFee = subtotal >= 3500 ? 0 : Number(selectedShipping?.baseFee ?? selectedShipping?.base_fee ?? 180)
+  const previewShippingFee = mockShippingFee(subtotal, selectedShipping)
 
   useEffect(() => {
     if (USE_MOCK || cancelledPaymentId || !items.length || shippingLoading || !shippingId) return
@@ -211,7 +219,7 @@ export function Component() {
       if (USE_MOCK) {
         const orderNumber = `STR-${Math.floor(100000 + Math.random() * 899999)}`
         clear()
-        navigate(`/order-confirmation/${orderNumber}`, { state: { order: { orderNumber, email: values.email, grandTotal: subtotal + mockShippingFee } } })
+        navigate(`/order-confirmation/${orderNumber}`, { state: { order: { orderNumber, email: values.email, grandTotal: subtotal + previewShippingFee, isGuest: !user } } })
         return
       }
       if (!quote || quoteBusy || shippingLoading || shippingError) throw new Error('Please wait until the current order total is confirmed.')
@@ -285,14 +293,14 @@ export function Component() {
   }
 
   const displayedSubtotal = USE_MOCK ? subtotal : quote?.subtotal
-  const displayedShipping = USE_MOCK ? mockShippingFee : quote?.shippingFee
+  const displayedShipping = USE_MOCK ? previewShippingFee : quote?.shippingFee
   const displayedDiscount = USE_MOCK ? 0 : quote?.discountTotal
   const displayedTax = USE_MOCK ? 0 : quote?.taxTotal
-  const displayedTotal = USE_MOCK ? subtotal + mockShippingFee : quote?.grandTotal
+  const displayedTotal = USE_MOCK ? subtotal + previewShippingFee : quote?.grandTotal
   const displayMoney = (value) => value == null ? '—' : formatPeso(Number(value))
 
   return <section className="container section"><div className="mb-8 flex items-end justify-between gap-4"><div><p className="eyebrow">Almost there</p><h1 className="page-heading">Checkout</h1></div><Link className="text-sm font-semibold" to="/cart">← Return to bag</Link></div><form onSubmit={submit} className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_370px]"><div className="grid gap-8"><section className="surface p-5 sm:p-7"><h2 className="text-[31px]">Contact</h2><div className="form-grid mt-5"><label className="field-label form-full">Email address<input className="field" type="email" name="email" required defaultValue={user?.email ?? ''} autoComplete="email" /></label><label className="field-label">Full name<input className="field" name="fullName" required defaultValue={user?.fullName ?? ''} autoComplete="name" /></label><label className="field-label">Phone number<input className="field" name="phone" required autoComplete="tel" inputMode="tel" placeholder="09XX XXX XXXX" /></label></div></section>
-    <section className="surface p-5 sm:p-7"><h2 className="text-[31px]">Delivery</h2><div className="form-grid mt-5"><label className="field-label form-full">Address<input className="field" name="address" required autoComplete="street-address" /></label><label className="field-label">City / municipality<input className="field" name="city" required autoComplete="address-level2" /></label><label className="field-label">Province<input className="field" name="province" required autoComplete="address-level1" /></label><label className="field-label">Postal code<input className="field" name="postalCode" required autoComplete="postal-code" /></label><label className="field-label form-full">Delivery note (optional)<input className="field" name="note" placeholder="Unit, landmark or instruction" /></label></div><label className="field-label mt-5">Delivery method<select className="field" value={shippingId} onChange={(event) => setShippingId(event.target.value)}>{shippingMethods.map((option) => <option key={option.id} value={option.id}>{option.name} — {Number(option.baseFee ?? option.base_fee) ? formatPeso(Number(option.baseFee ?? option.base_fee)) : 'Free'}</option>)}</select></label></section>
+    <section className="surface p-5 sm:p-7"><h2 className="text-[31px]">Delivery</h2><div className="form-grid mt-5"><label className="field-label form-full">Address<input className="field" name="address" required autoComplete="street-address" /></label><label className="field-label">City / municipality<input className="field" name="city" required autoComplete="address-level2" /></label><label className="field-label">Province<input className="field" name="province" required autoComplete="address-level1" /></label><label className="field-label">Postal code<input className="field" name="postalCode" required autoComplete="postal-code" /></label><label className="field-label form-full">Delivery note (optional)<input className="field" name="note" placeholder="Unit, landmark or instruction" /></label></div><label className="field-label mt-5">Delivery method<select className="field" value={shippingId} onChange={(event) => setShippingId(event.target.value)}>{shippingMethods.map((option) => <option key={option.id} value={option.id}>{option.name} — {Number(option.baseFee ?? option.base_fee) ? `Base rate ${formatPeso(Number(option.baseFee ?? option.base_fee))}` : 'Free'}</option>)}</select></label></section>
     <section className="surface p-5 sm:p-7"><h2 className="text-[31px]">Payment</h2><div className="mt-5 grid gap-3"><label className={`flex cursor-pointer items-center gap-3 rounded-ui border p-4 ${method === 'ewallet' ? 'border-[var(--olive)] bg-[#eef1e9]' : 'border-[var(--line)]'}`}><input type="radio" name="payment" checked={method === 'ewallet'} onChange={() => setMethod('ewallet')} /><span><b>Pay securely online</b><br /><span className="text-sm text-[var(--olive-gray)]">Cards, e-wallets, QR Ph and enabled local payment options.</span></span></label><label className={`flex cursor-pointer items-center gap-3 rounded-ui border p-4 ${method === 'cod' ? 'border-[var(--olive)] bg-[#eef1e9]' : 'border-[var(--line)]'}`}><input type="radio" name="payment" checked={method === 'cod'} onChange={() => setMethod('cod')} /><span><b>Cash on delivery</b><br /><span className="text-sm text-[var(--olive-gray)]">Available for selected locations.</span></span></label></div></section></div>
     <aside className="surface p-5 lg:sticky lg:top-5"><h2 className="text-[31px]">Your order</h2>{items.some((item) => item.product.isExamplePrice || item.product.isExampleStock) && <p className="status mt-4 text-sm">Some prices, sizes or stock are examples and have not been verified. The displayed total may still be charged if you place an order. Please confirm details with the store.</p>}<div className="mt-5 grid gap-4">{items.map((item) => {
       const quotedLine = quote?.items?.find((line) => String(line.variant?.id) === String(item.variantId))

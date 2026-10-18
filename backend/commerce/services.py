@@ -20,6 +20,7 @@ from catalog.models import Inventory, Product, ProductVariant
 from .models import Cart, CartItem, InventoryMovement, Order, OrderAddress, OrderItem, OrderStatusHistory, Payment, PromoCode, ShippingMethod
 
 ZERO = Decimal("0.00")
+FREE_STANDARD_DELIVERY_THRESHOLD = Decimal("3500.00")
 
 
 def get_cart_for_request(request, *, create: bool = True) -> tuple[Cart | None, str | None]:
@@ -93,6 +94,15 @@ def calculate_cart_totals(cart: Cart, shipping_method: ShippingMethod | None = N
     subtotal = sum(((prices[item.variant_id] if prices is not None else get_unit_price(item.variant)) * item.quantity for item in items), ZERO).quantize(Decimal("0.01"))
     shipping_fee = shipping_method.base_fee if shipping_method else ZERO
     discount_total, shipping_fee = calculate_discount(cart.promo_code, subtotal, shipping_fee)
+    # The published policy applies to standard delivery when the merchandise
+    # subtotal (before promo discounts) is strictly above the threshold.
+    # Other methods are charged normally, unless a free-shipping promo applies.
+    if (
+        shipping_method
+        and shipping_method.name.strip().casefold() in {"standard", "standard delivery"}
+        and subtotal > FREE_STANDARD_DELIVERY_THRESHOLD
+    ):
+        shipping_fee = ZERO
     tax_total = ZERO  # Philippine tax is included in displayed retail price for this MVP.
     return {
         "subtotal": subtotal,

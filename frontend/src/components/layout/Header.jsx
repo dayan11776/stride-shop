@@ -32,7 +32,7 @@ export function Header() {
   }
   return (
     <>
-      <div className={styles.announce}>Free delivery on orders over ₱3,500 <span>•</span> Easy 30-day returns</div>
+      <div className={styles.announce}>Free standard delivery on orders over ₱3,500 <span>•</span> Easy 30-day returns</div>
       <header className={styles.shell}>
         <div className={`${styles.header} container`}>
           <button className={styles.menuButton} onClick={() => setOpen((value) => !value)} aria-label={open ? 'Close menu' : 'Open menu'} aria-expanded={open}>
@@ -48,7 +48,7 @@ export function Header() {
           <div className={styles.actions}>
             {user ? <button onClick={onSignOut} className={styles.action} aria-label="Sign out"><Icon name="logout" size={20} /></button> : <Link to="/login" className={styles.action} aria-label="Account"><Icon name="user" size={20} /></Link>}
             <Link to="/account/wishlist" className={styles.action} aria-label={`Wishlist, ${wishes} saved`}><Icon name="heart" size={20} />{wishes > 0 && <b>{wishes}</b>}</Link>
-            <Link to="/cart" className={styles.action} aria-label={`Cart, ${count} items`}><Icon name="bag" size={20} />{count > 0 && <b>{count}</b>}</Link>
+            <Link to="/cart" className={styles.action} aria-label={`Cart, ${count} ${count === 1 ? 'item' : 'items'}`}><Icon name="bag" size={20} />{count > 0 && <b>{count}</b>}</Link>
           </div>
         </div>
         <div className={`${styles.mobileSearch} container`}><form onSubmit={onSearch} role="search"><Icon name="search" size={17} /><input name="q" placeholder="Search shoes, styles and brands" aria-label="Search shoes and brands" /></form></div>

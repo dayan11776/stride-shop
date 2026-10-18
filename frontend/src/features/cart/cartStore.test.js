@@ -36,3 +36,13 @@ test('uses the backend current price even when a sale is scheduled', () => {
   const variant = { id: 'v', price: '200', salePrice: '150', currentPrice: 200 }
   expect(priceForItem({ product, variant })).toBe(200)
 })
+
+test('merging a cart line uses the latest stock and price for its variant', () => {
+  const product = { id: 'p', price: 1000, image: '/old.jpg' }
+  useCartStore.getState().add(product, 40, 2, { id: 'v', available: 5, currentPrice: 1000 })
+  useCartStore.getState().add({ ...product, image: '/new.jpg' }, 40, 3, { id: 'v', available: 3, currentPrice: 1100 })
+  const item = useCartStore.getState().items[0]
+  expect(item.qty).toBe(3)
+  expect(priceForItem(item)).toBe(1100)
+  expect(item.product.image).toBe('/new.jpg')
+})

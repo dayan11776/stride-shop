@@ -9,7 +9,7 @@ from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db import IntegrityError, transaction
-from django.db.models import Count, F, Prefetch, Q, Sum
+from django.db.models import Avg, Count, F, Prefetch, Q, Sum
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.decorators import method_decorator
@@ -225,7 +225,12 @@ class ProductListView(APIView):
 
     def get_queryset(self):
         query = self.request.query_params
-        products = Product.objects.filter(status=Product.Status.ACTIVE, recycled_at__isnull=True).select_related("brand", "category").prefetch_related("variants__inventory", "images")
+        products = (
+            Product.objects.filter(status=Product.Status.ACTIVE, recycled_at__isnull=True)
+            .select_related("brand", "category")
+            .prefetch_related("variants__inventory", "images")
+            .annotate(review_average=Avg("reviews__rating", filter=Q(reviews__status=Review.Status.PUBLISHED)))
+        )
         audience = query.get("audience")
         if audience:
             products = products.filter(audience=audience)
@@ -236,7 +241,15 @@ class ProductListView(APIView):
         if category:
             products = products.filter(Q(category__slug=category) | Q(category__name__iexact=category))
         if is_true(query.get("sale")):
-            products = products.filter(variants__sale_price__isnull=False, variants__is_active=True)
+            # Match the same date window as ProductVariant.current_price so
+            # expired and upcoming promotions do not appear as active sales.
+            now = timezone.now()
+            products = products.filter(
+                Q(variants__sale_starts_at__isnull=True) | Q(variants__sale_starts_at__lte=now),
+                Q(variants__sale_ends_at__isnull=True) | Q(variants__sale_ends_at__gte=now),
+                variants__sale_price__isnull=False,
+                variants__is_active=True,
+            )
         if is_true(query.get("isNew") or query.get("is_new")):
             products = products.filter(is_new_arrival=True)
         if phrase := query.get("q"):

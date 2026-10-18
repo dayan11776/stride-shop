@@ -22,7 +22,7 @@ export function CatalogPage({ title, filters }) {
         <div className="flex flex-wrap gap-2" role="group" aria-label="Sort products">
           {[['new', 'Latest'], ['low', 'Price: low to high'], ['high', 'Price: high to low']].map(([key, label]) => <Chip key={key} selected={sort === key} onClick={() => setSort(key)}>{label}</Chip>)}
         </div>
-        <span className="text-xs font-semibold uppercase tracking-[.12em] text-[var(--olive-gray)]">Free delivery over ₱3,500</span>
+        <span className="text-xs font-semibold uppercase tracking-[.12em] text-[var(--olive-gray)]">Free standard delivery over ₱3,500</span>
       </div>
       {isLoading && <CatalogSkeleton />}
       {isError && <ErrorState title="The collection is taking a moment." detail={error?.message} onRetry={refetch} />}

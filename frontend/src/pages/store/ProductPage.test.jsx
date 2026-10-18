@@ -77,3 +77,48 @@ test('uses the placeholder when a product image fails, and tries the next colour
   fireEvent.click(within(screen.getByRole('group', { name: 'Select colour' })).getByRole('button', { name: 'Black' }))
   expect(screen.getByAltText('Runner').getAttribute('src')).toBe('/black.jpg')
 })
+
+test('shows each supplied gallery photo once and hides failed extra photos', () => {
+  useProduct.mockReturnValue({ data: { ...product, images: [
+    { colorName: 'Sage', url: '/sage.jpg' },
+    { colorName: 'Sage', url: '/sage-side.jpg', altText: 'Runner side view' },
+    { colorName: 'Sage', url: '/sage-side.jpg' },
+    { colorName: 'Black', url: '/black.jpg' },
+  ] }, isLoading: false, isError: false })
+  const { container } = showProduct()
+  expect([...container.querySelectorAll('img')].map((img) => img.getAttribute('src'))).toEqual(['/sage.jpg', '/sage-side.jpg'])
+  fireEvent.error(screen.getByAltText('Runner side view'))
+  expect([...container.querySelectorAll('img')].map((img) => img.getAttribute('src'))).toEqual(['/sage.jpg'])
+  fireEvent.click(within(screen.getByRole('group', { name: 'Select colour' })).getByRole('button', { name: 'Black' }))
+  expect([...container.querySelectorAll('img')].map((img) => img.getAttribute('src'))).toEqual(['/black.jpg'])
+})
+
+test('does not duplicate a missing product-image placeholder', () => {
+  useProduct.mockReturnValue({ data: { ...product, image: '', images: [] }, isLoading: false, isError: false })
+  const { container } = showProduct()
+  expect(container.querySelectorAll('img')).toHaveLength(1)
+  expect(screen.getByAltText('Product image unavailable').getAttribute('src')).toBe('/images/product-placeholder.svg')
+})
+
+test('reports the actual amount added and warns when the bag is already at the stock limit', () => {
+  showProduct()
+  fireEvent.click(within(screen.getByRole('group', { name: 'Select shoe size' })).getByRole('button', { name: '40' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Increase quantity' }))
+  fireEvent.click(screen.getByRole('button', { name: /Add to bag/i }))
+  expect(useCartStore.getState().items[0].qty).toBe(2)
+  fireEvent.click(screen.getByRole('button', { name: /Add to bag/i }))
+  expect(useCartStore.getState().items[0].qty).toBe(3)
+  expect(screen.getByRole('status').textContent).toMatch(/1 pair was added/)
+  fireEvent.click(screen.getByRole('button', { name: /Add to bag/i }))
+  expect(useCartStore.getState().items[0].qty).toBe(3)
+  expect(screen.getByRole('status').textContent).toMatch(/already contains the maximum/)
+})
+
+test('explains when a saved cart quantity is reduced to match newly fetched stock', () => {
+  useCartStore.getState().add(product, 40, 5, { ...product.variants[0], available: 5 })
+  showProduct()
+  fireEvent.click(within(screen.getByRole('group', { name: 'Select shoe size' })).getByRole('button', { name: '40' }))
+  fireEvent.click(screen.getByRole('button', { name: /Add to bag/i }))
+  expect(useCartStore.getState().items[0].qty).toBe(3)
+  expect(screen.getByRole('status').textContent).toMatch(/adjusted to the latest available stock/)
+})

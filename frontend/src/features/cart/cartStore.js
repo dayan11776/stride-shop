@@ -17,7 +17,13 @@ export const useCartStore = create(
         const variantId = variant?.id ?? findVariantForSize(product?.variants, size)?.id ?? null
         const key = variantId ? `${product.id}-${variantId}` : `${product.id}-${size}`
         const found = s.items.find((i) => i.key === key)
-        if (found) return { items: s.items.map((i) => (i.key === key ? { ...i, qty: Math.min(i.qty + qty, maxQtyFor(i)) } : i)) }
+        if (found) return { items: s.items.map((i) => {
+          if (i.key !== key) return i
+          // The product page may have fetched a newer price or stock level
+          // than the one saved when this line was first added.
+          const updated = { ...i, product, variant: variant ?? i.variant }
+          return { ...updated, qty: Math.min(i.qty + qty, maxQtyFor(updated)) }
+        }) }
         const item = { key, product, size, qty, variantId, variant }
         return { items: [...s.items, { ...item, qty: Math.min(qty, maxQtyFor(item)) }] }
       }),
