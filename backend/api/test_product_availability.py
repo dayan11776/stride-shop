@@ -33,6 +33,7 @@ class ProductAvailabilityTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()[0]["availableQuantity"], 12)
         self.assertFalse(response.json()[0]["isExampleStock"])
+        self.assertFalse(response.json()[0]["isExamplePrice"])
 
         detail = self.client.get("/api/products/test-shoe")
         self.assertEqual(detail.status_code, 200)
@@ -71,3 +72,15 @@ class ProductAvailabilityTests(TestCase):
         self.assertEqual(response.status_code, 200, response.content)
         self.assertFalse(response.json()["is_example_stock"])
         self.assertFalse(self.client.get("/api/products/test-shoe").json()["isExampleStock"])
+
+    def test_example_price_marker_is_visible_and_staff_can_change_it(self):
+        self.product.is_example_price = True
+        self.product.save(update_fields=["is_example_price"])
+        self.assertTrue(self.client.get("/api/products").json()[0]["isExamplePrice"])
+        self.assertTrue(self.client.get("/api/products/test-shoe").json()["isExamplePrice"])
+        user = get_user_model().objects.create_user(email="pricing@example.test", password="test-password", role="admin")
+        self.client.force_login(user)
+        response = self.client.patch(f"/api/staff/products/{self.product.id}", data='{"is_example_price": false}', content_type="application/json")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertFalse(response.json()["is_example_price"])
+        self.assertFalse(self.client.get("/api/products/test-shoe").json()["isExamplePrice"])

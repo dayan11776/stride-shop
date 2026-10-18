@@ -26,6 +26,6 @@ export function ProductCard({ product }) {
     </Link>
     {(product.salePrice != null || product.isNew) && <Badge className={styles.badge}>{product.salePrice != null ? 'Sale' : 'New'}</Badge>}
     <button className={styles.heart} aria-label={saved ? `Remove ${product.name} from wishlist` : `Add ${product.name} to wishlist`} aria-pressed={saved} onClick={() => toggle(product.id)}><Icon name="heart" size={20} strokeWidth={saved ? 2.4 : 1.7} /></button>
-    <div className={styles.copy}><p className={styles.brand}>{product.brand}</p><h3 className={styles.name}><Link to={`/products/${product.slug}`}>{product.name}</Link></h3><p className={styles.price}><strong>{formatPeso(product.salePrice ?? product.price)}</strong>{product.salePrice != null && <s>{formatPeso(product.price)}</s>}</p><p className={styles.stock}>{stockLabel}</p></div>
+    <div className={styles.copy}><p className={styles.brand}>{product.brand}</p><h3 className={styles.name}><Link to={`/products/${product.slug}`}>{product.name}</Link></h3><p className={styles.price}><strong>{formatPeso(product.salePrice ?? product.price)}</strong>{product.salePrice != null && <s>{formatPeso(product.price)}</s>}</p>{product.isExamplePrice && <p className={styles.stock}>Example price; not verified by the store.</p>}<p className={styles.stock}>{stockLabel}</p></div>
   </article>
 }

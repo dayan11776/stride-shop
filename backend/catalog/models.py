@@ -58,6 +58,8 @@ class Product(TimeStampedUUIDModel):
     is_new_arrival = models.BooleanField(default=False)
     # Example quantities are not verified stock and must be labelled as such.
     is_example_stock = models.BooleanField(default=False)
+    # Reference prices are illustrative rather than verified store prices.
+    is_example_price = models.BooleanField(default=False)
     # Separate from status: an archived product is not necessarily in the bin.
     # Keeping the row and its relations preserves order history and makes the
     # operation reversible.

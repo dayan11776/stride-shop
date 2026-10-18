@@ -1,0 +1,97 @@
+.home-arrivals { background: #f9f6f1; overflow: hidden; }
+.home-arrivals-inner { padding-top: clamp(26px, 4vw, 64px); padding-bottom: clamp(30px, 4vw, 54px); }
+.home-arrivals-stage { position: relative; display: grid; grid-template-columns: minmax(180px, .9fr) minmax(0, 2fr) minmax(165px, .75fr); align-items: center; min-height: clamp(280px, 32vw, 430px); }
+.home-arrivals-title, .home-arrivals-info { position: relative; z-index: 2; }
+.home-arrivals-title h1 { font-size: clamp(54px, 7.5vw, 112px); line-height: .8; letter-spacing: -.015em; }
+.home-arrivals-watermark { position: absolute; left: 19%; right: 15%; top: 50%; transform: translateY(-55%); color: #eae4dc; font-family: var(--font-display); font-size: clamp(100px, 20vw, 300px); font-weight: 800; line-height: .75; text-align: center; white-space: nowrap; user-select: none; }
+.home-arrivals-image { position: relative; z-index: 1; height: clamp(260px, 32vw, 430px); min-width: 0; }
+.home-arrivals-image img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply; }
+.home-arrivals-skeleton { height: 85%; margin: 5% 0; }
+.home-arrivals-info { padding-left: 14px; }
+.home-arrivals-info h2 { margin-bottom: 10px; font-size: clamp(25px, 2.6vw, 40px); line-height: 1; overflow-wrap: anywhere; }
+.home-arrivals-info > p:not(.eyebrow) { margin-bottom: 12px; }
+.home-arrivals-price { font-size: 18px; font-weight: 700; }
+.home-example-note { color: var(--olive-gray); font-size: 12px; }
+.home-image-note { position: absolute; z-index: 2; right: 8px; bottom: 8px; padding: 3px 7px; border-radius: 4px; color: #30372b; background: rgba(247,242,235,.92); font-size: 10px; line-height: 1.2; }
+.home-arrivals-controls { display: flex; align-items: center; justify-content: center; gap: clamp(10px, 2.4vw, 30px); margin: 12px auto 0; }
+.home-carousel-arrow { display: grid; flex: 0 0 auto; width: 44px; height: 44px; place-items: center; border: 0; border-radius: 50%; color: var(--ink); background: #ece7df; transition: background .2s ease; }
+.home-carousel-arrow:hover:not(:disabled) { background: #d9e2cc; }
+.home-carousel-arrow:disabled { opacity: .4; }
+.home-arrow-reversed { transform: rotate(180deg); }
+.home-arrivals-thumbnails { display: grid; width: min(100%, 720px); grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.home-arrivals-thumbnail { display: block; overflow: hidden; height: 98px; padding: 2px; border: 1px solid transparent; border-radius: 6px; background: #eeeae4; }
+.home-arrivals-thumbnail.is-selected { border-color: var(--olive); }
+.home-arrivals-thumbnail img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply; }
+.home-underlined-link { display: inline-flex; align-items: center; gap: 10px; padding-bottom: 4px; border-bottom: 1px solid currentColor; color: inherit; font-size: 12px; font-weight: 700; letter-spacing: .07em; text-decoration: none; text-transform: uppercase; }
+.home-underlined-link:hover, .home-heading-link:hover { color: var(--olive); }
+.home-all-arrivals { display: flex; width: max-content; margin: 26px auto 0; }
+.home-text-button { padding: 0; border: 0; border-bottom: 1px solid currentColor; color: var(--olive); background: none; font-weight: 700; }
+.home-section { padding-top: clamp(40px, 5vw, 72px); }
+.home-section-heading { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 14px; margin-bottom: 20px; }
+.home-section-heading h2 { font-size: clamp(38px, 4.5vw, 62px); }
+.home-heading-link { display: inline-flex; align-items: center; gap: 9px; font-size: 13px; font-weight: 700; text-decoration: none; }
+.home-collection-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 12px; }
+.home-collection-card { position: relative; display: flex; min-height: clamp(170px, 20vw, 260px); overflow: hidden; align-items: center; border-radius: 8px; padding: clamp(18px, 3vw, 42px); color: var(--ink); background: #eae2d6; text-decoration: none; }
+.home-collection-card--women, .home-collection-card--new { grid-column: span 7; }
+.home-collection-card--men, .home-collection-card--kids { grid-column: span 5; }
+.home-collection-card--men { background: #e4e6dd; }
+.home-collection-card--kids { background: #eeeef0; }
+.home-collection-copy { position: relative; z-index: 2; width: 48%; }
+.home-collection-copy h3 { margin-bottom: 14px; font-size: clamp(30px, 3vw, 48px); line-height: .95; }
+.home-collection-image { position: absolute; inset: 5% 0 5% auto; width: 58%; height: 90%; object-fit: contain; mix-blend-mode: multiply; transition: transform .3s ease; }
+.home-collection-card:hover .home-collection-image { transform: scale(1.04); }
+.home-brands { padding-bottom: clamp(50px, 6vw, 90px); }
+.home-brand-stage { position: relative; min-height: clamp(330px, 40vw, 550px); overflow: hidden; border-radius: 8px; background: #eae4dc; }
+.home-brand-stage::before, .home-brand-stage::after { position: absolute; top: 50%; width: 130px; height: 130px; border: 1px solid rgba(38,43,31,.05); border-radius: 50%; box-shadow: 0 0 0 22px rgba(38,43,31,.025), 0 0 0 44px rgba(38,43,31,.02); content: ''; transform: translateY(-50%); }
+.home-brand-stage::before { left: -65px; }
+.home-brand-stage::after { right: -65px; }
+.home-brand-word { position: absolute; inset: 48% 60px auto; transform: translateY(-50%); color: var(--ink); font-family: var(--font-display); font-size: clamp(80px, 22vw, 320px); font-weight: 800; letter-spacing: -.04em; line-height: .75; text-align: center; text-transform: uppercase; white-space: nowrap; }
+.home-brand-word--long { font-size: clamp(48px, 13vw, 190px); }
+.home-brand-image { position: absolute; z-index: 1; inset: 8% 20% 16%; display: flex; align-items: center; justify-content: center; pointer-events: none; }
+.home-brand-image img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply; }
+.home-brand-arrows { position: absolute; z-index: 3; inset: 0 18px; display: flex; align-items: center; justify-content: space-between; pointer-events: none; }
+.home-brand-arrows button { pointer-events: auto; }
+.home-brand-bottom { position: absolute; z-index: 3; right: clamp(20px, 4vw, 50px); bottom: 22px; left: clamp(20px, 4vw, 50px); display: flex; align-items: end; justify-content: space-between; gap: 10px; }
+.home-brand-count { font-size: 12px; font-weight: 700; letter-spacing: .08em; }
+.home-brand-progress { display: inline-block; width: 80px; height: 1px; margin: 0 0 4px 14px; background: rgba(38,43,31,.4); }
+.home-brand-caption { display: flex; flex-direction: column; align-items: end; gap: 6px; }
+.home-brand-empty { color: var(--olive-gray); font-size: 12px; }
+@media (max-width: 800px) {
+  .home-arrivals-stage { grid-template-columns: minmax(130px, 1fr) minmax(0, 1.7fr); }
+  .home-arrivals-info { grid-column: 1 / -1; padding: 0; text-align: center; }
+  .home-arrivals-info h2 { font-size: 30px; }
+  .home-arrivals-watermark { right: 0; left: 15%; top: 35%; }
+  .home-arrivals-image { height: 290px; }
+  .home-brand-word { font-size: clamp(80px, 20vw, 160px); }
+  .home-brand-word--long { font-size: clamp(44px, 11vw, 88px); }
+}
+@media (max-width: 560px) {
+  .home-arrivals-inner { padding-top: 24px; }
+  .home-arrivals-stage { grid-template-columns: 1fr; }
+  .home-arrivals-title { text-align: center; }
+  .home-arrivals-title h1 br { display: none; }
+  .home-arrivals-title h1 { font-size: clamp(48px, 13vw, 70px); }
+  .home-arrivals-watermark { inset: 28% 0 auto; font-size: 25vw; }
+  .home-arrivals-image { grid-row: 2; height: 220px; }
+  .home-arrivals-info { grid-row: 3; }
+  .home-arrivals-info h2 { font-size: 27px; }
+  .home-arrivals-controls { gap: 7px; }
+  .home-carousel-arrow { width: 38px; height: 38px; }
+  .home-arrivals-thumbnails { gap: 5px; }
+  .home-arrivals-thumbnail { height: 58px; }
+  .home-collection-grid { grid-template-columns: 1fr; }
+  .home-collection-card--women, .home-collection-card--men, .home-collection-card--kids, .home-collection-card--new { grid-column: auto; }
+  .home-collection-card { min-height: 165px; }
+  .home-collection-copy h3 { font-size: 36px; }
+  .home-brand-stage { min-height: 330px; }
+  .home-brand-word { right: 35px; left: 35px; font-size: 20vw; }
+  .home-brand-word--long { font-size: 11vw; }
+  .home-brand-image { inset: 16% 14% 23%; }
+  .home-brand-arrows { inset: 0 10px; }
+  .home-brand-bottom { right: 18px; bottom: 18px; left: 18px; }
+  .home-brand-progress { width: 30px; }
+  .home-brand-caption { max-width: 55%; text-align: right; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-collection-image, .home-carousel-arrow { transition: none; }
+}

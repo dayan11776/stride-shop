@@ -130,6 +130,17 @@ class ImportCatalogCommandTests(TestCase):
         self.assertFalse(Brand.objects.filter(slug="test-brand").exists())
         self.assertFalse(Inventory.objects.exists())
 
+    def test_optional_example_price_flag_is_validated_and_persisted(self):
+        items = catalog()
+        items[0]["is_example_price"] = "true"
+        with self.assertRaisesMessage(CommandError, "is_example_price must be a boolean"):
+            self.import_items(items)
+        items[0]["is_example_price"] = True
+        self.import_items(items, publish=True)
+        self.assertTrue(Product.objects.get(slug="test-men-0").is_example_price)
+        self.assertFalse(Product.objects.get(slug="test-men-1").is_example_price)
+        self.assertTrue(self.client.get("/api/products/test-men-0").json()["isExamplePrice"])
+
     def test_unsupported_removal_keys_and_duplicate_slugs_are_rejected(self):
         items = catalog()
         items[0]["remove_variant_ids"] = ["unsafe"]

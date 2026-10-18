@@ -68,3 +68,8 @@ describe('product card images', () => {
     expect(screen.getByAltText('Runner').getAttribute('src')).toBe('/new-runner.jpg')
   })
 })
+
+test('identifies example prices separately from example stock', () => {
+  render(<MemoryRouter><ProductCard product={{ ...product, isExamplePrice: true }} /></MemoryRouter>)
+  expect(screen.getByText('Example price; not verified by the store.')).toBeTruthy()
+})

@@ -1,0 +1,2192 @@
+[
+  {
+    "name": "Example STRIDE Aero Runner",
+    "slug": "example-20261018-stride-aero-runner",
+    "brand": {
+      "name": "STRIDE",
+      "slug": "stride"
+    },
+    "audience": "men",
+    "description": "Example model and price for demonstration, not a confirmed STRIDE product; sizes, colour and inventory are illustrative and unverified.",
+    "is_new_arrival": false,
+    "is_example_stock": true,
+    "images": [],
+    "variants": [
+      {
+        "sku": "EXAMPLE-20261018-STRIDE-1-40",
+        "size_eu": "40",
+        "color_name": "Example (unverified)",
+        "price": "4495.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-20261018-STRIDE-1-42",
+        "size_eu": "42",
+        "color_name": "Example (unverified)",
+        "price": "4495.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-20261018-STRIDE-1-44",
+        "size_eu": "44",
+        "color_name": "Example (unverified)",
+        "price": "4495.00",
+        "quantity_on_hand": 8
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "Example STRIDE Daily Slip-On",
+    "slug": "example-20261018-stride-daily-slip-on",
+    "brand": {
+      "name": "STRIDE",
+      "slug": "stride"
+    },
+    "audience": "women",
+    "description": "Example model and price for demonstration, not a confirmed STRIDE product; sizes, colour and inventory are illustrative and unverified.",
+    "is_new_arrival": true,
+    "is_example_stock": true,
+    "images": [],
+    "variants": [
+      {
+        "sku": "EXAMPLE-20261018-STRIDE-2-36",
+        "size_eu": "36",
+        "color_name": "Example (unverified)",
+        "price": "2995.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-20261018-STRIDE-2-38",
+        "size_eu": "38",
+        "color_name": "Example (unverified)",
+        "price": "2995.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-20261018-STRIDE-2-40",
+        "size_eu": "40",
+        "color_name": "Example (unverified)",
+        "price": "2995.00",
+        "quantity_on_hand": 8
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "Example STRIDE Kids Sprint",
+    "slug": "example-20261018-stride-kids-sprint",
+    "brand": {
+      "name": "STRIDE",
+      "slug": "stride"
+    },
+    "audience": "kids",
+    "description": "Example model and price for demonstration, not a confirmed STRIDE product; sizes, colour and inventory are illustrative and unverified.",
+    "is_new_arrival": true,
+    "is_example_stock": true,
+    "images": [],
+    "variants": [
+      {
+        "sku": "EXAMPLE-20261018-STRIDE-3-30",
+        "size_eu": "30",
+        "color_name": "Example (unverified)",
+        "price": "2495.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-20261018-STRIDE-3-32",
+        "size_eu": "32",
+        "color_name": "Example (unverified)",
+        "price": "2495.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-20261018-STRIDE-3-34",
+        "size_eu": "34",
+        "color_name": "Example (unverified)",
+        "price": "2495.00",
+        "quantity_on_hand": 8
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "Example STRIDE Track Lite",
+    "slug": "example-20261018-stride-track-lite",
+    "brand": {
+      "name": "STRIDE",
+      "slug": "stride"
+    },
+    "audience": "women",
+    "description": "Example model and price for demonstration, not a confirmed STRIDE product; sizes, colour and inventory are illustrative and unverified.",
+    "is_new_arrival": false,
+    "is_example_stock": true,
+    "images": [],
+    "variants": [
+      {
+        "sku": "EXAMPLE-20261018-STRIDE-4-36",
+        "size_eu": "36",
+        "color_name": "Example (unverified)",
+        "price": "3695.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-20261018-STRIDE-4-38",
+        "size_eu": "38",
+        "color_name": "Example (unverified)",
+        "price": "3695.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-20261018-STRIDE-4-40",
+        "size_eu": "40",
+        "color_name": "Example (unverified)",
+        "price": "3695.00",
+        "quantity_on_hand": 8
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "Example STRIDE Trail Pro",
+    "slug": "example-20261018-stride-trail-pro",
+    "brand": {
+      "name": "STRIDE",
+      "slug": "stride"
+    },
+    "audience": "men",
+    "description": "Example model and price for demonstration, not a confirmed STRIDE product; sizes, colour and inventory are illustrative and unverified.",
+    "is_new_arrival": false,
+    "is_example_stock": true,
+    "images": [],
+    "variants": [
+      {
+        "sku": "EXAMPLE-20261018-STRIDE-5-40",
+        "size_eu": "40",
+        "color_name": "Example (unverified)",
+        "price": "5295.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-20261018-STRIDE-5-42",
+        "size_eu": "42",
+        "color_name": "Example (unverified)",
+        "price": "5295.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-20261018-STRIDE-5-44",
+        "size_eu": "44",
+        "color_name": "Example (unverified)",
+        "price": "5295.00",
+        "quantity_on_hand": 8
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "Example listing: ASICS NOVABLAST 6 1011C243-403",
+    "slug": "example-20261018-asics-novablast-6-1011c243-403",
+    "brand": {
+      "name": "ASICS",
+      "slug": "asics"
+    },
+    "audience": "men",
+    "description": "Example listing based on a real model. Sizes, colour, category assignment and quantities are illustrative and unverified. PHP price is a source reference observed on 18 Oct 2026, not a verified STRIDE price. Source: https://www.asics.com/ph/en-ph/novablast-6/p/1011C243-403.html",
+    "is_new_arrival": true,
+    "is_example_stock": true,
+    "images": [],
+    "variants": [
+      {
+        "sku": "EXAMPLE-20261018-ASICS-6-40",
+        "size_eu": "40",
+        "color_name": "Example (unverified)",
+        "price": "9490.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-20261018-ASICS-6-42",
+        "size_eu": "42",
+        "color_name": "Example (unverified)",
+        "price": "9490.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-20261018-ASICS-6-44",
+        "size_eu": "44",
+        "color_name": "Example (unverified)",
+        "price": "9490.00",
+        "quantity_on_hand": 8
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "Example listing: ASICS GEL-KAYANO 33 1011C167-101",
+    "slug": "example-20261018-asics-gel-kayano-33-1011c167-101",
+    "brand": {
+      "name": "ASICS",
+      "slug": "asics"
+    },
+    "audience": "men",
+    "description": "Example listing based on a real model. Sizes, colour, category assignment and quantities are illustrative and unverified. PHP price is a source reference observed on 18 Oct 2026, not a verified STRIDE price. Source: https://www.asics.com/ph/en-ph/gel-kayano-33/p/1011C167-101.html",
+    "is_new_arrival": false,
+    "is_example_stock": true,
+    "images": [],
+    "variants": [
+      {
+        "sku": "EXAMPLE-20261018-ASICS-7-40",
+        "size_eu": "40",
+        "color_name": "Example (unverified)",
+        "price": "11490.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-20261018-ASICS-7-42",
+        "size_eu": "42",
+        "color_name": "Example (unverified)",
+        "price": "11490.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-20261018-ASICS-7-44",
+        "size_eu": "44",
+        "color_name": "Example (unverified)",
+        "price": "11490.00",
+        "quantity_on_hand": 8
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "Example listing: ASICS GEL-CUMULUS 28 1011C143-101",
+    "slug": "example-20261018-asics-gel-cumulus-28-1011c143-101",
+    "brand": {
+      "name": "ASICS",
+      "slug": "asics"
+    },
+    "audience": "men",
+    "description": "Example listing based on a real model. Sizes, colour, category assignment and quantities are illustrative and unverified. PHP price is a source reference observed on 18 Oct 2026, not a verified STRIDE price. Source: https://www.asics.com/ph/en-ph/gel-cumulus-28/p/1011C143-101.html",
+    "is_new_arrival": false,
+    "is_example_stock": true,
+    "images": [],
+    "variants": [
+      {
+        "sku": "EXAMPLE-20261018-ASICS-8-40",
+        "size_eu": "40",
+        "color_name": "Example (unverified)",
+        "price": "9890.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-20261018-ASICS-8-42",
+        "size_eu": "42",
+        "color_name": "Example (unverified)",
+        "price": "9890.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-20261018-ASICS-8-44",
+        "size_eu": "44",
+        "color_name": "Example (unverified)",
+        "price": "9890.00",
+        "quantity_on_hand": 8
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "Example listing: ASICS GEL-NIMBUS 28 1011C127-102",
+    "slug": "example-20261018-asics-gel-nimbus-28-1011c127-102",
+    "brand": {
+      "name": "ASICS",
+      "slug": "asics"
+    },
+    "audience": "men",
+    "description": "Example listing based on a real model. Sizes, colour, category assignment and quantities are illustrative and unverified. PHP price is a source reference observed on 18 Oct 2026, not a verified STRIDE price. Source: https://www.asics.com/ph/en-ph/gel-nimbus-28/p/1011C127-102.html",
+    "is_new_arrival": false,
+    "is_example_stock": true,
+    "images": [],
+    "variants": [
+      {
+        "sku": "EXAMPLE-20261018-ASICS-9-40",
+        "size_eu": "40",
+        "color_name": "Example (unverified)",
+        "price": "11290.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-20261018-ASICS-9-42",
+        "size_eu": "42",
+        "color_name": "Example (unverified)",
+        "price": "11290.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-20261018-ASICS-9-44",
+        "size_eu": "44",
+        "color_name": "Example (unverified)",
+        "price": "11290.00",
+        "quantity_on_hand": 8
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "Example listing: ASICS GT-2000 15 1011C235-002",
+    "slug": "example-20261018-asics-gt-2000-15-1011c235-002",
+    "brand": {
+      "name": "ASICS",
+      "slug": "asics"
+    },
+    "audience": "men",
+    "description": "Example listing based on a real model. Sizes, colour, category assignment and quantities are illustrative and unverified. PHP price is a source reference observed on 18 Oct 2026, not a verified STRIDE price. Source: https://www.asics.com/ph/en-ph/mens01/",
+    "is_new_arrival": false,
+    "is_example_stock": true,
+    "images": [],
+    "variants": [
+      {
+        "sku": "EXAMPLE-20261018-ASICS-10-40",
+        "size_eu": "40",
+        "color_name": "Example (unverified)",
+        "price": "9890.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-20261018-ASICS-10-42",
+        "size_eu": "42",
+        "color_name": "Example (unverified)",
+        "price": "9890.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-20261018-ASICS-10-44",
+        "size_eu": "44",
+        "color_name": "Example (unverified)",
+        "price": "9890.00",
+        "quantity_on_hand": 8
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "Example listing: NEW BALANCE 530",
+    "slug": "example-20261018-new-balance-530",
+    "brand": {
+      "name": "NEW BALANCE",
+      "slug": "new-balance"
+    },
+    "audience": "men",
+    "description": "Example listing based on a real model. Sizes, colour, category assignment and quantities are illustrative and unverified. PHP price is a source reference observed on 18 Oct 2026, not a verified STRIDE price. Source: https://www.footlocker.ph/icons/new-balance-530.html",
+    "is_new_arrival": false,
+    "is_example_stock": true,
+    "images": [],
+    "variants": [
+      {
+        "sku": "EXAMPLE-20261018-NEW-BALANCE-11-40",
+        "size_eu": "40",
+        "color_name": "Example (unverified)",
+        "price": "6795.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-20261018-NEW-BALANCE-11-42",
+        "size_eu": "42",
+        "color_name": "Example (unverified)",
+        "price": "6795.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-20261018-NEW-BALANCE-11-44",
+        "size_eu": "44",
+        "color_name": "Example (unverified)",
+        "price": "6795.00",
+        "quantity_on_hand": 8
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "Example listing: NEW BALANCE 740",
+    "slug": "example-20261018-new-balance-740",
+    "brand": {
+      "name": "NEW BALANCE",
+      "slug": "new-balance"
+    },
+    "audience": "men",
+    "description": "Example listing based on a real model. Sizes, colour, category assignment and quantities are illustrative and unverified. PHP price is a source reference observed on 18 Oct 2026, not a verified STRIDE price. Source: https://www.footlocker.ph/men/shoes",
+    "is_new_arrival": false,
+    "is_example_stock": true,
+    "images": [],
+    "variants": [
+      {
+        "sku": "EXAMPLE-20261018-NEW-BALANCE-12-40",
+        "size_eu": "40",
+        "color_name": "Example (unverified)",
+        "price": "6995.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-20261018-NEW-BALANCE-12-42",
+        "size_eu": "42",
+        "color_name": "Example (unverified)",
+        "price": "6995.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-20261018-NEW-BALANCE-12-44",
+        "size_eu": "44",
+        "color_name": "Example (unverified)",
+        "price": "6995.00",
+        "quantity_on_hand": 8
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "Example listing: NEW BALANCE 1906",
+    "slug": "example-20261018-new-balance-1906",
+    "brand": {
+      "name": "NEW BALANCE",
+      "slug": "new-balance"
+    },
+    "audience": "men",
+    "description": "Example listing based on a real model. Sizes, colour, category assignment and quantities are illustrative and unverified. PHP price is a source reference observed on 18 Oct 2026, not a verified STRIDE price. Source: https://www.footlocker.ph/men/shoes",
+    "is_new_arrival": false,
+    "is_example_stock": true,
+    "images": [],
+    "variants": [
+      {
+        "sku": "EXAMPLE-20261018-NEW-BALANCE-13-40",
+        "size_eu": "40",
+        "color_name": "Example (unverified)",
+        "price": "9795.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-20261018-NEW-BALANCE-13-42",
+        "size_eu": "42",
+        "color_name": "Example (unverified)",
+        "price": "9795.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-20261018-NEW-BALANCE-13-44",
+        "size_eu": "44",
+        "color_name": "Example (unverified)",
+        "price": "9795.00",
+        "quantity_on_hand": 8
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "Example listing: NEW BALANCE 327",
+    "slug": "example-20261018-new-balance-327",
+    "brand": {
+      "name": "NEW BALANCE",
+      "slug": "new-balance"
+    },
+    "audience": "women",
+    "description": "Example listing based on a real model. Sizes, colour, category assignment and quantities are illustrative and unverified. PHP price is a source reference observed on 18 Oct 2026, not a verified STRIDE price. Source: https://www.footlocker.ph/women",
+    "is_new_arrival": false,
+    "is_example_stock": true,
+    "images": [],
+    "variants": [
+      {
+        "sku": "EXAMPLE-20261018-NEW-BALANCE-14-36",
+        "size_eu": "36",
+        "color_name": "Example (unverified)",
+        "price": "6895.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-20261018-NEW-BALANCE-14-38",
+        "size_eu": "38",
+        "color_name": "Example (unverified)",
+        "price": "6895.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-20261018-NEW-BALANCE-14-40",
+        "size_eu": "40",
+        "color_name": "Example (unverified)",
+        "price": "6895.00",
+        "quantity_on_hand": 8
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "Example listing: NEW BALANCE 574",
+    "slug": "example-20261018-new-balance-574",
+    "brand": {
+      "name": "NEW BALANCE",
+      "slug": "new-balance"
+    },
+    "audience": "men",
+    "description": "Example listing based on a real model. Sizes, colour, category assignment and quantities are illustrative and unverified. PHP price is a source reference observed on 18 Oct 2026, not a verified STRIDE price. Source: https://www.footlocker.ph/all-products.html",
+    "is_new_arrival": false,
+    "is_example_stock": true,
+    "images": [],
+    "variants": [
+      {
+        "sku": "EXAMPLE-20261018-NEW-BALANCE-15-40",
+        "size_eu": "40",
+        "color_name": "Example (unverified)",
+        "price": "5995.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-20261018-NEW-BALANCE-15-42",
+        "size_eu": "42",
+        "color_name": "Example (unverified)",
+        "price": "5995.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-20261018-NEW-BALANCE-15-44",
+        "size_eu": "44",
+        "color_name": "Example (unverified)",
+        "price": "5995.00",
+        "quantity_on_hand": 8
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "Example listing: ON Cloudboom Strike 2",
+    "slug": "example-20261018-on-cloudboom-strike-2",
+    "brand": {
+      "name": "ON",
+      "slug": "on"
+    },
+    "audience": "men",
+    "description": "Example listing based on a real model. Sizes, colour, category assignment and quantities are illustrative and unverified. PHP price is a source reference observed on 18 Oct 2026, not a verified STRIDE price. Source: https://www.on.com/en-ph/shop/shoes",
+    "is_new_arrival": true,
+    "is_example_stock": true,
+    "images": [],
+    "variants": [
+      {
+        "sku": "EXAMPLE-20261018-ON-16-40",
+        "size_eu": "40",
+        "color_name": "Example (unverified)",
+        "price": "14990.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-20261018-ON-16-42",
+        "size_eu": "42",
+        "color_name": "Example (unverified)",
+        "price": "14990.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-20261018-ON-16-44",
+        "size_eu": "44",
+        "color_name": "Example (unverified)",
+        "price": "14990.00",
+        "quantity_on_hand": 8
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "Example listing: ON Cloud X 5",
+    "slug": "example-20261018-on-cloud-x-5",
+    "brand": {
+      "name": "ON",
+      "slug": "on"
+    },
+    "audience": "women",
+    "description": "Example listing based on a real model. Sizes, colour, category assignment and quantities are illustrative and unverified. PHP price is a source reference observed on 18 Oct 2026, not a verified STRIDE price. Source: https://www.on.com/en-ph/shop/shoes",
+    "is_new_arrival": false,
+    "is_example_stock": true,
+    "images": [],
+    "variants": [
+      {
+        "sku": "EXAMPLE-20261018-ON-17-36",
+        "size_eu": "36",
+        "color_name": "Example (unverified)",
+        "price": "9590.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-20261018-ON-17-38",
+        "size_eu": "38",
+        "color_name": "Example (unverified)",
+        "price": "9590.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-20261018-ON-17-40",
+        "size_eu": "40",
+        "color_name": "Example (unverified)",
+        "price": "9590.00",
+        "quantity_on_hand": 8
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "Example listing: ON Cloudtilt Remix",
+    "slug": "example-20261018-on-cloudtilt-remix",
+    "brand": {
+      "name": "ON",
+      "slug": "on"
+    },
+    "audience": "men",
+    "description": "Example listing based on a real model. Sizes, colour, category assignment and quantities are illustrative and unverified. PHP price is a source reference observed on 18 Oct 2026, not a verified STRIDE price. Source: https://www.on.com/en-ph/shop/shoes",
+    "is_new_arrival": false,
+    "is_example_stock": true,
+    "images": [],
+    "variants": [
+      {
+        "sku": "EXAMPLE-20261018-ON-18-40",
+        "size_eu": "40",
+        "color_name": "Example (unverified)",
+        "price": "10490.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-20261018-ON-18-42",
+        "size_eu": "42",
+        "color_name": "Example (unverified)",
+        "price": "10490.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-20261018-ON-18-44",
+        "size_eu": "44",
+        "color_name": "Example (unverified)",
+        "price": "10490.00",
+        "quantity_on_hand": 8
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "Example listing: ON Cloudzone",
+    "slug": "example-20261018-on-cloudzone",
+    "brand": {
+      "name": "ON",
+      "slug": "on"
+    },
+    "audience": "men",
+    "description": "Example listing based on a real model. Sizes, colour, category assignment and quantities are illustrative and unverified. PHP price is a source reference observed on 18 Oct 2026, not a verified STRIDE price. Source: https://www.on.com/en-ph/shop/shoes",
+    "is_new_arrival": false,
+    "is_example_stock": true,
+    "images": [],
+    "variants": [
+      {
+        "sku": "EXAMPLE-20261018-ON-19-40",
+        "size_eu": "40",
+        "color_name": "Example (unverified)",
+        "price": "9490.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-20261018-ON-19-42",
+        "size_eu": "42",
+        "color_name": "Example (unverified)",
+        "price": "9490.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-20261018-ON-19-44",
+        "size_eu": "44",
+        "color_name": "Example (unverified)",
+        "price": "9490.00",
+        "quantity_on_hand": 8
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "Example listing: ON Cloud 6",
+    "slug": "example-20261018-on-cloud-6",
+    "brand": {
+      "name": "ON",
+      "slug": "on"
+    },
+    "audience": "women",
+    "description": "Example listing based on a real model. Sizes, colour, category assignment and quantities are illustrative and unverified. PHP price is a source reference observed on 18 Oct 2026, not a verified STRIDE price. Source: https://www.on.com/en-ph/shop/shoes",
+    "is_new_arrival": false,
+    "is_example_stock": true,
+    "images": [],
+    "variants": [
+      {
+        "sku": "EXAMPLE-20261018-ON-20-36",
+        "size_eu": "36",
+        "color_name": "Example (unverified)",
+        "price": "9590.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-20261018-ON-20-38",
+        "size_eu": "38",
+        "color_name": "Example (unverified)",
+        "price": "9590.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-20261018-ON-20-40",
+        "size_eu": "40",
+        "color_name": "Example (unverified)",
+        "price": "9590.00",
+        "quantity_on_hand": 8
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "Example listing: SALOMON XT-6",
+    "slug": "example-20261018-salomon-xt-6",
+    "brand": {
+      "name": "SALOMON",
+      "slug": "salomon"
+    },
+    "audience": "men",
+    "description": "Example listing based on a real model. Sizes, colour, category assignment and quantities are illustrative and unverified. PHP price is a source reference observed on 18 Oct 2026, not a verified STRIDE price. Source: https://ph.salomon.com/products/salomon-xt-6-unisex-sportstyle-shoes",
+    "is_new_arrival": true,
+    "is_example_stock": true,
+    "images": [],
+    "variants": [
+      {
+        "sku": "EXAMPLE-20261018-SALOMON-21-40",
+        "size_eu": "40",
+        "color_name": "Example (unverified)",
+        "price": "12990.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-20261018-SALOMON-21-42",
+        "size_eu": "42",
+        "color_name": "Example (unverified)",
+        "price": "12990.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-20261018-SALOMON-21-44",
+        "size_eu": "44",
+        "color_name": "Example (unverified)",
+        "price": "12990.00",
+        "quantity_on_hand": 8
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "Example listing: SALOMON XT-4 OG",
+    "slug": "example-20261018-salomon-xt-4-og",
+    "brand": {
+      "name": "SALOMON",
+      "slug": "salomon"
+    },
+    "audience": "men",
+    "description": "Example listing based on a real model. Sizes, colour, category assignment and quantities are illustrative and unverified. PHP price is a source reference observed on 18 Oct 2026, not a verified STRIDE price. Source: https://ph.salomon.com/products/xt-4-og-l47568500",
+    "is_new_arrival": false,
+    "is_example_stock": true,
+    "images": [],
+    "variants": [
+      {
+        "sku": "EXAMPLE-20261018-SALOMON-22-40",
+        "size_eu": "40",
+        "color_name": "Example (unverified)",
+        "price": "14990.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-20261018-SALOMON-22-42",
+        "size_eu": "42",
+        "color_name": "Example (unverified)",
+        "price": "14990.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-20261018-SALOMON-22-44",
+        "size_eu": "44",
+        "color_name": "Example (unverified)",
+        "price": "14990.00",
+        "quantity_on_hand": 8
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "Example listing: SALOMON SPEEDCROSS 6",
+    "slug": "example-20261018-salomon-speedcross-6",
+    "brand": {
+      "name": "SALOMON",
+      "slug": "salomon"
+    },
+    "audience": "women",
+    "description": "Example listing based on a real model. Sizes, colour, category assignment and quantities are illustrative and unverified. PHP price is a source reference observed on 18 Oct 2026, not a verified STRIDE price. Source: https://ph.salomon.com/collections/speedcross-6",
+    "is_new_arrival": false,
+    "is_example_stock": true,
+    "images": [],
+    "variants": [
+      {
+        "sku": "EXAMPLE-20261018-SALOMON-23-36",
+        "size_eu": "36",
+        "color_name": "Example (unverified)",
+        "price": "10990.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-20261018-SALOMON-23-38",
+        "size_eu": "38",
+        "color_name": "Example (unverified)",
+        "price": "10990.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-20261018-SALOMON-23-40",
+        "size_eu": "40",
+        "color_name": "Example (unverified)",
+        "price": "10990.00",
+        "quantity_on_hand": 8
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "Example listing: SALOMON XA PRO 3D",
+    "slug": "example-20261018-salomon-xa-pro-3d",
+    "brand": {
+      "name": "SALOMON",
+      "slug": "salomon"
+    },
+    "audience": "men",
+    "description": "Example listing based on a real model. Sizes, colour, category assignment and quantities are illustrative and unverified. PHP price is a source reference observed on 18 Oct 2026, not a verified STRIDE price. Source: https://ph.salomon.com/collections/xa-pro",
+    "is_new_arrival": false,
+    "is_example_stock": true,
+    "images": [],
+    "variants": [
+      {
+        "sku": "EXAMPLE-20261018-SALOMON-24-40",
+        "size_eu": "40",
+        "color_name": "Example (unverified)",
+        "price": "10990.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-20261018-SALOMON-24-42",
+        "size_eu": "42",
+        "color_name": "Example (unverified)",
+        "price": "10990.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-20261018-SALOMON-24-44",
+        "size_eu": "44",
+        "color_name": "Example (unverified)",
+        "price": "10990.00",
+        "quantity_on_hand": 8
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "Example listing: SALOMON ACS PRO",
+    "slug": "example-20261018-salomon-acs-pro",
+    "brand": {
+      "name": "SALOMON",
+      "slug": "salomon"
+    },
+    "audience": "men",
+    "description": "Example listing based on a real model. Sizes, colour, category assignment and quantities are illustrative and unverified. PHP price is a source reference observed on 18 Oct 2026, not a verified STRIDE price. Source: https://ph.salomon.com/collections/acs",
+    "is_new_arrival": false,
+    "is_example_stock": true,
+    "images": [],
+    "variants": [
+      {
+        "sku": "EXAMPLE-20261018-SALOMON-25-40",
+        "size_eu": "40",
+        "color_name": "Example (unverified)",
+        "price": "14990.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-20261018-SALOMON-25-42",
+        "size_eu": "42",
+        "color_name": "Example (unverified)",
+        "price": "14990.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-20261018-SALOMON-25-44",
+        "size_eu": "44",
+        "color_name": "Example (unverified)",
+        "price": "14990.00",
+        "quantity_on_hand": 8
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "Example listing: HOKA Clifton 10",
+    "slug": "example-20261018-hoka-clifton-10",
+    "brand": {
+      "name": "HOKA",
+      "slug": "hoka"
+    },
+    "audience": "men",
+    "description": "Example listing based on a real model. Sizes, colour, category assignment and quantities are illustrative and unverified. PHP price is a source reference observed on 18 Oct 2026, not a verified STRIDE price. Source: https://runnr.com.ph/products/hoka-mens-clifton-10-running-shoes-1162030-alf",
+    "is_new_arrival": false,
+    "is_example_stock": true,
+    "images": [],
+    "variants": [
+      {
+        "sku": "EXAMPLE-20261018-HOKA-26-40",
+        "size_eu": "40",
+        "color_name": "Example (unverified)",
+        "price": "9495.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-20261018-HOKA-26-42",
+        "size_eu": "42",
+        "color_name": "Example (unverified)",
+        "price": "9495.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-20261018-HOKA-26-44",
+        "size_eu": "44",
+        "color_name": "Example (unverified)",
+        "price": "9495.00",
+        "quantity_on_hand": 8
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "Example listing: HOKA Bondi 9",
+    "slug": "example-20261018-hoka-bondi-9",
+    "brand": {
+      "name": "HOKA",
+      "slug": "hoka"
+    },
+    "audience": "women",
+    "description": "Example listing based on a real model. Sizes, colour, category assignment and quantities are illustrative and unverified. PHP price is a source reference observed on 18 Oct 2026, not a verified STRIDE price. Source: https://runnr.com.ph/products/hoka-womens-bondi-9-running-shoes-1162012-rltt",
+    "is_new_arrival": false,
+    "is_example_stock": true,
+    "images": [],
+    "variants": [
+      {
+        "sku": "EXAMPLE-20261018-HOKA-27-36",
+        "size_eu": "36",
+        "color_name": "Example (unverified)",
+        "price": "10995.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-20261018-HOKA-27-38",
+        "size_eu": "38",
+        "color_name": "Example (unverified)",
+        "price": "10995.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-20261018-HOKA-27-40",
+        "size_eu": "40",
+        "color_name": "Example (unverified)",
+        "price": "10995.00",
+        "quantity_on_hand": 8
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "Example listing: HOKA Rincon 4",
+    "slug": "example-20261018-hoka-rincon-4",
+    "brand": {
+      "name": "HOKA",
+      "slug": "hoka"
+    },
+    "audience": "women",
+    "description": "Example listing based on a real model. Sizes, colour, category assignment and quantities are illustrative and unverified. PHP price is a source reference observed on 18 Oct 2026, not a verified STRIDE price. Source: https://runnr.com.ph/",
+    "is_new_arrival": false,
+    "is_example_stock": true,
+    "images": [],
+    "variants": [
+      {
+        "sku": "EXAMPLE-20261018-HOKA-28-36",
+        "size_eu": "36",
+        "color_name": "Example (unverified)",
+        "price": "7495.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-20261018-HOKA-28-38",
+        "size_eu": "38",
+        "color_name": "Example (unverified)",
+        "price": "7495.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-20261018-HOKA-28-40",
+        "size_eu": "40",
+        "color_name": "Example (unverified)",
+        "price": "7495.00",
+        "quantity_on_hand": 8
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "Example listing: HOKA Arahi 8",
+    "slug": "example-20261018-hoka-arahi-8",
+    "brand": {
+      "name": "HOKA",
+      "slug": "hoka"
+    },
+    "audience": "men",
+    "description": "Example listing based on a real model. Sizes, colour, category assignment and quantities are illustrative and unverified. PHP price is a source reference observed on 18 Oct 2026, not a verified STRIDE price. Source: https://runnr.com.ph/products/hoka-mens-arahi-8-running-shoes-1168690-bblc",
+    "is_new_arrival": false,
+    "is_example_stock": true,
+    "images": [],
+    "variants": [
+      {
+        "sku": "EXAMPLE-20261018-HOKA-29-40",
+        "size_eu": "40",
+        "color_name": "Example (unverified)",
+        "price": "9495.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-20261018-HOKA-29-42",
+        "size_eu": "42",
+        "color_name": "Example (unverified)",
+        "price": "9495.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-20261018-HOKA-29-44",
+        "size_eu": "44",
+        "color_name": "Example (unverified)",
+        "price": "9495.00",
+        "quantity_on_hand": 8
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "Example listing: HOKA Transport 2",
+    "slug": "example-20261018-hoka-transport-2",
+    "brand": {
+      "name": "HOKA",
+      "slug": "hoka"
+    },
+    "audience": "men",
+    "description": "Example listing based on a real model. Sizes, colour, category assignment and quantities are illustrative and unverified. PHP price is a source reference observed on 18 Oct 2026, not a verified STRIDE price. Source: https://www.zalora.com.ph/p/hoka-transport-2-men-s-running-alabaster-alabaster-beige-4128206",
+    "is_new_arrival": false,
+    "is_example_stock": true,
+    "images": [],
+    "variants": [
+      {
+        "sku": "EXAMPLE-20261018-HOKA-30-40",
+        "size_eu": "40",
+        "color_name": "Example (unverified)",
+        "price": "10495.00",
+        "quantity_on_hand": 4
+      },
+      {
+        "sku": "EXAMPLE-20261018-HOKA-30-42",
+        "size_eu": "42",
+        "color_name": "Example (unverified)",
+        "price": "10495.00",
+        "quantity_on_hand": 6
+      },
+      {
+        "sku": "EXAMPLE-20261018-HOKA-30-44",
+        "size_eu": "44",
+        "color_name": "Example (unverified)",
+        "price": "10495.00",
+        "quantity_on_hand": 8
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "Nike Air Force 1 '07",
+    "slug": "example-nike-air-force-1-07-cw2288-111",
+    "brand": {
+      "name": "NIKE",
+      "slug": "nike"
+    },
+    "audience": "men",
+    "is_new_arrival": true,
+    "is_example_stock": true,
+    "description": "Reference price from Nike Philippines; not a verified STRIDE selling price. Size and quantity are examples. Source: https://www.nike.com/ph/t/air-force-1-07-mens-shoes-WrLlWX/CW2288-111",
+    "variants": [
+      {
+        "sku": "EX-NIKE-CW2288-111-40",
+        "color_name": "White",
+        "size_eu": "40.0",
+        "price": "5895.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-NIKE-CW2288-111-42",
+        "color_name": "White",
+        "size_eu": "42.0",
+        "price": "5895.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-NIKE-CW2288-111-44",
+        "color_name": "White",
+        "size_eu": "44.0",
+        "price": "5895.00",
+        "quantity_on_hand": 2
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "NikeCourt Lite 4",
+    "slug": "example-nikecourt-lite-4-fd6574-125",
+    "brand": {
+      "name": "NIKE",
+      "slug": "nike"
+    },
+    "audience": "men",
+    "is_new_arrival": false,
+    "is_example_stock": true,
+    "description": "Reference price from Nike Philippines; not a verified STRIDE selling price. Size and quantity are examples. Source: https://www.nike.com/ph/t/nikecourt-lite-4-mens-tennis-shoes-5B5NWb/FD6574-125",
+    "variants": [
+      {
+        "sku": "EX-NIKE-FD6574-125-40",
+        "color_name": "Example",
+        "size_eu": "40.0",
+        "price": "4095.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-NIKE-FD6574-125-42",
+        "color_name": "Example",
+        "size_eu": "42.0",
+        "price": "4095.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-NIKE-FD6574-125-44",
+        "color_name": "Example",
+        "size_eu": "44.0",
+        "price": "4095.00",
+        "quantity_on_hand": 2
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "Nike Air Monarch IV",
+    "slug": "example-nike-air-monarch-iv-415445-102",
+    "brand": {
+      "name": "NIKE",
+      "slug": "nike"
+    },
+    "audience": "men",
+    "is_new_arrival": false,
+    "is_example_stock": true,
+    "description": "Reference price from Nike Philippines; not a verified STRIDE selling price. Size and quantity are examples. Source: https://www.nike.com/ph/t/air-monarch-iv-mens-workout-shoes-cc3XbD/415445-102",
+    "variants": [
+      {
+        "sku": "EX-NIKE-415445-102-40",
+        "color_name": "Example",
+        "size_eu": "40.0",
+        "price": "3395.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-NIKE-415445-102-42",
+        "color_name": "Example",
+        "size_eu": "42.0",
+        "price": "3395.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-NIKE-415445-102-44",
+        "color_name": "Example",
+        "size_eu": "44.0",
+        "price": "3395.00",
+        "quantity_on_hand": 2
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "Nike P-6000",
+    "slug": "example-nike-p-6000-io8711-101",
+    "brand": {
+      "name": "NIKE",
+      "slug": "nike"
+    },
+    "audience": "men",
+    "is_new_arrival": false,
+    "is_example_stock": true,
+    "description": "Reference price from Nike Philippines; not a verified STRIDE selling price. Size and quantity are examples. Source: https://www.nike.com/ph/t/p-6000-mens-shoes-dmQKzHZC/IO8711-101",
+    "variants": [
+      {
+        "sku": "EX-NIKE-IO8711-101-40",
+        "color_name": "Example",
+        "size_eu": "40.0",
+        "price": "6195.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-NIKE-IO8711-101-42",
+        "color_name": "Example",
+        "size_eu": "42.0",
+        "price": "6195.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-NIKE-IO8711-101-44",
+        "color_name": "Example",
+        "size_eu": "44.0",
+        "price": "6195.00",
+        "quantity_on_hand": 2
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "Nike Waffle Racer",
+    "slug": "example-nike-waffle-racer-im8658-103",
+    "brand": {
+      "name": "NIKE",
+      "slug": "nike"
+    },
+    "audience": "men",
+    "is_new_arrival": false,
+    "is_example_stock": true,
+    "description": "Reference price from Nike Philippines; not a verified STRIDE selling price. Size and quantity are examples. Source: https://www.nike.com/ph/w/mens-shoes-4g797zbdkaznik1zy7ok",
+    "variants": [
+      {
+        "sku": "EX-NIKE-IM8658-103-40",
+        "color_name": "Example",
+        "size_eu": "40.0",
+        "price": "5195.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-NIKE-IM8658-103-42",
+        "color_name": "Example",
+        "size_eu": "42.0",
+        "price": "5195.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-NIKE-IM8658-103-44",
+        "color_name": "Example",
+        "size_eu": "44.0",
+        "price": "5195.00",
+        "quantity_on_hand": 2
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "adidas Tokyo Shoes",
+    "slug": "example-adidas-tokyo-ih6639",
+    "brand": {
+      "name": "adidas",
+      "slug": "adidas"
+    },
+    "audience": "women",
+    "is_new_arrival": true,
+    "is_example_stock": true,
+    "description": "Reference price from adidas Philippines; not a verified STRIDE selling price. Size and quantity are examples. Source: https://www.adidas.com.ph/tokyo-shoes/IH6639.html",
+    "variants": [
+      {
+        "sku": "EX-ADIDAS-IH6639-36",
+        "color_name": "Black",
+        "size_eu": "36.0",
+        "price": "5500.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-ADIDAS-IH6639-38",
+        "color_name": "Black",
+        "size_eu": "38.0",
+        "price": "5500.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-ADIDAS-IH6639-40",
+        "color_name": "Black",
+        "size_eu": "40.0",
+        "price": "5500.00",
+        "quantity_on_hand": 2
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "adidas Stadt Shoes",
+    "slug": "example-adidas-stadt-ji1884",
+    "brand": {
+      "name": "adidas",
+      "slug": "adidas"
+    },
+    "audience": "men",
+    "is_new_arrival": false,
+    "is_example_stock": true,
+    "description": "Reference regular price from adidas Philippines; not a verified STRIDE selling price. Size and quantity are examples. Source: https://www.adidas.com.ph/stadt-shoes/JI1884.html",
+    "variants": [
+      {
+        "sku": "EX-ADIDAS-JI1884-40",
+        "color_name": "Blue",
+        "size_eu": "40.0",
+        "price": "4900.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-ADIDAS-JI1884-42",
+        "color_name": "Blue",
+        "size_eu": "42.0",
+        "price": "4900.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-ADIDAS-JI1884-44",
+        "color_name": "Blue",
+        "size_eu": "44.0",
+        "price": "4900.00",
+        "quantity_on_hand": 2
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "adidas Gazelle Shoes",
+    "slug": "example-adidas-gazelle-men-reference",
+    "brand": {
+      "name": "adidas",
+      "slug": "adidas"
+    },
+    "audience": "men",
+    "is_new_arrival": false,
+    "is_example_stock": true,
+    "description": "Reference price from adidas Philippines; not a verified STRIDE selling price. Size and quantity are examples. Source: https://www.adidas.com.ph/gazelle-trainers-shoes",
+    "variants": [
+      {
+        "sku": "EX-ADIDAS-GAZELLE-40",
+        "color_name": "Example",
+        "size_eu": "40.0",
+        "price": "5000.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-ADIDAS-GAZELLE-42",
+        "color_name": "Example",
+        "size_eu": "42.0",
+        "price": "5000.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-ADIDAS-GAZELLE-44",
+        "color_name": "Example",
+        "size_eu": "44.0",
+        "price": "5000.00",
+        "quantity_on_hand": 2
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "adidas SL 72 RS Shoes Kids",
+    "slug": "example-adidas-sl-72-rs-kids-reference",
+    "brand": {
+      "name": "adidas",
+      "slug": "adidas"
+    },
+    "audience": "kids",
+    "is_new_arrival": true,
+    "is_example_stock": true,
+    "description": "Reference price from adidas Philippines; not a verified STRIDE selling price. Size and quantity are examples. Source: https://www.adidas.com.ph/sl_72",
+    "variants": [
+      {
+        "sku": "EX-ADIDAS-SL72RS-K-30",
+        "color_name": "Example",
+        "size_eu": "30.0",
+        "price": "4500.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-ADIDAS-SL72RS-K-32",
+        "color_name": "Example",
+        "size_eu": "32.0",
+        "price": "4500.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-ADIDAS-SL72RS-K-34",
+        "color_name": "Example",
+        "size_eu": "34.0",
+        "price": "4500.00",
+        "quantity_on_hand": 2
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "adidas Handball Spezial Shoes",
+    "slug": "example-adidas-handball-spezial-women-reference",
+    "brand": {
+      "name": "adidas",
+      "slug": "adidas"
+    },
+    "audience": "women",
+    "is_new_arrival": false,
+    "is_example_stock": true,
+    "description": "Reference price from adidas Philippines; not a verified STRIDE selling price. Size and quantity are examples. Source: https://www.adidas.com.ph/t_toe-trainers",
+    "variants": [
+      {
+        "sku": "EX-ADIDAS-SPEZIAL-W-36",
+        "color_name": "Example",
+        "size_eu": "36.0",
+        "price": "6000.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-ADIDAS-SPEZIAL-W-38",
+        "color_name": "Example",
+        "size_eu": "38.0",
+        "price": "6000.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-ADIDAS-SPEZIAL-W-40",
+        "color_name": "Example",
+        "size_eu": "40.0",
+        "price": "6000.00",
+        "quantity_on_hand": 2
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "PUMA Turino II Sneakers",
+    "slug": "example-puma-turino-ii-397452-02",
+    "brand": {
+      "name": "PUMA",
+      "slug": "puma"
+    },
+    "audience": "men",
+    "is_new_arrival": true,
+    "is_example_stock": true,
+    "description": "Reference price from PUMA Philippines; not a verified STRIDE selling price. Size and quantity are examples. Source: https://ph.puma.com/ph/en/pd/puma-turino-ii-sneakers-unisex/397452.html?dwvar_397452_color=02",
+    "variants": [
+      {
+        "sku": "EX-PUMA-397452-02-40",
+        "color_name": "White",
+        "size_eu": "40.0",
+        "price": "3500.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-PUMA-397452-02-42",
+        "color_name": "White",
+        "size_eu": "42.0",
+        "price": "3500.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-PUMA-397452-02-44",
+        "color_name": "White",
+        "size_eu": "44.0",
+        "price": "3500.00",
+        "quantity_on_hand": 2
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "PUMA Turino II OG Sneakers",
+    "slug": "example-puma-turino-ii-og-397646-06",
+    "brand": {
+      "name": "PUMA",
+      "slug": "puma"
+    },
+    "audience": "men",
+    "is_new_arrival": false,
+    "is_example_stock": true,
+    "description": "Reference price from PUMA Philippines; not a verified STRIDE selling price. Size and quantity are examples. Source: https://ph.puma.com/ph/en/pd/puma-turino-ii-og-sneakers-unisex/397646.html?dwvar_397646_color=06",
+    "variants": [
+      {
+        "sku": "EX-PUMA-397646-06-40",
+        "color_name": "Black",
+        "size_eu": "40.0",
+        "price": "3600.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-PUMA-397646-06-42",
+        "color_name": "Black",
+        "size_eu": "42.0",
+        "price": "3600.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-PUMA-397646-06-44",
+        "color_name": "Black",
+        "size_eu": "44.0",
+        "price": "3600.00",
+        "quantity_on_hand": 2
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "PUMA SOFTRIDE Carson 2 Sneakers",
+    "slug": "example-puma-softride-carson-2-313501-05",
+    "brand": {
+      "name": "PUMA",
+      "slug": "puma"
+    },
+    "audience": "women",
+    "is_new_arrival": false,
+    "is_example_stock": true,
+    "description": "Reference price from PUMA Philippines; not a verified STRIDE selling price. Size and quantity are examples. Source: https://ph.puma.com/ph/en/pd/softride-carson-2-sneakers-unisex/313501.html?dwvar_313501_color=05",
+    "variants": [
+      {
+        "sku": "EX-PUMA-313501-05-36",
+        "color_name": "Black",
+        "size_eu": "36.0",
+        "price": "3400.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-PUMA-313501-05-38",
+        "color_name": "Black",
+        "size_eu": "38.0",
+        "price": "3400.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-PUMA-313501-05-40",
+        "color_name": "Black",
+        "size_eu": "40.0",
+        "price": "3400.00",
+        "quantity_on_hand": 2
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "PUMA Suede Classic Sneakers",
+    "slug": "example-puma-suede-classic-399781-01",
+    "brand": {
+      "name": "PUMA",
+      "slug": "puma"
+    },
+    "audience": "women",
+    "is_new_arrival": false,
+    "is_example_stock": true,
+    "description": "Reference price from PUMA Philippines; not a verified STRIDE selling price. Size and quantity are examples. Source: https://ph.puma.com/ph/en/pd/suede-classic-sneakers-unisex/399781.html",
+    "variants": [
+      {
+        "sku": "EX-PUMA-399781-01-36",
+        "color_name": "Black",
+        "size_eu": "36.0",
+        "price": "5500.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-PUMA-399781-01-38",
+        "color_name": "Black",
+        "size_eu": "38.0",
+        "price": "5500.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-PUMA-399781-01-40",
+        "color_name": "Black",
+        "size_eu": "40.0",
+        "price": "5500.00",
+        "quantity_on_hand": 2
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "PUMA Rebound V6 Low Sneakers",
+    "slug": "example-puma-rebound-v6-low-392328-32",
+    "brand": {
+      "name": "PUMA",
+      "slug": "puma"
+    },
+    "audience": "men",
+    "is_new_arrival": false,
+    "is_example_stock": true,
+    "description": "Reference price from PUMA Philippines; not a verified STRIDE selling price. Size and quantity are examples. Source: https://ph.puma.com/ph/en/pd/rebound-v6-low-sneakers/4067979616980.html",
+    "variants": [
+      {
+        "sku": "EX-PUMA-392328-32-40",
+        "color_name": "Gray",
+        "size_eu": "40.0",
+        "price": "3900.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-PUMA-392328-32-42",
+        "color_name": "Gray",
+        "size_eu": "42.0",
+        "price": "3900.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-PUMA-392328-32-44",
+        "color_name": "Gray",
+        "size_eu": "44.0",
+        "price": "3900.00",
+        "quantity_on_hand": 2
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "Vans Authentic Sneakers - Navy",
+    "slug": "example-vans-authentic-navy-reference",
+    "brand": {
+      "name": "VANS",
+      "slug": "vans"
+    },
+    "audience": "men",
+    "is_new_arrival": false,
+    "is_example_stock": true,
+    "description": "Reference regular price from Foot Locker Philippines; not a verified STRIDE selling price. Size and quantity are examples. Source: https://www.footlocker.ph/vans",
+    "variants": [
+      {
+        "sku": "EX-VANS-AUTH-NAVY-40",
+        "color_name": "Navy",
+        "size_eu": "40.0",
+        "price": "3998.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-VANS-AUTH-NAVY-42",
+        "color_name": "Navy",
+        "size_eu": "42.0",
+        "price": "3998.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-VANS-AUTH-NAVY-44",
+        "color_name": "Navy",
+        "size_eu": "44.0",
+        "price": "3998.00",
+        "quantity_on_hand": 2
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "Vans Old Skool Sneakers - Navy",
+    "slug": "example-vans-old-skool-navy-reference",
+    "brand": {
+      "name": "VANS",
+      "slug": "vans"
+    },
+    "audience": "men",
+    "is_new_arrival": false,
+    "is_example_stock": true,
+    "description": "Reference regular price from Foot Locker Philippines; not a verified STRIDE selling price. Size and quantity are examples. Source: https://www.footlocker.ph/vans",
+    "variants": [
+      {
+        "sku": "EX-VANS-OLD-NAVY-40",
+        "color_name": "Navy",
+        "size_eu": "40.0",
+        "price": "3998.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-VANS-OLD-NAVY-42",
+        "color_name": "Navy",
+        "size_eu": "42.0",
+        "price": "3998.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-VANS-OLD-NAVY-44",
+        "color_name": "Navy",
+        "size_eu": "44.0",
+        "price": "3998.00",
+        "quantity_on_hand": 2
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "Vans Mary Jane Sneakers - Leather Black/White",
+    "slug": "example-vans-mary-jane-leather-reference",
+    "brand": {
+      "name": "VANS",
+      "slug": "vans"
+    },
+    "audience": "women",
+    "is_new_arrival": true,
+    "is_example_stock": true,
+    "description": "Reference regular price from Foot Locker Philippines; not a verified STRIDE selling price. Size and quantity are examples. Source: https://www.footlocker.ph/vans",
+    "variants": [
+      {
+        "sku": "EX-VANS-MARY-BLK-36",
+        "color_name": "Black",
+        "size_eu": "36.0",
+        "price": "4998.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-VANS-MARY-BLK-38",
+        "color_name": "Black",
+        "size_eu": "38.0",
+        "price": "4998.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-VANS-MARY-BLK-40",
+        "color_name": "Black",
+        "size_eu": "40.0",
+        "price": "4998.00",
+        "quantity_on_hand": 2
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "Vans Mary Jane Straps Sneakers - Metal Parisian Night",
+    "slug": "example-vans-mary-jane-straps-reference",
+    "brand": {
+      "name": "VANS",
+      "slug": "vans"
+    },
+    "audience": "women",
+    "is_new_arrival": false,
+    "is_example_stock": true,
+    "description": "Reference regular price from Foot Locker Philippines; not a verified STRIDE selling price. Size and quantity are examples. Source: https://www.footlocker.ph/vans",
+    "variants": [
+      {
+        "sku": "EX-VANS-MARY-STRAP-36",
+        "color_name": "Navy",
+        "size_eu": "36.0",
+        "price": "4498.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-VANS-MARY-STRAP-38",
+        "color_name": "Navy",
+        "size_eu": "38.0",
+        "price": "4498.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-VANS-MARY-STRAP-40",
+        "color_name": "Navy",
+        "size_eu": "40.0",
+        "price": "4498.00",
+        "quantity_on_hand": 2
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "Vans Knu Skool Sneakers - Retro Color Brown",
+    "slug": "example-vans-knu-skool-brown-reference",
+    "brand": {
+      "name": "VANS",
+      "slug": "vans"
+    },
+    "audience": "men",
+    "is_new_arrival": false,
+    "is_example_stock": true,
+    "description": "Reference price from Foot Locker Philippines; not a verified STRIDE selling price. Size and quantity are examples. Source: https://www.footlocker.ph/vans",
+    "variants": [
+      {
+        "sku": "EX-VANS-KNU-BROWN-40",
+        "color_name": "Brown",
+        "size_eu": "40.0",
+        "price": "5998.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-VANS-KNU-BROWN-42",
+        "color_name": "Brown",
+        "size_eu": "42.0",
+        "price": "5998.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-VANS-KNU-BROWN-44",
+        "color_name": "Brown",
+        "size_eu": "44.0",
+        "price": "5998.00",
+        "quantity_on_hand": 2
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "Converse Chuck Taylor All Star High Top",
+    "slug": "example-converse-chuck-taylor-high-m9160c",
+    "brand": {
+      "name": "CONVERSE",
+      "slug": "converse"
+    },
+    "audience": "men",
+    "is_new_arrival": false,
+    "is_example_stock": true,
+    "description": "Reference price from Converse Philippines; not a verified STRIDE selling price. Size and quantity are examples. Source: https://www.converse.ph/all-collections/shoes/classic-chuck.html",
+    "variants": [
+      {
+        "sku": "EX-CONVERSE-M9160C-40",
+        "color_name": "Black",
+        "size_eu": "40.0",
+        "price": "3795.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-CONVERSE-M9160C-42",
+        "color_name": "Black",
+        "size_eu": "42.0",
+        "price": "3795.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-CONVERSE-M9160C-44",
+        "color_name": "Black",
+        "size_eu": "44.0",
+        "price": "3795.00",
+        "quantity_on_hand": 2
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "Converse Chuck Taylor All Star Malden Street Canvas & Suede",
+    "slug": "example-converse-malden-street-a17842c",
+    "brand": {
+      "name": "CONVERSE",
+      "slug": "converse"
+    },
+    "audience": "men",
+    "is_new_arrival": false,
+    "is_example_stock": true,
+    "description": "Reference regular price from Converse Philippines; not a verified STRIDE selling price. Size and quantity are examples. Source: https://www.converse.ph/cona17842c-chuck-taylor-all-star-malden-street-canvas-suede-low-men-green.html",
+    "variants": [
+      {
+        "sku": "EX-CONVERSE-A17842C-40",
+        "color_name": "Green",
+        "size_eu": "40.0",
+        "price": "3995.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-CONVERSE-A17842C-42",
+        "color_name": "Green",
+        "size_eu": "42.0",
+        "price": "3995.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-CONVERSE-A17842C-44",
+        "color_name": "Green",
+        "size_eu": "44.0",
+        "price": "3995.00",
+        "quantity_on_hand": 2
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "Converse Chuck Taylor All Star Move Platform",
+    "slug": "example-converse-chuck-taylor-move-platform",
+    "brand": {
+      "name": "CONVERSE",
+      "slug": "converse"
+    },
+    "audience": "women",
+    "is_new_arrival": false,
+    "is_example_stock": true,
+    "description": "Reference regular price from Converse Philippines; not a verified STRIDE selling price. Size and quantity are examples. Source: https://www.converse.ph/chuck-taylor-all-star-move-platform-10.html",
+    "variants": [
+      {
+        "sku": "EX-CONVERSE-MOVE-36",
+        "color_name": "Example",
+        "size_eu": "36.0",
+        "price": "4290.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-CONVERSE-MOVE-38",
+        "color_name": "Example",
+        "size_eu": "38.0",
+        "price": "4290.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-CONVERSE-MOVE-40",
+        "color_name": "Example",
+        "size_eu": "40.0",
+        "price": "4290.00",
+        "quantity_on_hand": 2
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "Converse Chuck Taylor All Star Lift",
+    "slug": "example-converse-chuck-taylor-lift-high-black",
+    "brand": {
+      "name": "CONVERSE",
+      "slug": "converse"
+    },
+    "audience": "women",
+    "is_new_arrival": false,
+    "is_example_stock": true,
+    "description": "Reference price from Converse Philippines; not a verified STRIDE selling price. Size and quantity are examples. Source: https://www.converse.ph/chuck-taylor-all-star-lift-hi-women-black-white-white.html",
+    "variants": [
+      {
+        "sku": "EX-CONVERSE-LIFT-BLK-36",
+        "color_name": "Black",
+        "size_eu": "36.0",
+        "price": "4295.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-CONVERSE-LIFT-BLK-38",
+        "color_name": "Black",
+        "size_eu": "38.0",
+        "price": "4295.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-CONVERSE-LIFT-BLK-40",
+        "color_name": "Black",
+        "size_eu": "40.0",
+        "price": "4295.00",
+        "quantity_on_hand": 2
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "Converse Chuck 70 Industrial",
+    "slug": "example-converse-chuck-70-industrial-reference",
+    "brand": {
+      "name": "CONVERSE",
+      "slug": "converse"
+    },
+    "audience": "men",
+    "is_new_arrival": false,
+    "is_example_stock": true,
+    "description": "Reference price from Converse Philippines; not a verified STRIDE selling price. Size and quantity are examples. Source: https://www.converse.ph/men.html",
+    "variants": [
+      {
+        "sku": "EX-CONVERSE-70-IND-40",
+        "color_name": "Example",
+        "size_eu": "40.0",
+        "price": "5995.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-CONVERSE-70-IND-42",
+        "color_name": "Example",
+        "size_eu": "42.0",
+        "price": "5995.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-CONVERSE-70-IND-44",
+        "color_name": "Example",
+        "size_eu": "44.0",
+        "price": "5995.00",
+        "quantity_on_hand": 2
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "Reebok Workout Plus",
+    "slug": "example-reebok-workout-plus-100244988",
+    "brand": {
+      "name": "REEBOK",
+      "slug": "reebok"
+    },
+    "audience": "men",
+    "is_new_arrival": false,
+    "is_example_stock": true,
+    "description": "Reference regular price from Reebok Philippines; not a verified STRIDE selling price. Size and quantity are examples. Source: https://reebok.ph/products/reebok-unisex-workout-plus-100244988",
+    "variants": [
+      {
+        "sku": "EX-REEBOK-100244988-40",
+        "color_name": "Example",
+        "size_eu": "40.0",
+        "price": "5595.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-REEBOK-100244988-42",
+        "color_name": "Example",
+        "size_eu": "42.0",
+        "price": "5595.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-REEBOK-100244988-44",
+        "color_name": "Example",
+        "size_eu": "44.0",
+        "price": "5595.00",
+        "quantity_on_hand": 2
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "Reebok Nano X5 Edge",
+    "slug": "example-reebok-nano-x5-edge-100244428",
+    "brand": {
+      "name": "REEBOK",
+      "slug": "reebok"
+    },
+    "audience": "men",
+    "is_new_arrival": false,
+    "is_example_stock": true,
+    "description": "Reference regular price from Reebok Philippines; not a verified STRIDE selling price. Size and quantity are examples. Source: https://reebok.ph/products/reebok-unisex-nano-x5-edge-100244428",
+    "variants": [
+      {
+        "sku": "EX-REEBOK-100244428-40",
+        "color_name": "Example",
+        "size_eu": "40.0",
+        "price": "6595.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-REEBOK-100244428-42",
+        "color_name": "Example",
+        "size_eu": "42.0",
+        "price": "6595.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-REEBOK-100244428-44",
+        "color_name": "Example",
+        "size_eu": "44.0",
+        "price": "6595.00",
+        "quantity_on_hand": 2
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "Reebok Nano Court",
+    "slug": "example-reebok-nano-court-100225419",
+    "brand": {
+      "name": "REEBOK",
+      "slug": "reebok"
+    },
+    "audience": "women",
+    "is_new_arrival": false,
+    "is_example_stock": true,
+    "description": "Reference regular price from Reebok Philippines; not a verified STRIDE selling price. Size and quantity are examples. Source: https://reebok.ph/products/reebok-women-nano-court-100225419",
+    "variants": [
+      {
+        "sku": "EX-REEBOK-100225419-36",
+        "color_name": "Example",
+        "size_eu": "36.0",
+        "price": "5795.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-REEBOK-100225419-38",
+        "color_name": "Example",
+        "size_eu": "38.0",
+        "price": "5795.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-REEBOK-100225419-40",
+        "color_name": "Example",
+        "size_eu": "40.0",
+        "price": "5795.00",
+        "quantity_on_hand": 2
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "Reebok Ultra Lo Mary Jane",
+    "slug": "example-reebok-ultra-lo-mary-jane-100261003",
+    "brand": {
+      "name": "REEBOK",
+      "slug": "reebok"
+    },
+    "audience": "women",
+    "is_new_arrival": false,
+    "is_example_stock": true,
+    "description": "Reference regular price from Reebok Philippines; not a verified STRIDE selling price. Size and quantity are examples. Source: https://reebok.ph/products/reebok-women-ultra-lo-mary-jane-100261003",
+    "variants": [
+      {
+        "sku": "EX-REEBOK-100261003-36",
+        "color_name": "Example",
+        "size_eu": "36.0",
+        "price": "3995.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-REEBOK-100261003-38",
+        "color_name": "Example",
+        "size_eu": "38.0",
+        "price": "3995.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-REEBOK-100261003-40",
+        "color_name": "Example",
+        "size_eu": "40.0",
+        "price": "3995.00",
+        "quantity_on_hand": 2
+      }
+    ],
+    "is_example_price": true
+  },
+  {
+    "name": "Reebok Nano 2.0",
+    "slug": "example-reebok-nano-2-0-100244684",
+    "brand": {
+      "name": "REEBOK",
+      "slug": "reebok"
+    },
+    "audience": "men",
+    "is_new_arrival": false,
+    "is_example_stock": true,
+    "description": "Reference regular price from Reebok Philippines; not a verified STRIDE selling price. Size and quantity are examples. Source: https://reebok.ph/products/reebok-men-nano-2-0-100244684",
+    "variants": [
+      {
+        "sku": "EX-REEBOK-100244684-40",
+        "color_name": "Example",
+        "size_eu": "40.0",
+        "price": "5795.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-REEBOK-100244684-42",
+        "color_name": "Example",
+        "size_eu": "42.0",
+        "price": "5795.00",
+        "quantity_on_hand": 2
+      },
+      {
+        "sku": "EX-REEBOK-100244684-44",
+        "color_name": "Example",
+        "size_eu": "44.0",
+        "price": "5795.00",
+        "quantity_on_hand": 2
+      }
+    ],
+    "is_example_price": true
+  }
+]

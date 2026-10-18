@@ -80,6 +80,14 @@ test('shows the server quote for the selected variant, discount and delivery', a
   expect(add[1].body).toEqual({ variantId: 'black-40', quantity: 1 })
 })
 
+test('warns before ordering when the cart has example pricing or stock', async () => {
+  const item = useCartStore.getState().items[0]
+  useCartStore.setState({ items: [{ ...item, product: { ...item.product, isExamplePrice: true } }] })
+  showCheckout()
+  expect(screen.getByText(/prices, sizes or stock are examples/i)).toBeTruthy()
+  expect(await screen.findByText(/1,750\.5/)).toBeTruthy()
+})
+
 test('requires review when the server quote changes before order submission', async () => {
   showCheckout()
   await screen.findByText(/1,750\.5/)

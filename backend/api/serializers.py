@@ -141,13 +141,14 @@ class ProductCardSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     isNew = serializers.BooleanField(source="is_new_arrival", read_only=True)
     isExampleStock = serializers.BooleanField(source="is_example_stock", read_only=True)
+    isExamplePrice = serializers.BooleanField(source="is_example_price", read_only=True)
     sizes = serializers.SerializerMethodField()
     availableQuantity = serializers.SerializerMethodField()
     reviewAverage = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
-        fields = ("id", "slug", "name", "brand", "brandSlug", "category", "categorySlug", "audience", "price", "salePrice", "image", "isNew", "isExampleStock", "sizes", "availableQuantity", "reviewAverage")
+        fields = ("id", "slug", "name", "brand", "brandSlug", "category", "categorySlug", "audience", "price", "salePrice", "image", "isNew", "isExampleStock", "isExamplePrice", "sizes", "availableQuantity", "reviewAverage")
 
     def _variants(self, obj):
         return [variant for variant in obj.variants.all() if variant.is_active]
@@ -623,7 +624,7 @@ class AdminProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ("id", "brand", "brand_name", "category", "category_name", "name", "slug", "description", "materials", "audience", "fit_note", "status", "is_new_arrival", "is_example_stock", "recycled_at", "created_at", "updated_at", "images", "variants", "remove_image_ids", "remove_variant_ids")
+        fields = ("id", "brand", "brand_name", "category", "category_name", "name", "slug", "description", "materials", "audience", "fit_note", "status", "is_new_arrival", "is_example_stock", "is_example_price", "recycled_at", "created_at", "updated_at", "images", "variants", "remove_image_ids", "remove_variant_ids")
         read_only_fields = ("id", "recycled_at", "created_at", "updated_at")
 
     def validate(self, attrs):

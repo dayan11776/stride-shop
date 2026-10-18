@@ -16,7 +16,7 @@ from catalog.models import Brand, Category, Product
 
 
 AUDIENCES = {"men": "Men", "women": "Women", "kids": "Kids"}
-PRODUCT_FIELDS = {"name", "slug", "description", "materials", "audience", "fit_note", "is_new_arrival", "is_example_stock", "images", "variants"}
+PRODUCT_FIELDS = {"name", "slug", "description", "materials", "audience", "fit_note", "is_new_arrival", "is_example_stock", "is_example_price", "images", "variants"}
 IMAGE_FIELDS = {"url", "color_name", "alt_text", "position", "is_primary"}
 VARIANT_FIELDS = {"sku", "color_name", "color_hex", "size_eu", "size_us", "width", "price", "sale_price", "sale_starts_at", "sale_ends_at", "quantity_on_hand", "low_stock_threshold"}
 
@@ -45,6 +45,8 @@ def validate_shape(products, expected_count):
         counts[audience] += 1
         if not isinstance(item.get("is_example_stock"), bool):
             raise CommandError(f"{prefix} needs an explicit boolean is_example_stock flag.")
+        if "is_example_price" in item and not isinstance(item["is_example_price"], bool):
+            raise CommandError(f"{prefix} is_example_price must be a boolean.")
         brand = item.get("brand")
         if not isinstance(brand, dict) or set(brand) != {"name", "slug"} or any(not isinstance(v, str) or not v for v in brand.values()):
             raise CommandError(f"{prefix} needs a brand object with nonempty name and slug.")

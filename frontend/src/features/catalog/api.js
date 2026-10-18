@@ -2,7 +2,7 @@ import { api, listFrom, payloadFrom, USE_MOCK } from '@/lib/apiClient'
 import { products } from '@/lib/mockData'
 import { unitPrice } from '@/lib/format'
 
-// filters: { audience, sale, isNew, q }
+// filters: { audience, brand, sale, isNew, q }
 export async function getProducts(filters = {}) {
   if (!USE_MOCK) {
     const data = await api('/products', { params: filters })
@@ -11,6 +11,7 @@ export async function getProducts(filters = {}) {
   const q = filters.q?.toLowerCase()
   return products.filter((p) =>
     (!filters.audience || p.audience === filters.audience) &&
+    (!filters.brand || p.brand?.trim().toLowerCase() === filters.brand.trim().toLowerCase()) &&
     (!filters.sale || p.salePrice != null) &&
     (!filters.isNew || p.isNew) &&
     (!q || `${p.name} ${p.audience}`.toLowerCase().includes(q)))

@@ -58,6 +58,12 @@ test('warns that example sizes and stock are unverified before and after selecti
   expect(screen.getByText('Example stock: 3 pairs for this option (not verified).')).toBeTruthy()
 })
 
+test('warns that the example price may still be charged', () => {
+  useProduct.mockReturnValue({ data: { ...product, isExamplePrice: true }, isLoading: false, isError: false })
+  showProduct()
+  expect(screen.getByText(/Example price; not verified by the store/)).toBeTruthy()
+})
+
 test('uses the placeholder when a product image fails, and tries the next colour image', () => {
   useProduct.mockReturnValue({ data: { ...product, images: [
     { colorName: 'Sage', url: '/sage.jpg' },

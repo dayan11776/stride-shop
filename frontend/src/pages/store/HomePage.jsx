@@ -1,39 +1,159 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
-import { ErrorState } from '@/components/ui/PageState'
 import { useProducts } from '@/features/catalog/hooks'
-import { ProductCard } from '@/features/catalog/components/ProductCard'
+import { formatPeso } from '@/lib/format'
+import './HomePage.css'
 
-const categories = [['Women', '/women', '/images/shoe3.jpg'], ['Men', '/men', '/images/shoe1.jpg'], ['Kids', '/kids', '/images/shoe6.jpg']]
+// The same brands shown on the Brands page, with adidas first as in the
+// approved homepage design. Illustrations are used when a product photo is absent.
+const brands = ['ADIDAS', 'STRIDE', 'ASICS', 'NEW BALANCE', 'ON', 'SALOMON', 'HOKA', 'NIKE', 'PUMA', 'VANS', 'CONVERSE', 'REEBOK']
+const placeholder = '/images/product-placeholder.svg'
+const illustrations = ['/images/illustration-runner.png', '/images/illustration-casual.png', '/images/illustration-kids.png', '/images/illustration-trail.png']
+const collections = [
+  { label: 'Women', to: '/women', audience: 'women', style: 'women' },
+  { label: 'Men', to: '/men', audience: 'men', style: 'men' },
+  { label: 'Kids', to: '/kids', audience: 'kids', style: 'kids' },
+  { label: 'New arrivals', to: '/new-arrivals', style: 'new' },
+]
+
+function hasPhoto(product) {
+  return Boolean(product?.image && product.image !== placeholder)
+}
+
+function featuredProduct(products) {
+  return products.find(hasPhoto) ?? products[0]
+}
+
+function ProductImage({ product, className = '', decorative = false, caption = false, fallbackIndex = 0 }) {
+  const [failedUrl, setFailedUrl] = useState(null)
+  const audienceIndex = { men: 0, women: 1, kids: 2 }[product?.audience]
+  const image = hasPhoto(product) && product.image !== failedUrl ? product.image : illustrations[audienceIndex ?? fallbackIndex % illustrations.length]
+  const isIllustration = image !== product?.image
+  return <><img
+    className={className}
+    src={image}
+    alt={decorative ? '' : isIllustration ? 'Illustrative shoe, not an actual product photo' : product.name}
+    onError={!isIllustration ? () => setFailedUrl(image) : undefined}
+  />{isIllustration && caption && <span className="home-image-note">Illustrative shoe image</span>}</>
+}
+
+function CarouselArrow({ label, previous = false, onClick, disabled = false }) {
+  return <button type="button" className="home-carousel-arrow" aria-label={label} onClick={onClick} disabled={disabled}>
+    <Icon name="arrow" size={22} className={previous ? 'home-arrow-reversed' : ''} />
+  </button>
+}
+
+function ArrivalSpotlight({ arrivals, isLoading, isError, retry }) {
+  const [index, setIndex] = useState(0)
+  const currentIndex = arrivals.length ? index % arrivals.length : 0
+  const product = arrivals[currentIndex]
+  const thumbnailStart = Math.min(Math.max(currentIndex - 1, 0), Math.max(arrivals.length - 4, 0))
+  const thumbnails = arrivals.slice(thumbnailStart, thumbnailStart + 4)
+  const move = (delta) => setIndex((currentIndex + delta + arrivals.length) % arrivals.length)
+
+  return <section className="home-arrivals" aria-label="New arrivals spotlight">
+    <div className="container home-arrivals-inner">
+      <div className="home-arrivals-stage">
+        <div className="home-arrivals-title">
+          <p className="eyebrow">Just landed</p>
+          <h1>New<br /> arrivals</h1>
+        </div>
+        <span className="home-arrivals-watermark" aria-hidden="true">STRIDE</span>
+        <div className="home-arrivals-image" aria-busy={isLoading}>
+          {isLoading ? <div className="skeleton home-arrivals-skeleton" /> : product && <ProductImage product={product} caption />}
+        </div>
+        <div className="home-arrivals-info" aria-live="polite">
+          {isLoading ? <p>Finding the latest styles…</p> : isError ? <>
+            <p>New arrivals could not be loaded.</p>
+            <button type="button" className="home-text-button" onClick={retry}>Try again</button>
+          </> : product ? <>
+            <p className="eyebrow">New arrival · {product.brand}</p>
+            <h2>{product.name}</h2>
+            {Number(product.salePrice ?? product.price) > 0 && <p className="home-arrivals-price">{formatPeso(product.salePrice ?? product.price)}</p>}
+            {product.isExamplePrice && <p className="home-example-note">Example price; not verified.</p>}
+            {product.isExampleStock && <p className="home-example-note">Example stock; confirm availability.</p>}
+            <Button as={Link} to={`/products/${product.slug}`}>View product <Icon name="arrow" size={17} /></Button>
+          </> : <>
+            <p className="eyebrow">Coming soon</p>
+            <p>New arrivals are on their way.</p>
+            <Button as={Link} to="/shop">Explore all shoes <Icon name="arrow" size={17} /></Button>
+          </>}
+        </div>
+      </div>
+      {arrivals.length > 0 && <div className="home-arrivals-controls" aria-label="Choose a new arrival">
+        <CarouselArrow label="Previous new arrival" previous onClick={() => move(-1)} disabled={arrivals.length < 2} />
+        <div className="home-arrivals-thumbnails">
+          {thumbnails.map((item, offset) => {
+            const itemIndex = thumbnailStart + offset
+            return <button type="button" key={item.id ?? item.slug} className={`home-arrivals-thumbnail${itemIndex === currentIndex ? ' is-selected' : ''}`} aria-label={`Show ${item.name}, ${itemIndex + 1} of ${arrivals.length}`} aria-pressed={itemIndex === currentIndex} onClick={() => setIndex(itemIndex)}>
+              <ProductImage product={item} decorative />
+            </button>
+          })}
+        </div>
+        <CarouselArrow label="Next new arrival" onClick={() => move(1)} disabled={arrivals.length < 2} />
+      </div>}
+      <Link className="home-underlined-link home-all-arrivals" to="/new-arrivals">Shop all new arrivals <Icon name="arrow" size={17} /></Link>
+    </div>
+  </section>
+}
+
+function Collections({ products, arrivals, isLoading }) {
+  return <section className="container home-collections home-section">
+    <div className="home-section-heading">
+      <div><p className="eyebrow">Shop by collection</p><h2>Find your stride</h2></div>
+      <Link className="home-heading-link" to="/shop">View all shoes <Icon name="arrow" size={17} /></Link>
+    </div>
+    <div className="home-collection-grid" aria-busy={isLoading}>
+      {collections.map((collection) => {
+        const items = collection.audience ? products.filter((product) => String(product.audience).toLowerCase() === collection.audience) : arrivals
+        const product = featuredProduct(items)
+        return <Link key={collection.label} to={collection.to} className={`home-collection-card home-collection-card--${collection.style}`}>
+          <div className="home-collection-copy"><h3>{collection.label}</h3><span className="home-underlined-link">Explore category <Icon name="arrow" size={17} /></span></div>
+          <ProductImage product={product ?? { audience: collection.audience }} className="home-collection-image" decorative caption fallbackIndex={collection.style === 'new' ? 3 : 0} />
+        </Link>
+      })}
+    </div>
+  </section>
+}
+
+function BrandSpotlight({ products, isLoading, isError, retry }) {
+  const [index, setIndex] = useState(0)
+  const brand = brands[index]
+  const matchingProducts = products.filter((product) => String(product.brand).trim().toUpperCase() === brand)
+  const product = featuredProduct(matchingProducts)
+  const move = (delta) => setIndex((index + delta + brands.length) % brands.length)
+  return <section className="container home-brands home-section" aria-label="Shop by brand">
+    <div className="home-section-heading">
+      <div><p className="eyebrow">Shop by brand</p><h2>Brands</h2></div>
+      <Link className="home-heading-link" to="/brands">View all brands <Icon name="arrow" size={17} /></Link>
+    </div>
+    <div className="home-brand-stage" aria-live="polite" aria-busy={isLoading}>
+      <span className={`home-brand-word${brand.length > 7 ? ' home-brand-word--long' : ''}`} aria-hidden="true">{brand}</span>
+      <div className="home-brand-image"><ProductImage product={product} fallbackIndex={index} caption /></div>
+      <div className="home-brand-arrows">
+        <CarouselArrow label="Previous brand" previous onClick={() => move(-1)} />
+        <CarouselArrow label="Next brand" onClick={() => move(1)} />
+      </div>
+      <div className="home-brand-bottom">
+        <div><span className="home-brand-count">{String(index + 1).padStart(2, '0')} / {brands.length}</span><span className="home-brand-progress" aria-hidden="true" /></div>
+        <div className="home-brand-caption">
+          <span className="sr-only">{brand}. </span>
+          {isError ? <button type="button" className="home-text-button" onClick={retry}>Products unavailable · Try again</button> : !isLoading && !product ? <span className="home-brand-empty">Products coming soon</span> : null}
+          <Link className="home-underlined-link" to={`/search?brand=${encodeURIComponent(brand)}`}>Shop this brand <Icon name="arrow" size={17} /></Link>
+        </div>
+      </div>
+    </div>
+  </section>
+}
 
 export function Component() {
-  const { data: newArrivals = [], isLoading, isError, error, refetch } = useProducts({ isNew: true })
+  const { data: arrivals = [], isLoading: arrivalsLoading, isError: arrivalsError, refetch: retryArrivals } = useProducts({ isNew: true })
+  const { data: products = [], isLoading: productsLoading, isError: productsError, refetch: retryProducts } = useProducts({})
   return <>
-    <section className="overflow-hidden bg-ink text-cream">
-      <div className="container grid min-h-[520px] items-stretch lg:grid-cols-[1.05fr_.95fr]">
-        <div className="flex flex-col justify-center py-14 lg:py-20">
-          <p className="eyebrow !text-[#b7c49d]">New collection · 2026</p>
-          <h1 className="max-w-[630px] text-[clamp(68px,9.2vw,148px)] leading-[.78] tracking-[.01em]">MOVE<br /><em className="font-normal text-sage">YOUR WAY.</em></h1>
-          <p className="mt-7 max-w-[390px] text-base leading-6 text-[#EAE2D6]">Performance-led footwear with the comfort to take you further — on every kind of day.</p>
-          <div className="mt-8 flex flex-wrap gap-3"><Button as={Link} to="/new-arrivals">Shop new arrivals <Icon name="arrow" size={17} /></Button><Button as={Link} to="/lookbook" variant="secondary" className="!border-[#EAE2D6] !text-cream">Explore the lookbook</Button></div>
-        </div>
-        <div className="relative min-h-[310px] overflow-hidden bg-[#dad2c4] lg:mr-[-80px]">
-          <img src="/images/shoe6.jpg" alt="STRIDE Track Lite shoe" className="h-full w-full object-cover mix-blend-multiply" />
-          <div className="absolute bottom-5 left-5 flex items-center gap-3 text-xs font-semibold uppercase tracking-[.12em] text-ink"><span className="h-px w-10 bg-ink" />Built for the everyday</div>
-        </div>
-      </div>
-    </section>
-    <section className="container section">
-      <div className="mb-7 flex flex-wrap items-end justify-between gap-4"><div><p className="eyebrow">Shop by collection</p><h2 className="text-[clamp(34px,4vw,58px)]">Find your stride</h2></div><Link className="inline-flex items-center gap-2 text-sm font-bold no-underline" to="/shop">View all shoes <Icon name="arrow" size={17} /></Link></div>
-      <div className="grid gap-4 md:grid-cols-3">
-        {categories.map(([label, to, image]) => <Link key={label} to={to} className="group relative block aspect-[1.05] overflow-hidden rounded-ui bg-sand"><img src={image} alt="" className="h-full w-full object-cover mix-blend-multiply transition duration-500 group-hover:scale-105" /><span className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-gradient-to-t from-[#262B1Fbb] to-transparent px-5 pb-5 pt-14 text-[27px] font-display font-bold uppercase tracking-wide text-cream">{label}<Icon name="arrow" size={22} /></span></Link>)}
-      </div>
-    </section>
-    <section className="container section !pt-0">
-      <div className="mb-7 flex flex-wrap items-end justify-between gap-4"><div><p className="eyebrow">Just landed</p><h2 className="text-[clamp(34px,4vw,58px)]">New arrivals</h2></div><Link className="inline-flex items-center gap-2 text-sm font-bold no-underline" to="/new-arrivals">Shop the edit <Icon name="arrow" size={17} /></Link></div>
-      {isError ? <ErrorState title="New arrivals are unavailable." detail={error?.message} onRetry={refetch} /> : <div className="product-grid">{isLoading ? Array.from({ length: 4 }, (_, index) => <div key={index}><div className="skeleton" style={{ height: 320 }} /><div className="skeleton mt-3" style={{ width: '65%' }} /></div>) : newArrivals.slice(0, 4).map((product) => <ProductCard key={product.id} product={product} />)}</div>}
-    </section>
-    <section className="container pb-12 md:pb-20"><div className="grid overflow-hidden rounded-ui bg-sand md:grid-cols-2"><img src="/images/shoe5.jpg" alt="Trail Pro on a textured background" className="h-full min-h-[280px] w-full object-cover mix-blend-multiply" /><div className="flex flex-col justify-center p-8 md:p-14"><p className="eyebrow">Designed to go farther</p><h2 className="text-[clamp(42px,5vw,72px)]">Trail ready.<br />City approved.</h2><p className="mt-5 max-w-[390px] leading-6 text-[var(--olive-gray)]">The Trail Pro pairs weather-ready grip with a clean, easy silhouette. One pair, every plan.</p><div className="mt-6"><Button as={Link} to="/products/trail-pro" variant="secondary">Meet Trail Pro</Button></div></div></div></section>
+    <ArrivalSpotlight arrivals={arrivals} isLoading={arrivalsLoading} isError={arrivalsError} retry={retryArrivals} />
+    <Collections products={products} arrivals={arrivals} isLoading={productsLoading || arrivalsLoading} />
+    <BrandSpotlight products={products} isLoading={productsLoading} isError={productsError} retry={retryProducts} />
   </>
 }
