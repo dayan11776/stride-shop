@@ -4,39 +4,44 @@ import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
 import { useProducts } from '@/features/catalog/hooks'
 import { formatPeso } from '@/lib/format'
+import { arrivalArtworkFor } from './homeArtwork'
 import './HomePage.css'
 
 // The same brands shown on the Brands page, with adidas first as in the
 // approved homepage design. Illustrations are used when a product photo is absent.
 const brands = ['ADIDAS', 'STRIDE', 'ASICS', 'NEW BALANCE', 'ON', 'SALOMON', 'HOKA', 'NIKE', 'PUMA', 'VANS', 'CONVERSE', 'REEBOK']
 const placeholder = '/images/product-placeholder.svg'
-const illustrations = ['/images/illustration-runner.png', '/images/illustration-casual.png', '/images/illustration-kids.png', '/images/illustration-trail.png']
+// Editorial cutouts are intentionally separate from catalog photos. This keeps
+// the design consistent without claiming that they depict a specific product.
+const brandIllustrations = [
+  '/images/illustration-runner.webp', '/images/illustration-casual.webp',
+  '/images/arrival-blue-runner.webp', '/images/illustration-trail.webp',
+  '/images/arrival-sage-runner.webp', '/images/arrival-trail.webp',
+  '/images/arrival-kids-sprint.webp', '/images/arrival-retro.webp',
+  '/images/illustration-kids.webp', '/images/arrival-mary-jane.webp',
+  '/images/arrival-canvas.webp', '/images/arrival-slip-on.webp',
+]
 const collections = [
-  { label: 'Women', to: '/women', audience: 'women', style: 'women' },
-  { label: 'Men', to: '/men', audience: 'men', style: 'men' },
-  { label: 'Kids', to: '/kids', audience: 'kids', style: 'kids' },
-  { label: 'New arrivals', to: '/new-arrivals', style: 'new' },
+  { label: 'Women', to: '/women', style: 'women', image: '/images/illustration-casual.webp' },
+  { label: 'Men', to: '/men', style: 'men', image: '/images/illustration-runner.webp' },
+  { label: 'Kids', to: '/kids', style: 'kids', image: '/images/illustration-kids.webp' },
+  { label: 'New arrivals', to: '/new-arrivals', style: 'new', image: '/images/arrival-sage-runner.webp' },
 ]
 
 function hasPhoto(product) {
   return Boolean(product?.image && product.image !== placeholder)
 }
 
-function featuredProduct(products) {
-  return products.find(hasPhoto) ?? products[0]
-}
-
-function ProductImage({ product, className = '', decorative = false, caption = false, fallbackIndex = 0 }) {
-  const [failedUrl, setFailedUrl] = useState(null)
-  const audienceIndex = { men: 0, women: 1, kids: 2 }[product?.audience]
-  const image = hasPhoto(product) && product.image !== failedUrl ? product.image : illustrations[audienceIndex ?? fallbackIndex % illustrations.length]
-  const isIllustration = image !== product?.image
-  return <><img
+function ProductImage({ product, artwork, failedPhotos, onPhotoError, className = '', decorative = false }) {
+  const isPhoto = hasPhoto(product) && !failedPhotos.has(product.image)
+  const image = isPhoto ? product.image : artwork ?? placeholder
+  const alt = image === placeholder ? 'Product photo not available' : 'Editorial shoe artwork; not the actual product photo'
+  return <img
     className={className}
     src={image}
-    alt={decorative ? '' : isIllustration ? 'Illustrative shoe, not an actual product photo' : product.name}
-    onError={!isIllustration ? () => setFailedUrl(image) : undefined}
-  />{isIllustration && caption && <span className="home-image-note">Illustrative shoe image</span>}</>
+    alt={decorative ? '' : isPhoto ? product.name : alt}
+    onError={isPhoto ? () => onPhotoError(image) : (event) => { if (image !== placeholder) event.currentTarget.src = placeholder }}
+  />
 }
 
 function CarouselArrow({ label, previous = false, onClick, disabled = false }) {
@@ -47,8 +52,12 @@ function CarouselArrow({ label, previous = false, onClick, disabled = false }) {
 
 function ArrivalSpotlight({ arrivals, isLoading, isError, retry }) {
   const [index, setIndex] = useState(0)
+  const [failedPhotos, setFailedPhotos] = useState(() => new Set())
   const currentIndex = arrivals.length ? index % arrivals.length : 0
   const product = arrivals[currentIndex]
+  const artwork = arrivalArtworkFor(arrivals)
+  const isEditorial = product && (!hasPhoto(product) || failedPhotos.has(product.image))
+  const markPhotoFailed = (url) => setFailedPhotos((previous) => new Set(previous).add(url))
   const thumbnailStart = Math.min(Math.max(currentIndex - 1, 0), Math.max(arrivals.length - 4, 0))
   const thumbnails = arrivals.slice(thumbnailStart, thumbnailStart + 4)
   const move = (delta) => setIndex((currentIndex + delta + arrivals.length) % arrivals.length)
@@ -62,7 +71,7 @@ function ArrivalSpotlight({ arrivals, isLoading, isError, retry }) {
         </div>
         <span className="home-arrivals-watermark" aria-hidden="true">STRIDE</span>
         <div className="home-arrivals-image" aria-busy={isLoading}>
-          {isLoading ? <div className="skeleton home-arrivals-skeleton" /> : product && <ProductImage product={product} caption />}
+          {isLoading ? <div className="skeleton home-arrivals-skeleton" /> : product && <ProductImage product={product} artwork={artwork[product.slug]} failedPhotos={failedPhotos} onPhotoError={markPhotoFailed} />}
         </div>
         <div className="home-arrivals-info" aria-live="polite">
           {isLoading ? <p>Finding the latest styles…</p> : isError ? <>
@@ -74,6 +83,7 @@ function ArrivalSpotlight({ arrivals, isLoading, isError, retry }) {
             {Number(product.salePrice ?? product.price) > 0 && <p className="home-arrivals-price">{formatPeso(product.salePrice ?? product.price)}</p>}
             {product.isExamplePrice && <p className="home-example-note">Example price; not verified.</p>}
             {product.isExampleStock && <p className="home-example-note">Example stock; confirm availability.</p>}
+            {isEditorial && <p className="home-example-note">{artwork[product.slug] === placeholder ? 'Product photo not available.' : 'Editorial artwork — not the actual product photo.'}</p>}
             <Button as={Link} to={`/products/${product.slug}`}>View product <Icon name="arrow" size={17} /></Button>
           </> : <>
             <p className="eyebrow">Coming soon</p>
@@ -88,7 +98,7 @@ function ArrivalSpotlight({ arrivals, isLoading, isError, retry }) {
           {thumbnails.map((item, offset) => {
             const itemIndex = thumbnailStart + offset
             return <button type="button" key={item.id ?? item.slug} className={`home-arrivals-thumbnail${itemIndex === currentIndex ? ' is-selected' : ''}`} aria-label={`Show ${item.name}, ${itemIndex + 1} of ${arrivals.length}`} aria-pressed={itemIndex === currentIndex} onClick={() => setIndex(itemIndex)}>
-              <ProductImage product={item} decorative />
+              <ProductImage product={item} artwork={artwork[item.slug]} failedPhotos={failedPhotos} onPhotoError={markPhotoFailed} decorative />
             </button>
           })}
         </div>
@@ -99,30 +109,26 @@ function ArrivalSpotlight({ arrivals, isLoading, isError, retry }) {
   </section>
 }
 
-function Collections({ products, arrivals, isLoading }) {
+function Collections() {
   return <section className="container home-collections home-section">
     <div className="home-section-heading">
       <div><p className="eyebrow">Shop by collection</p><h2>Find your stride</h2></div>
       <Link className="home-heading-link" to="/shop">View all shoes <Icon name="arrow" size={17} /></Link>
     </div>
-    <div className="home-collection-grid" aria-busy={isLoading}>
-      {collections.map((collection) => {
-        const items = collection.audience ? products.filter((product) => String(product.audience).toLowerCase() === collection.audience) : arrivals
-        const product = featuredProduct(items)
-        return <Link key={collection.label} to={collection.to} className={`home-collection-card home-collection-card--${collection.style}`}>
+    <div className="home-collection-grid">
+      {collections.map((collection) => <Link key={collection.label} to={collection.to} className={`home-collection-card home-collection-card--${collection.style}`}>
           <div className="home-collection-copy"><h3>{collection.label}</h3><span className="home-underlined-link">Explore category <Icon name="arrow" size={17} /></span></div>
-          <ProductImage product={product ?? { audience: collection.audience }} className="home-collection-image" decorative caption fallbackIndex={collection.style === 'new' ? 3 : 0} />
-        </Link>
-      })}
+          <img src={collection.image} className="home-collection-image" alt="" />
+        </Link>)}
     </div>
+    <p className="home-art-disclosure">Editorial artwork — not actual product photos.</p>
   </section>
 }
 
 function BrandSpotlight({ products, isLoading, isError, retry }) {
   const [index, setIndex] = useState(0)
   const brand = brands[index]
-  const matchingProducts = products.filter((product) => String(product.brand).trim().toUpperCase() === brand)
-  const product = featuredProduct(matchingProducts)
+  const hasBrandProducts = products.some((product) => String(product.brand).trim().toUpperCase() === brand)
   const move = (delta) => setIndex((index + delta + brands.length) % brands.length)
   return <section className="container home-brands home-section" aria-label="Shop by brand">
     <div className="home-section-heading">
@@ -132,7 +138,7 @@ function BrandSpotlight({ products, isLoading, isError, retry }) {
     <div className="home-brand-stage" aria-live="polite" aria-busy={isLoading}>
       <span className={`home-brand-word${brand.length > 7 ? ' home-brand-word--long' : ''}`} aria-hidden="true">{brand}</span>
       <span className="home-brand-label">{brand}</span>
-      <div className="home-brand-image"><ProductImage product={product} fallbackIndex={index} caption /></div>
+      <div className="home-brand-image"><img src={brandIllustrations[index % brandIllustrations.length]} alt="" /></div>
       <div className="home-brand-arrows">
         <CarouselArrow label="Previous brand" previous onClick={() => move(-1)} />
         <CarouselArrow label="Next brand" onClick={() => move(1)} />
@@ -140,11 +146,12 @@ function BrandSpotlight({ products, isLoading, isError, retry }) {
       <div className="home-brand-bottom">
         <div><span className="home-brand-count">{String(index + 1).padStart(2, '0')} / {brands.length}</span><span className="home-brand-progress" aria-hidden="true" /></div>
         <div className="home-brand-caption">
-          {isError ? <button type="button" className="home-text-button" onClick={retry}>Products unavailable · Try again</button> : !isLoading && !product ? <span className="home-brand-empty">Products coming soon</span> : null}
+          {isError ? <button type="button" className="home-text-button" onClick={retry}>Products unavailable · Try again</button> : !isLoading && !hasBrandProducts ? <span className="home-brand-empty">Products coming soon</span> : null}
           <Link className="home-underlined-link" to={`/search?brand=${encodeURIComponent(brand)}`}>Shop this brand <Icon name="arrow" size={17} /></Link>
         </div>
       </div>
     </div>
+    <p className="home-art-disclosure">Editorial artwork — not actual product photos.</p>
   </section>
 }
 
@@ -153,7 +160,7 @@ export function Component() {
   const { data: products = [], isLoading: productsLoading, isError: productsError, refetch: retryProducts } = useProducts({})
   return <>
     <ArrivalSpotlight arrivals={arrivals} isLoading={arrivalsLoading} isError={arrivalsError} retry={retryArrivals} />
-    <Collections products={products} arrivals={arrivals} isLoading={productsLoading || arrivalsLoading} />
+    <Collections />
     <BrandSpotlight products={products} isLoading={productsLoading} isError={productsError} retry={retryProducts} />
   </>
 }

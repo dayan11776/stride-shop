@@ -12,7 +12,6 @@
 .home-arrivals-info > p:not(.eyebrow) { margin-bottom: 12px; }
 .home-arrivals-price { font-size: 18px; font-weight: 700; }
 .home-example-note { color: var(--olive-gray); font-size: 12px; }
-.home-image-note { position: absolute; z-index: 2; right: 8px; bottom: 8px; padding: 3px 7px; border-radius: 4px; color: #30372b; background: rgba(247,242,235,.92); font-size: 10px; line-height: 1.2; }
 .home-arrivals-controls { display: flex; align-items: center; justify-content: center; gap: clamp(10px, 2.4vw, 30px); margin: 12px auto 0; }
 .home-carousel-arrow { display: grid; flex: 0 0 auto; width: 44px; height: 44px; place-items: center; border: 0; border-radius: 50%; color: var(--ink); background: #ece7df; transition: background .2s ease; }
 .home-carousel-arrow:hover:not(:disabled) { background: #d9e2cc; }
@@ -38,20 +37,23 @@
 .home-collection-card--kids { background: #eeeef0; }
 .home-collection-copy { position: relative; z-index: 2; width: 48%; }
 .home-collection-copy h3 { margin-bottom: 14px; font-size: clamp(30px, 3vw, 48px); line-height: .95; }
-.home-collection-image { position: absolute; inset: 5% 0 5% auto; width: 58%; height: 90%; object-fit: contain; mix-blend-mode: multiply; transition: transform .3s ease; }
+.home-collection-image { position: absolute; inset: 3% 0 3% auto; width: 59%; height: 94%; object-fit: contain; transition: transform .3s ease; }
 .home-collection-card:hover .home-collection-image { transform: scale(1.04); }
+.home-collection-copy .home-underlined-link { gap: 6px; font-size: clamp(10px, 1.3vw, 12px); letter-spacing: .01em; text-transform: none; white-space: nowrap; }
+.home-art-disclosure { margin: 10px 2px 0; color: var(--olive-gray); font-size: 11px; line-height: 1.4; }
 .home-brands { padding-bottom: clamp(50px, 6vw, 90px); }
 .home-brand-stage { position: relative; min-height: clamp(330px, 40vw, 550px); overflow: hidden; border-radius: 8px; background: #eae4dc; }
 .home-brand-stage::before, .home-brand-stage::after { position: absolute; top: 50%; width: 130px; height: 130px; border: 1px solid rgba(38,43,31,.05); border-radius: 50%; box-shadow: 0 0 0 22px rgba(38,43,31,.025), 0 0 0 44px rgba(38,43,31,.02); content: ''; transform: translateY(-50%); }
 .home-brand-stage::before { left: -65px; }
 .home-brand-stage::after { right: -65px; }
-.home-brand-word { position: absolute; inset: 48% 60px auto; transform: translateY(-50%); color: var(--ink); font-family: var(--font-display); font-size: clamp(80px, 22vw, 320px); font-weight: 800; letter-spacing: -.04em; line-height: .75; text-align: center; text-transform: uppercase; white-space: nowrap; }
-.home-brand-word--long { font-size: clamp(48px, 13vw, 190px); }
-.home-brand-label { position: absolute; z-index: 3; top: 22px; left: clamp(20px, 4vw, 50px); color: var(--ink); font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
-.home-brand-image { position: absolute; z-index: 1; inset: 8% 20% 16%; display: flex; align-items: center; justify-content: center; pointer-events: none; }
-.home-brand-image img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply; }
+.home-brand-word { position: absolute; inset: 12% 60px auto; color: var(--ink); font-family: var(--font-display); font-size: clamp(80px, 26vw, 370px); font-weight: 800; letter-spacing: -.04em; line-height: .75; text-align: center; text-transform: uppercase; white-space: nowrap; }
+.home-brand-word--long { font-size: clamp(48px, 15vw, 215px); }
+/* The large wordmark is decorative; the live label announces slide changes. */
+.home-brand-label { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.home-brand-image { position: absolute; z-index: 1; inset: 23% 20% 10%; display: flex; align-items: center; justify-content: center; pointer-events: none; }
+.home-brand-image img { width: 100%; height: 100%; object-fit: contain; }
 .home-brand-arrows { position: absolute; z-index: 3; inset: 0 18px; display: flex; align-items: center; justify-content: space-between; pointer-events: none; }
-.home-brand-arrows button { pointer-events: auto; }
+.home-brand-arrows button { width: clamp(48px, 5vw, 72px); height: clamp(48px, 5vw, 72px); pointer-events: auto; }
 .home-brand-bottom { position: absolute; z-index: 3; right: clamp(20px, 4vw, 50px); bottom: 22px; left: clamp(20px, 4vw, 50px); display: flex; align-items: end; justify-content: space-between; gap: 10px; }
 .home-brand-count { font-size: 12px; font-weight: 700; letter-spacing: .08em; }
 .home-brand-progress { display: inline-block; width: 80px; height: 1px; margin: 0 0 4px 14px; background: rgba(38,43,31,.4); }
@@ -63,6 +65,7 @@
   .home-arrivals-info h2 { font-size: 30px; }
   .home-arrivals-watermark { right: 0; left: 15%; top: 35%; }
   .home-arrivals-image { height: 290px; }
+  .home-collection-image { width: 55%; }
   .home-brand-word { font-size: clamp(80px, 20vw, 160px); }
   .home-brand-word--long { font-size: clamp(44px, 11vw, 88px); }
 }
@@ -87,8 +90,9 @@
   .home-brand-stage { min-height: 330px; }
   .home-brand-word { right: 35px; left: 35px; font-size: 20vw; }
   .home-brand-word--long { font-size: 11vw; }
-  .home-brand-image { inset: 16% 14% 23%; }
+  .home-brand-image { inset: 24% 14% 20%; }
   .home-brand-arrows { inset: 0 10px; }
+  .home-brand-arrows button { width: 40px; height: 40px; }
   .home-brand-bottom { right: 18px; bottom: 18px; left: 18px; }
   .home-brand-progress { width: 30px; }
   .home-brand-caption { max-width: 55%; text-align: right; }
