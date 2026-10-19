@@ -2,9 +2,11 @@ import { fireEvent, render, screen, within } from '@testing-library/react'
 import { createMemoryRouter, MemoryRouter, RouterProvider } from 'react-router-dom'
 import { beforeEach, expect, test, vi } from 'vitest'
 import { useProducts } from '@/features/catalog/hooks'
+import { Component as HomePage } from './HomePage'
 import { Component as NewArrivalsPage } from './NewArrivalsPage'
 import { Component as SearchPage } from './SearchPage'
 import { Component as CategoryPage } from './CategoryPage'
+import { Component as ShopPage } from './ShopPage'
 
 // Keep the real page, catalog, artwork mapping, and product cards in this test.
 // Only the network-backed hook is replaced so we can exercise the routing behavior.
@@ -77,6 +79,35 @@ function renderCategoryPage(audience) {
   )
   return render(<RouterProvider router={router} />)
 }
+
+test('View all shoes shows mapped artwork with disclosure and preserves photo and fallback behavior', async () => {
+  const router = createMemoryRouter(
+    [
+      { path: '/', element: <HomePage /> },
+      { path: '/shop', element: <ShopPage /> },
+    ],
+    { initialEntries: ['/'] },
+  )
+  render(<RouterProvider router={router} />)
+
+  fireEvent.click(screen.getByRole('link', { name: /view all shoes/i }))
+  await screen.findByRole('heading', { level: 1, name: 'All shoes' })
+  expect(router.state.location.pathname).toBe('/shop')
+  expect(useProducts).toHaveBeenLastCalledWith({})
+
+  expectIllustration('Example ASICS NOVABLAST 6', '/images/arrival-blue-runner.webp')
+  expectPlaceholder('Unrecognized shoe')
+
+  const card = within(productCard('Adidas Tokyo with a genuine photo'))
+  expect(card.getByAltText('Adidas Tokyo with a genuine photo').getAttribute('src')).toBe('/verified-tokyo.jpg')
+  expect(card.queryByText('Illustration — not actual product')).toBeNull()
+
+  fireEvent.error(card.getByAltText('Adidas Tokyo with a genuine photo'))
+  expectIllustration('Adidas Tokyo with a genuine photo', '/images/illustration-runner.webp')
+
+  fireEvent.error(card.getByAltText('Illustration, not the actual product: Adidas Tokyo with a genuine photo'))
+  expectPlaceholder('Adidas Tokyo with a genuine photo')
+})
 
 test.each([
   ['men', 'example-adidas-gazelle-men-reference', '/images/arrival-retro.webp'],
