@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useProduct } from '@/features/catalog/hooks'
+import { catalogArtworkFor } from '@/features/catalog/catalogArtwork'
 import { MAX_PER_LINE, useCartStore } from '@/features/cart/cartStore'
 import { useWishlistStore } from '@/features/wishlist/wishlistStore'
 import { formatPeso } from '@/lib/format'
@@ -26,6 +27,7 @@ export function Component() {
   const [quantity, setQuantity] = useState(1)
   const [message, setMessage] = useState('')
   const [failedImage, setFailedImage] = useState(null)
+  const [failedArtwork, setFailedArtwork] = useState(null)
   if (isLoading) return <div className="container section"><LoadingState label="Loading shoe" /></div>
   if (isError || !product) return <div className="container section"><ErrorState title="This shoe is unavailable." detail={error?.message} onRetry={refetch} /></div>
 
@@ -49,9 +51,16 @@ export function Component() {
   const sourceImage = colorImage?.url || product.image
   const imageUrl = typeof sourceImage === 'string' ? sourceImage.trim() : ''
   const placeholder = '/images/product-placeholder.svg'
-  const hasPhoto = Boolean(imageUrl && imageUrl !== placeholder && imageUrl !== failedImage)
-  const image = hasPhoto ? imageUrl : placeholder
-  const handleImageError = hasPhoto ? () => setFailedImage(imageUrl) : undefined
+  const artworkUrl = catalogArtworkFor(product.slug)
+  // Failures are scoped to the product so navigating to another shoe that uses
+  // the same illustration can still retry it.
+  const hasPhoto = Boolean(imageUrl && imageUrl !== placeholder && !(failedImage?.slug === product.slug && failedImage?.url === imageUrl))
+  const hasArtwork = Boolean(!hasPhoto && artworkUrl && !(failedArtwork?.slug === product.slug && failedArtwork?.url === artworkUrl))
+  const image = hasPhoto ? imageUrl : hasArtwork ? artworkUrl : placeholder
+  const imageAlt = hasPhoto ? product.name : hasArtwork ? `Illustration, not the actual product: ${product.name}` : 'Product image unavailable'
+  const handleImageError = hasPhoto
+    ? () => setFailedImage({ slug: product.slug, url: imageUrl })
+    : hasArtwork ? () => setFailedArtwork({ slug: product.slug, url: artworkUrl }) : undefined
   // Only show additional, distinct photos that belong to the chosen colour.
   // Repeating the primary image (or a missing-image placeholder) implies that
   // there are more product views than the store has actually supplied.
@@ -67,7 +76,9 @@ export function Component() {
     if (!mockWithoutVariants && !variant) { setMessage('That size is currently unavailable. Please choose another size.'); return }
     const key = variant?.id ? `${product.id}-${variant.id}` : `${product.id}-${size}`
     const before = useCartStore.getState().items.find((item) => item.key === key)?.qty ?? 0
-    add({ ...product, image }, size, Math.min(quantity, maxQuantity), variant ?? null)
+    // Cart imagery is not labeled as illustrative, so do not persist artwork
+    // there as if it were a photo of the product.
+    add({ ...product, image: hasPhoto ? imageUrl : placeholder }, size, Math.min(quantity, maxQuantity), variant ?? null)
     const after = useCartStore.getState().items.find((item) => item.key === key)?.qty ?? 0
     const added = after - before
     if (added < 0) { setMessage('Your bag quantity was adjusted to the latest available stock for this option.'); return }
@@ -78,7 +89,7 @@ export function Component() {
   }
 
   return <section className="container section"><div className="mb-5 text-xs font-semibold uppercase tracking-[.11em] text-[var(--olive-gray)]"><Link to="/shop">Shop</Link> <span className="mx-1">/</span> {product.brand} <span className="mx-1">/</span> {product.name}</div><div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1.25fr)_minmax(340px,.75fr)]">
-    <div className="grid grid-cols-2 gap-3"><div className="col-span-2 overflow-hidden rounded-ui bg-sand"><img src={image} alt={hasPhoto ? product.name : 'Product image unavailable'} onError={handleImageError} className="aspect-[1.32] w-full object-contain mix-blend-multiply" /></div>{extraImages.map((entry) => <AdditionalProductImage key={entry.url.trim()} entry={entry} productName={product.name} />)}</div>
+    <div className="grid grid-cols-2 gap-3"><figure className="col-span-2 overflow-hidden rounded-ui bg-sand"><img src={image} alt={imageAlt} onError={handleImageError} className="aspect-[1.32] w-full object-contain mix-blend-multiply" />{hasArtwork && <figcaption className="px-4 pb-4 text-xs font-semibold text-[var(--olive-gray)]">Illustration — not actual product</figcaption>}</figure>{extraImages.map((entry) => <AdditionalProductImage key={`${product.slug}:${entry.url.trim()}`} entry={entry} productName={product.name} />)}</div>
     <div className="lg:sticky lg:top-5"><p className="eyebrow">{product.brand}</p><div className="flex items-start justify-between gap-4"><h1 className="text-[clamp(46px,5vw,72px)]">{product.name}</h1><button className="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-[var(--line)] bg-transparent" onClick={() => toggle(product.id)} aria-label={saved ? 'Remove from wishlist' : 'Add to wishlist'} aria-pressed={saved}><Icon name="heart" size={21} strokeWidth={saved ? 2.5 : 1.7} /></button></div><p className="mt-5 text-xl">{!variant && !mockWithoutVariants && availableVariants.length > 0 && <span className="mr-2 text-sm">From</span>}<strong>{formatPeso(currentPrice)}</strong>{Number.isFinite(listPrice) && currentPrice < listPrice && <s className="ml-3 text-base text-[var(--olive-gray)]">{formatPeso(listPrice)}</s>}</p><p className="mt-5 max-w-[530px] leading-6 text-[var(--olive-gray)]">{product.description || 'A versatile, made-to-move silhouette with lightweight support and all-day comfort. Designed for the rhythm of real life.'}</p>
     {product.isExamplePrice && <p className="mt-2 text-sm font-semibold text-[var(--olive-gray)]">Example price; not verified by the store. This amount may be charged if you order.</p>}
     {colors.length > 0 && <div className="mt-8"><p className="mb-3 text-sm font-semibold">Colour: {selectedColor}</p><div className="flex flex-wrap gap-2" role="group" aria-label="Select colour">{colors.map((value) => <Chip key={value} selected={value === selectedColor} onClick={() => { setColor(value); setSize(null); setWidth(''); setQuantity(1); setMessage('') }}>{value}</Chip>)}</div></div>}

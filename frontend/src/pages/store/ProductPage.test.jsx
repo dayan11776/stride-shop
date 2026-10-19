@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, within } from '@testing-library/react'
-import { MemoryRouter, Route, Routes } from 'react-router-dom'
+import { Link, MemoryRouter, Route, Routes } from 'react-router-dom'
 import { beforeEach, expect, test, vi } from 'vitest'
 import { useProduct } from '@/features/catalog/hooks'
 import { useCartStore, selectSubtotal } from '@/features/cart/cartStore'
@@ -18,13 +18,23 @@ const product = {
   ],
 }
 
+const mappedExample = {
+  ...product,
+  id: 'vans-mary-jane',
+  slug: 'example-vans-mary-jane-leather-reference',
+  name: 'Vans Mary Jane Sneakers - Leather Black/White',
+  brand: 'VANS',
+  image: '',
+  images: [],
+}
+
 beforeEach(() => {
   useCartStore.getState().clear()
   useProduct.mockReturnValue({ data: product, isLoading: false, isError: false })
 })
 
-function showProduct() {
-  return render(<MemoryRouter initialEntries={['/products/runner']}><Routes><Route path="/products/:slug" element={<Component />} /></Routes></MemoryRouter>)
+function showProduct(path = '/products/runner') {
+  return render(<MemoryRouter initialEntries={[path]}><Routes><Route path="/products/:slug" element={<Component />} /></Routes></MemoryRouter>)
 }
 
 test('selecting a colour and size adds the matching active variant and price', () => {
@@ -98,6 +108,111 @@ test('does not duplicate a missing product-image placeholder', () => {
   const { container } = showProduct()
   expect(container.querySelectorAll('img')).toHaveLength(1)
   expect(screen.getByAltText('Product image unavailable').getAttribute('src')).toBe('/images/product-placeholder.svg')
+})
+
+test.each(['', '/images/product-placeholder.svg'])(
+  'shows a clearly labeled illustration for a mapped example with missing photo %j',
+  (missingImage) => {
+    useProduct.mockReturnValue({ data: { ...mappedExample, image: missingImage }, isLoading: false, isError: false })
+    const { container } = showProduct(`/products/${mappedExample.slug}`)
+    const illustration = screen.getByAltText(`Illustration, not the actual product: ${mappedExample.name}`)
+    expect(illustration.getAttribute('src')).toBe('/images/arrival-mary-jane.webp')
+    expect(screen.getByText('Illustration — not actual product')).toBeTruthy()
+    expect(screen.queryByAltText('Product image unavailable')).toBeNull()
+    expect(container.querySelectorAll('img')).toHaveLength(1)
+  },
+)
+
+test('shows a real photo instead of the example illustration when one is supplied', () => {
+  useProduct.mockReturnValue({ data: { ...mappedExample, image: '/verified-product.jpg' }, isLoading: false, isError: false })
+  showProduct(`/products/${mappedExample.slug}`)
+  expect(screen.getByAltText(mappedExample.name).getAttribute('src')).toBe('/verified-product.jpg')
+  expect(screen.queryByText('Illustration — not actual product')).toBeNull()
+})
+
+test('uses a labeled illustration if a real photo fails, and a placeholder if the illustration also fails', () => {
+  useProduct.mockReturnValue({ data: { ...mappedExample, image: '/broken-product.jpg' }, isLoading: false, isError: false })
+  const { container } = showProduct(`/products/${mappedExample.slug}`)
+  fireEvent.error(screen.getByAltText(mappedExample.name))
+  const illustration = screen.getByAltText(`Illustration, not the actual product: ${mappedExample.name}`)
+  expect(illustration.getAttribute('src')).toBe('/images/arrival-mary-jane.webp')
+  expect(screen.getByText('Illustration — not actual product')).toBeTruthy()
+  fireEvent.error(illustration)
+  expect(screen.getByAltText('Product image unavailable').getAttribute('src')).toBe('/images/product-placeholder.svg')
+  expect(screen.queryByText('Illustration — not actual product')).toBeNull()
+  expect(container.querySelectorAll('img')).toHaveLength(1)
+})
+
+test('tries a different colour photo after a mapped example falls back to an illustration', () => {
+  useProduct.mockReturnValue({ data: { ...mappedExample, images: [
+    { colorName: 'Sage', url: '/sage.jpg' },
+    { colorName: 'Black', url: '/black.jpg' },
+  ] }, isLoading: false, isError: false })
+  showProduct(`/products/${mappedExample.slug}`)
+  fireEvent.error(screen.getByAltText(mappedExample.name))
+  expect(screen.getByAltText(`Illustration, not the actual product: ${mappedExample.name}`)).toBeTruthy()
+  fireEvent.click(within(screen.getByRole('group', { name: 'Select colour' })).getByRole('button', { name: 'Black' }))
+  expect(screen.getByAltText(mappedExample.name).getAttribute('src')).toBe('/black.jpg')
+  expect(screen.queryByText('Illustration — not actual product')).toBeNull()
+})
+
+test('keeps an illustration from being saved in the cart as a real product photo', () => {
+  useProduct.mockReturnValue({ data: mappedExample, isLoading: false, isError: false })
+  showProduct(`/products/${mappedExample.slug}`)
+  fireEvent.click(within(screen.getByRole('group', { name: 'Select shoe size' })).getByRole('button', { name: '40' }))
+  fireEvent.click(screen.getByRole('button', { name: /Add to bag/i }))
+  expect(useCartStore.getState().items).toHaveLength(1)
+  expect(useCartStore.getState().items[0].product.image).not.toBe('/images/arrival-mary-jane.webp')
+})
+
+test('updates the example illustration when navigating between products', () => {
+  const next = { ...mappedExample, id: 'hoka', slug: 'example-20261018-hoka-arahi-8', name: 'Example HOKA Arahi 8' }
+  useProduct.mockImplementation((slug) => ({ data: slug === next.slug ? next : mappedExample, isLoading: false, isError: false }))
+  render(<MemoryRouter initialEntries={[`/products/${mappedExample.slug}`]}><Link to={`/products/${next.slug}`}>Next product</Link><Routes><Route path="/products/:slug" element={<Component />} /></Routes></MemoryRouter>)
+  expect(screen.getByAltText(`Illustration, not the actual product: ${mappedExample.name}`).getAttribute('src')).toBe('/images/arrival-mary-jane.webp')
+  fireEvent.click(screen.getByRole('link', { name: 'Next product' }))
+  expect(screen.getByAltText(`Illustration, not the actual product: ${next.name}`).getAttribute('src')).toBe('/images/arrival-blue-runner.webp')
+  expect(screen.getByText('Illustration — not actual product')).toBeTruthy()
+})
+
+test('retries a shared illustration for a different product after it fails', () => {
+  const next = { ...mappedExample, id: 'reebok', slug: 'example-reebok-ultra-lo-mary-jane-100261003', name: 'Reebok Mary Jane' }
+  useProduct.mockImplementation((slug) => ({ data: slug === next.slug ? next : mappedExample, isLoading: false, isError: false }))
+  render(<MemoryRouter initialEntries={[`/products/${mappedExample.slug}`]}><Link to={`/products/${next.slug}`}>Next product</Link><Routes><Route path="/products/:slug" element={<Component />} /></Routes></MemoryRouter>)
+  fireEvent.error(screen.getByAltText(`Illustration, not the actual product: ${mappedExample.name}`))
+  expect(screen.getByAltText('Product image unavailable')).toBeTruthy()
+  fireEvent.click(screen.getByRole('link', { name: 'Next product' }))
+  expect(screen.getByAltText(`Illustration, not the actual product: ${next.name}`).getAttribute('src')).toBe('/images/arrival-mary-jane.webp')
+  expect(screen.getByText('Illustration — not actual product')).toBeTruthy()
+})
+
+test('retries a shared photo for a different product after it fails', () => {
+  const first = { ...mappedExample, image: '/shared.jpg' }
+  const next = { ...product, id: 'another', slug: 'another', name: 'Another shoe', image: '/shared.jpg' }
+  useProduct.mockImplementation((slug) => ({ data: slug === next.slug ? next : first, isLoading: false, isError: false }))
+  render(<MemoryRouter initialEntries={[`/products/${first.slug}`]}><Link to={`/products/${next.slug}`}>Next product</Link><Routes><Route path="/products/:slug" element={<Component />} /></Routes></MemoryRouter>)
+  fireEvent.error(screen.getByAltText(first.name))
+  expect(screen.getByAltText(`Illustration, not the actual product: ${first.name}`)).toBeTruthy()
+  fireEvent.click(screen.getByRole('link', { name: 'Next product' }))
+  expect(screen.getByAltText(next.name).getAttribute('src')).toBe('/shared.jpg')
+  expect(screen.queryByText('Illustration — not actual product')).toBeNull()
+})
+
+test('retries a shared gallery photo when navigating to another product', () => {
+  const first = { ...mappedExample, images: [
+    { colorName: 'Sage', url: '/first.jpg' },
+    { colorName: 'Sage', url: '/shared-detail.jpg', altText: 'First detail' },
+  ] }
+  const next = { ...product, id: 'another', slug: 'another', name: 'Another shoe', images: [
+    { colorName: 'Sage', url: '/next.jpg' },
+    { colorName: 'Sage', url: '/shared-detail.jpg', altText: 'Next detail' },
+  ] }
+  useProduct.mockImplementation((slug) => ({ data: slug === next.slug ? next : first, isLoading: false, isError: false }))
+  render(<MemoryRouter initialEntries={[`/products/${first.slug}`]}><Link to={`/products/${next.slug}`}>Next product</Link><Routes><Route path="/products/:slug" element={<Component />} /></Routes></MemoryRouter>)
+  fireEvent.error(screen.getByAltText('First detail'))
+  expect(screen.queryByAltText('First detail')).toBeNull()
+  fireEvent.click(screen.getByRole('link', { name: 'Next product' }))
+  expect(screen.getByAltText('Next detail').getAttribute('src')).toBe('/shared-detail.jpg')
 })
 
 test('reports the actual amount added and warns when the bag is already at the stock limit', () => {
