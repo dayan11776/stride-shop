@@ -8,6 +8,8 @@ const product = {
   image: '/runner.jpg', price: 1000,
 }
 
+const offCenterAdidasPhoto = 'https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/56a1beb6b9614eb8bc244d5d6e65edf2_9366/GALAXY_8_RUNNING_SHOES_Blue_KI7977_HM1.jpg'
+
 function showCard(availableQuantity, isExampleStock = false) {
   return render(<MemoryRouter><ProductCard product={{ ...product, availableQuantity, isExampleStock }} /></MemoryRouter>)
 }
@@ -45,6 +47,29 @@ describe('product card stock', () => {
 })
 
 describe('product card images', () => {
+  test('re-centers the known off-center Adidas photo', () => {
+    render(<MemoryRouter><ProductCard product={{ ...product, image: offCenterAdidasPhoto }} /></MemoryRouter>)
+    expect(screen.getByRole('link', { name: 'View Runner' }).className).toContain('tileRecenteredPhoto')
+  })
+
+  test.each([
+    'https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/56a1beb6b9614eb8bc244d5d6e65edf2_9366/GALAXY_8_RUNNING_SHOES_Blue_KI7977_HM2.jpg',
+    'https://example.com/images/w_500%2Cf_auto%2Cq_auto/56a1beb6b9614eb8bc244d5d6e65edf2_9366/GALAXY_8_RUNNING_SHOES_Blue_KI7977_HM1.jpg',
+  ])('does not re-center an unrecognized, similarly named photo: %s', (image) => {
+    render(<MemoryRouter><ProductCard product={{ ...product, image }} /></MemoryRouter>)
+    expect(screen.getByRole('link', { name: 'View Runner' }).className).not.toContain('tileRecenteredPhoto')
+  })
+
+  test('removes the centering adjustment when the known photo fails and artwork is shown', () => {
+    render(<MemoryRouter><ProductCard product={{ ...product, image: offCenterAdidasPhoto }} artwork="/artwork.webp" /></MemoryRouter>)
+    const tile = screen.getByRole('link', { name: 'View Runner' })
+    expect(tile.className).toContain('tileRecenteredPhoto')
+    fireEvent.error(screen.getByAltText('Runner'))
+    expect(screen.getByAltText('Illustration, not the actual product: Runner').getAttribute('src')).toBe('/artwork.webp')
+    expect(screen.getByText('Illustration — not actual product')).toBeTruthy()
+    expect(tile.className).not.toContain('tileRecenteredPhoto')
+  })
+
   test('uses a neutral placeholder for an empty image URL', () => {
     render(<MemoryRouter><ProductCard product={{ ...product, image: '   ' }} /></MemoryRouter>)
     expect(screen.getByAltText('Product image unavailable').getAttribute('src')).toBe('/images/product-placeholder.svg')

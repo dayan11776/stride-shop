@@ -4,6 +4,7 @@ import { formatPeso } from '@/lib/format'
 import { Badge } from '@/components/ui/Badge'
 import { Icon } from '@/components/ui/Icon'
 import { useWishlistStore } from '@/features/wishlist/wishlistStore'
+import { shouldRecenterProductPhoto } from '@/features/catalog/productPhotoAlignment'
 import styles from './ProductCard.module.css'
 
 export function ProductCard({ product, artwork }) {
@@ -17,6 +18,7 @@ export function ProductCard({ product, artwork }) {
   const [failedImage, setFailedImage] = useState(null)
   const [failedArtwork, setFailedArtwork] = useState(null)
   const hasPhoto = Boolean(image && image !== placeholder && image !== failedImage)
+  const recenterPhoto = hasPhoto && shouldRecenterProductPhoto(image)
   const hasArtwork = Boolean(!hasPhoto && artworkUrl && artworkUrl !== placeholder && artworkUrl !== failedArtwork)
   const imageSource = hasPhoto ? image : hasArtwork ? artworkUrl : placeholder
   const imageAlt = hasPhoto ? product.name : hasArtwork ? `Illustration, not the actual product: ${product.name}` : 'Product image unavailable'
@@ -26,7 +28,7 @@ export function ProductCard({ product, artwork }) {
     ? pairCount ? `Example stock: ${pairCount} (not verified)` : 'Example stock: quantity unavailable (not verified)'
     : pairCount ? `${pairCount} available in total` : 'Stock information unavailable'
   return <article className={styles.card}>
-    <Link to={`/products/${product.slug}`} className={styles.tile} aria-label={`View ${product.name}`}>
+    <Link to={`/products/${product.slug}`} className={`${styles.tile}${recenterPhoto ? ` ${styles.tileRecenteredPhoto}` : ''}`} aria-label={`View ${product.name}`}>
       <img src={imageSource} alt={imageAlt} loading="lazy" onError={handleImageError} />
       <span className={styles.view}>View shoe <Icon name="arrow" size={16} /></span>
     </Link>

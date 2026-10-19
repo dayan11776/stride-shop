@@ -1,9 +1,10 @@
-import { render, screen, within } from '@testing-library/react'
-import { MemoryRouter } from 'react-router-dom'
+import { fireEvent, render, screen, within } from '@testing-library/react'
+import { createMemoryRouter, MemoryRouter, RouterProvider } from 'react-router-dom'
 import { beforeEach, expect, test, vi } from 'vitest'
 import { useProducts } from '@/features/catalog/hooks'
 import { Component as NewArrivalsPage } from './NewArrivalsPage'
 import { Component as SearchPage } from './SearchPage'
+import { Component as CategoryPage } from './CategoryPage'
 
 // Keep the real page, catalog, artwork mapping, and product cards in this test.
 // Only the network-backed hook is replaced so we can exercise the routing behavior.
@@ -40,6 +41,7 @@ const products = [
 ]
 
 beforeEach(() => {
+  useProducts.mockClear()
   useProducts.mockImplementation(() => ({ data: products, isLoading: false, isError: false, refetch: vi.fn() }))
 })
 
@@ -62,6 +64,47 @@ function expectPlaceholder(name) {
   expect(card.getByAltText('Product image unavailable').getAttribute('src')).toBe('/images/product-placeholder.svg')
   expect(card.queryByText('Illustration — not actual product')).toBeNull()
 }
+
+function renderCategoryPage(audience) {
+  // CategoryPage reads the audience from a data-router route handle.
+  const router = createMemoryRouter(
+    ['men', 'women', 'kids'].map((category) => ({
+      path: `/${category}`,
+      element: <CategoryPage />,
+      handle: { audience: category },
+    })),
+    { initialEntries: [`/${audience}`] },
+  )
+  return render(<RouterProvider router={router} />)
+}
+
+test.each([
+  ['men', 'example-adidas-gazelle-men-reference', '/images/arrival-retro.webp'],
+  ['women', 'example-adidas-handball-spezial-women-reference', '/images/illustration-casual.webp'],
+  ['kids', 'example-adidas-sl-72-rs-kids-reference', '/images/illustration-kids.webp'],
+])('%s category displays disclosed artwork while preserving genuine photos and unknown placeholders', (audience, slug, imagePath) => {
+  const sampleName = `Example ${audience} shoe`
+  useProducts.mockReturnValue({
+    data: [{ ...products[0], slug, name: sampleName }, products[1], products[2]],
+    isLoading: false,
+    isError: false,
+    refetch: vi.fn(),
+  })
+
+  renderCategoryPage(audience)
+  expect(screen.getByRole('heading', { level: 1, name: audience })).toBeTruthy()
+  expect(useProducts).toHaveBeenCalledWith({ audience })
+  expectIllustration(sampleName, imagePath)
+  expectPlaceholder('Unrecognized shoe')
+
+  const card = within(productCard('Adidas Tokyo with a genuine photo'))
+  expect(card.getByAltText('Adidas Tokyo with a genuine photo').getAttribute('src')).toBe('/verified-tokyo.jpg')
+  expect(card.queryByText('Illustration — not actual product')).toBeNull()
+
+  // A broken genuine photo may fall back, but the illustration must be labeled.
+  fireEvent.error(card.getByAltText('Adidas Tokyo with a genuine photo'))
+  expectIllustration('Adidas Tokyo with a genuine photo', '/images/illustration-runner.webp')
+})
 
 test('new arrivals show a disclosed illustration for a known sample and keep unknown products neutral', () => {
   renderPage(NewArrivalsPage, '/new-arrivals')
