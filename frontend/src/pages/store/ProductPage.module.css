@@ -1,0 +1,39 @@
+.figure {
+  aspect-ratio: 1.32;
+  overflow: hidden;
+  isolation: isolate;
+  border-radius: var(--radius);
+  background: var(--beige);
+}
+
+.image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  mix-blend-mode: multiply;
+}
+
+/* These known photos have pale, uniform backgrounds; keep unknown uploads as-is. */
+.photo {
+  mix-blend-mode: darken;
+  transform: scale(1.16);
+}
+
+/* Match the existing catalog-card alignment for photos with low-set subjects. */
+.recenteredPhoto {
+  transform: scale(1.16) translateY(-28%);
+}
+
+.galleryImage {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+
+.galleryPhoto {
+  mix-blend-mode: darken;
+}

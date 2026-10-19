@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useProduct } from '@/features/catalog/hooks'
 import { catalogArtworkFor } from '@/features/catalog/catalogArtwork'
+import { shouldBlendProductPhoto, shouldRecenterProductPhoto } from '@/features/catalog/productPhotoAlignment'
 import { MAX_PER_LINE, useCartStore } from '@/features/cart/cartStore'
 import { useWishlistStore } from '@/features/wishlist/wishlistStore'
 import { formatPeso } from '@/lib/format'
@@ -11,6 +12,7 @@ import { Icon } from '@/components/ui/Icon'
 import { ErrorState, LoadingState } from '@/components/ui/PageState'
 import { USE_MOCK } from '@/lib/apiClient'
 import { findVariantForSize, isVariantAvailable, shoeSizeKey } from '@/lib/shoeSize'
+import styles from './ProductPage.module.css'
 
 const colorOf = (variant) => variant.colorName ?? variant.color_name ?? ''
 const sizeOf = (variant) => variant.sizeEu ?? variant.size_eu ?? variant.size ?? variant.size_label
@@ -89,8 +91,8 @@ export function Component() {
   }
 
   return <section className="container section"><div className="mb-5 text-xs font-semibold uppercase tracking-[.11em] text-[var(--olive-gray)]"><Link to="/shop">Shop</Link> <span className="mx-1">/</span> {product.brand} <span className="mx-1">/</span> {product.name}</div><div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1.25fr)_minmax(340px,.75fr)]">
-    <div className="grid grid-cols-2 gap-3"><figure className="col-span-2 overflow-hidden rounded-ui bg-sand"><img src={image} alt={imageAlt} onError={handleImageError} className="aspect-[1.32] w-full object-contain mix-blend-multiply" />{hasArtwork && <figcaption className="px-4 pb-4 text-xs font-semibold text-[var(--olive-gray)]">Illustration — not actual product</figcaption>}</figure>{extraImages.map((entry) => <AdditionalProductImage key={`${product.slug}:${entry.url.trim()}`} entry={entry} productName={product.name} />)}</div>
-    <div className="lg:sticky lg:top-5"><p className="eyebrow">{product.brand}</p><div className="flex items-start justify-between gap-4"><h1 className="text-[clamp(46px,5vw,72px)]">{product.name}</h1><button className="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-[var(--line)] bg-transparent" onClick={() => toggle(product.id)} aria-label={saved ? 'Remove from wishlist' : 'Add to wishlist'} aria-pressed={saved}><Icon name="heart" size={21} strokeWidth={saved ? 2.5 : 1.7} /></button></div><p className="mt-5 text-xl">{!variant && !mockWithoutVariants && availableVariants.length > 0 && <span className="mr-2 text-sm">From</span>}<strong>{formatPeso(currentPrice)}</strong>{Number.isFinite(listPrice) && currentPrice < listPrice && <s className="ml-3 text-base text-[var(--olive-gray)]">{formatPeso(listPrice)}</s>}</p><p className="mt-5 max-w-[530px] leading-6 text-[var(--olive-gray)]">{product.description || 'A versatile, made-to-move silhouette with lightweight support and all-day comfort. Designed for the rhythm of real life.'}</p>
+    <div className="grid grid-cols-2 gap-3"><figure className={`col-span-2 ${styles.figure}`}><img src={image} alt={imageAlt} onError={handleImageError} className={`${styles.image}${hasPhoto && shouldBlendProductPhoto(image) ? ` ${styles.photo}` : ''}${hasPhoto && shouldRecenterProductPhoto(image) ? ` ${styles.recenteredPhoto}` : ''}`} /></figure>{extraImages.map((entry) => <AdditionalProductImage key={`${product.slug}:${entry.url.trim()}`} entry={entry} productName={product.name} />)}</div>
+    <div className="lg:sticky lg:top-5"><p className="eyebrow">{product.brand}</p><div className="flex items-start justify-between gap-4"><h1 className="text-[clamp(46px,5vw,72px)]">{product.name}</h1><button className="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-[var(--line)] bg-transparent" onClick={() => toggle(product.id)} aria-label={saved ? 'Remove from wishlist' : 'Add to wishlist'} aria-pressed={saved}><Icon name="heart" size={21} strokeWidth={saved ? 2.5 : 1.7} /></button></div><p className="mt-5 text-xl">{!variant && !mockWithoutVariants && availableVariants.length > 0 && <span className="mr-2 text-sm">From</span>}<strong>{formatPeso(currentPrice)}</strong>{Number.isFinite(listPrice) && currentPrice < listPrice && <s className="ml-3 text-base text-[var(--olive-gray)]">{formatPeso(listPrice)}</s>}</p>{hasArtwork && <p className="mt-2 text-sm text-[var(--olive-gray)]">Illustrative image</p>}<p className="mt-5 max-w-[530px] leading-6 text-[var(--olive-gray)]">{product.description || 'A versatile, made-to-move silhouette with lightweight support and all-day comfort. Designed for the rhythm of real life.'}</p>
     {product.isExamplePrice && <p className="mt-2 text-sm font-semibold text-[var(--olive-gray)]">Example price; not verified by the store. This amount may be charged if you order.</p>}
     {colors.length > 0 && <div className="mt-8"><p className="mb-3 text-sm font-semibold">Colour: {selectedColor}</p><div className="flex flex-wrap gap-2" role="group" aria-label="Select colour">{colors.map((value) => <Chip key={value} selected={value === selectedColor} onClick={() => { setColor(value); setSize(null); setWidth(''); setQuantity(1); setMessage('') }}>{value}</Chip>)}</div></div>}
     <div className="mt-8 border-y border-[#262B1F22] py-6"><div className="mb-3 flex justify-between text-sm font-semibold"><span>Select EU size</span><Link className="text-[var(--olive)]" to="/support/size-guide">Size guide</Link></div>{product.isExampleStock && <p className="mb-3 text-sm font-semibold text-[var(--olive-gray)]">Example sizes and stock are not verified. Please confirm availability with the store.</p>}{sizes.length ? <div className="flex flex-wrap gap-2" role="group" aria-label="Select shoe size">{sizes.map((value) => <Chip key={value} selected={shoeSizeKey(size) === shoeSizeKey(value)} onClick={() => { setSize(value); setWidth(''); setQuantity(1); setMessage('') }}>{value}</Chip>)}</div> : <p className="text-sm text-[var(--olive-gray)]">{product.isExampleStock ? 'No sizes are shown for the example stock.' : 'No sizes are currently available.'}</p>}
@@ -105,5 +107,6 @@ export function Component() {
 function AdditionalProductImage({ entry, productName }) {
   const [failed, setFailed] = useState(false)
   if (failed) return null
-  return <div className="overflow-hidden rounded-ui bg-sand"><img src={entry.url.trim()} alt={entry.altText || entry.alt_text || `${productName} detail`} loading="lazy" onError={() => setFailed(true)} className="aspect-square w-full object-contain mix-blend-multiply" /></div>
+  const url = entry.url.trim()
+  return <div className="overflow-hidden rounded-ui bg-sand"><img src={url} alt={entry.altText || entry.alt_text || `${productName} detail`} loading="lazy" onError={() => setFailed(true)} className={`${styles.galleryImage}${shouldBlendProductPhoto(url) ? ` ${styles.galleryPhoto}` : ''}`} /></div>
 }

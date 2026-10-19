@@ -4,6 +4,7 @@ import { beforeEach, expect, test, vi } from 'vitest'
 import { useProduct } from '@/features/catalog/hooks'
 import { useCartStore, selectSubtotal } from '@/features/cart/cartStore'
 import { Component } from './ProductPage'
+import styles from './ProductPage.module.css'
 
 vi.mock('@/features/catalog/hooks', () => ({ useProduct: vi.fn() }))
 
@@ -27,6 +28,9 @@ const mappedExample = {
   image: '',
   images: [],
 }
+
+const knownProductPhoto = 'https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/70f198b292f8433791442853f0a62c56_9366/Adizero_EVO_SL_Laceless_LIGHTSTRIKEPRO_Running_Shoes_Beige_HQ9534_01_00_standard.jpg'
+const lowSubjectPhoto = 'https://assets.adidas.com/images/w_500%2Cf_auto%2Cq_auto/56a1beb6b9614eb8bc244d5d6e65edf2_9366/GALAXY_8_RUNNING_SHOES_Blue_KI7977_HM1.jpg'
 
 beforeEach(() => {
   useCartStore.getState().clear()
@@ -117,16 +121,80 @@ test.each(['', '/images/product-placeholder.svg'])(
     const { container } = showProduct(`/products/${mappedExample.slug}`)
     const illustration = screen.getByAltText(`Illustration, not the actual product: ${mappedExample.name}`)
     expect(illustration.getAttribute('src')).toBe('/images/arrival-mary-jane.webp')
-    expect(screen.getByText('Illustration — not actual product')).toBeTruthy()
+    const label = screen.getByText('Illustrative image')
+    expect(label.closest('figure')).toBeNull()
+    expect(screen.getByRole('heading', { name: mappedExample.name }).parentElement.parentElement.contains(label)).toBe(true)
+    expect(illustration.classList.contains(styles.photo)).toBe(false)
+    expect(screen.queryByText('Illustration — not actual product')).toBeNull()
     expect(screen.queryByAltText('Product image unavailable')).toBeNull()
     expect(container.querySelectorAll('img')).toHaveLength(1)
   },
 )
 
+test('applies the seamless background only to a known reference photo and removes it on image failure', () => {
+  useProduct.mockReturnValue({ data: { ...mappedExample, image: knownProductPhoto }, isLoading: false, isError: false })
+  showProduct(`/products/${mappedExample.slug}`)
+
+  const photo = screen.getByAltText(mappedExample.name)
+  expect(photo.getAttribute('src')).toBe(knownProductPhoto)
+  expect(photo.classList.contains(styles.photo)).toBe(true)
+  expect(photo.closest('figure').classList.contains(styles.figure)).toBe(true)
+  expect(screen.queryByText('Illustrative image')).toBeNull()
+
+  fireEvent.error(photo)
+  const illustration = screen.getByAltText(`Illustration, not the actual product: ${mappedExample.name}`)
+  expect(illustration.classList.contains(styles.photo)).toBe(false)
+  expect(screen.getByText('Illustrative image')).toBeTruthy()
+  fireEvent.error(illustration)
+  expect(screen.getByAltText('Product image unavailable').classList.contains(styles.photo)).toBe(false)
+  expect(screen.queryByText('Illustrative image')).toBeNull()
+})
+
+test.each([
+  '/verified-product.jpg',
+  `${knownProductPhoto}?different-crop=true`,
+])('does not apply the background adjustment to an unknown photo %s', (image) => {
+  useProduct.mockReturnValue({ data: { ...mappedExample, image }, isLoading: false, isError: false })
+  showProduct(`/products/${mappedExample.slug}`)
+  const photo = screen.getByAltText(mappedExample.name)
+  expect(photo.getAttribute('src')).toBe(image)
+  expect(photo.classList.contains(styles.photo)).toBe(false)
+  expect(screen.queryByText('Illustrative image')).toBeNull()
+})
+
+test('re-centers a known low-subject photo, but not an unknown photo or fallback illustration', () => {
+  useProduct.mockReturnValue({ data: { ...mappedExample, image: lowSubjectPhoto }, isLoading: false, isError: false })
+  const { rerender } = showProduct(`/products/${mappedExample.slug}`)
+
+  expect(screen.getByAltText(mappedExample.name).classList.contains(styles.recenteredPhoto)).toBe(true)
+  fireEvent.error(screen.getByAltText(mappedExample.name))
+  expect(screen.getByAltText(`Illustration, not the actual product: ${mappedExample.name}`).classList.contains(styles.recenteredPhoto)).toBe(false)
+
+  useProduct.mockReturnValue({ data: { ...mappedExample, image: `${lowSubjectPhoto}?different-crop=true` }, isLoading: false, isError: false })
+  rerender(<MemoryRouter initialEntries={[`/products/${mappedExample.slug}`]}><Routes><Route path="/products/:slug" element={<Component />} /></Routes></MemoryRouter>)
+  expect(screen.getByAltText(mappedExample.name).classList.contains(styles.recenteredPhoto)).toBe(false)
+})
+
+test('applies the background adjustment to known extra gallery photos only', () => {
+  useProduct.mockReturnValue({ data: { ...product, images: [
+    { colorName: 'Sage', url: '/sage.jpg' },
+    { colorName: 'Sage', url: knownProductPhoto, altText: 'Known detail' },
+    { colorName: 'Sage', url: '/unknown-detail.jpg', altText: 'Unknown detail' },
+  ] }, isLoading: false, isError: false })
+  showProduct()
+
+  expect(screen.getByAltText('Known detail').classList.contains(styles.galleryPhoto)).toBe(true)
+  expect(screen.getByAltText('Unknown detail').classList.contains(styles.galleryPhoto)).toBe(false)
+  fireEvent.error(screen.getByAltText('Known detail'))
+  expect(screen.queryByAltText('Known detail')).toBeNull()
+  expect(screen.getByAltText('Unknown detail')).toBeTruthy()
+})
+
 test('shows a real photo instead of the example illustration when one is supplied', () => {
   useProduct.mockReturnValue({ data: { ...mappedExample, image: '/verified-product.jpg' }, isLoading: false, isError: false })
   showProduct(`/products/${mappedExample.slug}`)
   expect(screen.getByAltText(mappedExample.name).getAttribute('src')).toBe('/verified-product.jpg')
+  expect(screen.queryByText('Illustrative image')).toBeNull()
   expect(screen.queryByText('Illustration — not actual product')).toBeNull()
 })
 
@@ -136,9 +204,10 @@ test('uses a labeled illustration if a real photo fails, and a placeholder if th
   fireEvent.error(screen.getByAltText(mappedExample.name))
   const illustration = screen.getByAltText(`Illustration, not the actual product: ${mappedExample.name}`)
   expect(illustration.getAttribute('src')).toBe('/images/arrival-mary-jane.webp')
-  expect(screen.getByText('Illustration — not actual product')).toBeTruthy()
+  expect(screen.getByText('Illustrative image')).toBeTruthy()
   fireEvent.error(illustration)
   expect(screen.getByAltText('Product image unavailable').getAttribute('src')).toBe('/images/product-placeholder.svg')
+  expect(screen.queryByText('Illustrative image')).toBeNull()
   expect(screen.queryByText('Illustration — not actual product')).toBeNull()
   expect(container.querySelectorAll('img')).toHaveLength(1)
 })
@@ -153,6 +222,7 @@ test('tries a different colour photo after a mapped example falls back to an ill
   expect(screen.getByAltText(`Illustration, not the actual product: ${mappedExample.name}`)).toBeTruthy()
   fireEvent.click(within(screen.getByRole('group', { name: 'Select colour' })).getByRole('button', { name: 'Black' }))
   expect(screen.getByAltText(mappedExample.name).getAttribute('src')).toBe('/black.jpg')
+  expect(screen.queryByText('Illustrative image')).toBeNull()
   expect(screen.queryByText('Illustration — not actual product')).toBeNull()
 })
 
@@ -172,7 +242,7 @@ test('updates the example illustration when navigating between products', () => 
   expect(screen.getByAltText(`Illustration, not the actual product: ${mappedExample.name}`).getAttribute('src')).toBe('/images/arrival-mary-jane.webp')
   fireEvent.click(screen.getByRole('link', { name: 'Next product' }))
   expect(screen.getByAltText(`Illustration, not the actual product: ${next.name}`).getAttribute('src')).toBe('/images/arrival-blue-runner.webp')
-  expect(screen.getByText('Illustration — not actual product')).toBeTruthy()
+  expect(screen.getByText('Illustrative image')).toBeTruthy()
 })
 
 test('retries a shared illustration for a different product after it fails', () => {
@@ -183,7 +253,7 @@ test('retries a shared illustration for a different product after it fails', () 
   expect(screen.getByAltText('Product image unavailable')).toBeTruthy()
   fireEvent.click(screen.getByRole('link', { name: 'Next product' }))
   expect(screen.getByAltText(`Illustration, not the actual product: ${next.name}`).getAttribute('src')).toBe('/images/arrival-mary-jane.webp')
-  expect(screen.getByText('Illustration — not actual product')).toBeTruthy()
+  expect(screen.getByText('Illustrative image')).toBeTruthy()
 })
 
 test('retries a shared photo for a different product after it fails', () => {
@@ -195,6 +265,7 @@ test('retries a shared photo for a different product after it fails', () => {
   expect(screen.getByAltText(`Illustration, not the actual product: ${first.name}`)).toBeTruthy()
   fireEvent.click(screen.getByRole('link', { name: 'Next product' }))
   expect(screen.getByAltText(next.name).getAttribute('src')).toBe('/shared.jpg')
+  expect(screen.queryByText('Illustrative image')).toBeNull()
   expect(screen.queryByText('Illustration — not actual product')).toBeNull()
 })
 
