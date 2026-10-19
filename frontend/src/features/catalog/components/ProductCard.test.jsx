@@ -47,6 +47,35 @@ describe('product card stock', () => {
 })
 
 describe('product card images', () => {
+  test('uses the product-photo styling only while a known Adidas photo is displayed', () => {
+    render(<MemoryRouter><ProductCard product={{ ...product, image: offCenterAdidasPhoto }} artwork="/artwork.webp" /></MemoryRouter>)
+    const tile = screen.getByRole('link', { name: 'View Runner' })
+
+    expect(tile.className).toContain('tileProductPhoto')
+    expect(screen.getByAltText('Runner').getAttribute('src')).toBe(offCenterAdidasPhoto)
+
+    fireEvent.error(screen.getByAltText('Runner'))
+    expect(screen.getByAltText('Illustration, not the actual product: Runner').getAttribute('src')).toBe('/artwork.webp')
+    expect(tile.className).not.toContain('tileProductPhoto')
+  })
+
+  test('does not apply the known-photo treatment to a new, unrecognized product photo', () => {
+    render(<MemoryRouter><ProductCard product={product} artwork="/artwork.webp" /></MemoryRouter>)
+
+    expect(screen.getByAltText('Runner').getAttribute('src')).toBe('/runner.jpg')
+    expect(screen.getByRole('link', { name: 'View Runner' }).className).not.toContain('tileProductPhoto')
+  })
+
+  test.each([
+    ['/artwork.webp', 'Illustration, not the actual product: Runner'],
+    [undefined, 'Product image unavailable'],
+  ])('does not apply product-photo styling to artwork or a placeholder', (artwork, alt) => {
+    render(<MemoryRouter><ProductCard product={{ ...product, image: '' }} artwork={artwork} /></MemoryRouter>)
+
+    expect(screen.getByAltText(alt)).toBeTruthy()
+    expect(screen.getByRole('link', { name: 'View Runner' }).className).not.toContain('tileProductPhoto')
+  })
+
   test('re-centers the known off-center Adidas photo', () => {
     render(<MemoryRouter><ProductCard product={{ ...product, image: offCenterAdidasPhoto }} /></MemoryRouter>)
     expect(screen.getByRole('link', { name: 'View Runner' }).className).toContain('tileRecenteredPhoto')

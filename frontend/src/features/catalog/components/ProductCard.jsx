@@ -4,7 +4,7 @@ import { formatPeso } from '@/lib/format'
 import { Badge } from '@/components/ui/Badge'
 import { Icon } from '@/components/ui/Icon'
 import { useWishlistStore } from '@/features/wishlist/wishlistStore'
-import { shouldRecenterProductPhoto } from '@/features/catalog/productPhotoAlignment'
+import { shouldBlendProductPhoto, shouldRecenterProductPhoto } from '@/features/catalog/productPhotoAlignment'
 import styles from './ProductCard.module.css'
 
 export function ProductCard({ product, artwork }) {
@@ -28,7 +28,7 @@ export function ProductCard({ product, artwork }) {
     ? pairCount ? `Example stock: ${pairCount} (not verified)` : 'Example stock: quantity unavailable (not verified)'
     : pairCount ? `${pairCount} available in total` : 'Stock information unavailable'
   return <article className={styles.card}>
-    <Link to={`/products/${product.slug}`} className={`${styles.tile}${recenterPhoto ? ` ${styles.tileRecenteredPhoto}` : ''}`} aria-label={`View ${product.name}`}>
+    <Link to={`/products/${product.slug}`} className={`${styles.tile}${hasPhoto && shouldBlendProductPhoto(image) ? ` ${styles.tileProductPhoto}` : ''}${recenterPhoto ? ` ${styles.tileRecenteredPhoto}` : ''}`} aria-label={`View ${product.name}`}>
       <img src={imageSource} alt={imageAlt} loading="lazy" onError={handleImageError} />
       <span className={styles.view}>View shoe <Icon name="arrow" size={16} /></span>
     </Link>
