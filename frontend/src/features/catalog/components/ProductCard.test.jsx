@@ -58,6 +58,40 @@ describe('product card images', () => {
   test('uses the product image when one is supplied', () => {
     render(<MemoryRouter><ProductCard product={product} /></MemoryRouter>)
     expect(screen.getByAltText('Runner').getAttribute('src')).toBe('/runner.jpg')
+    expect(screen.queryByText('Illustration — not actual product')).toBeNull()
+  })
+
+  test('displays approved artwork with a visible disclosure when the photo is missing', () => {
+    render(<MemoryRouter><ProductCard product={{ ...product, image: '/images/product-placeholder.svg' }} artwork="/artwork.webp" /></MemoryRouter>)
+    expect(screen.getByAltText('Illustration, not the actual product: Runner').getAttribute('src')).toBe('/artwork.webp')
+    expect(screen.getByText('Illustration — not actual product')).toBeTruthy()
+  })
+
+  test('prefers a product photo over artwork and discloses the artwork if the photo fails', () => {
+    const { rerender } = render(<MemoryRouter><ProductCard product={product} artwork="/artwork.webp" /></MemoryRouter>)
+    expect(screen.getByAltText('Runner').getAttribute('src')).toBe('/runner.jpg')
+    expect(screen.queryByText('Illustration — not actual product')).toBeNull()
+    fireEvent.error(screen.getByAltText('Runner'))
+    expect(screen.getByAltText('Illustration, not the actual product: Runner').getAttribute('src')).toBe('/artwork.webp')
+    expect(screen.getByText('Illustration — not actual product')).toBeTruthy()
+    rerender(<MemoryRouter><ProductCard product={{ ...product, image: '/new-runner.jpg' }} artwork="/artwork.webp" /></MemoryRouter>)
+    expect(screen.getByAltText('Runner').getAttribute('src')).toBe('/new-runner.jpg')
+    expect(screen.queryByText('Illustration — not actual product')).toBeNull()
+  })
+
+  test('uses the neutral placeholder and removes the disclosure if the artwork fails', () => {
+    render(<MemoryRouter><ProductCard product={{ ...product, image: '' }} artwork="/artwork.webp" /></MemoryRouter>)
+    fireEvent.error(screen.getByAltText('Illustration, not the actual product: Runner'))
+    expect(screen.getByAltText('Product image unavailable').getAttribute('src')).toBe('/images/product-placeholder.svg')
+    expect(screen.queryByText('Illustration — not actual product')).toBeNull()
+  })
+
+  test('tries a different artwork URL if the prior artwork fails', () => {
+    const { rerender } = render(<MemoryRouter><ProductCard product={{ ...product, image: '' }} artwork="/old-artwork.webp" /></MemoryRouter>)
+    fireEvent.error(screen.getByAltText('Illustration, not the actual product: Runner'))
+    rerender(<MemoryRouter><ProductCard product={{ ...product, image: '' }} artwork="/new-artwork.webp" /></MemoryRouter>)
+    expect(screen.getByAltText('Illustration, not the actual product: Runner').getAttribute('src')).toBe('/new-artwork.webp')
+    expect(screen.getByText('Illustration — not actual product')).toBeTruthy()
   })
 
   test('falls back when an image fails and tries a different image if the product changes', () => {

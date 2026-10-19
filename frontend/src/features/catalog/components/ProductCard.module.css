@@ -10,6 +10,7 @@
 .brand { margin: 0 0 2px; color: var(--olive-gray); font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
 .name { font-family: var(--font-body); font-size: 15px; font-weight: 700; letter-spacing: 0; line-height: 1.2; text-transform: none; }
 .name a { text-decoration: none; }
+.artworkDisclosure { margin: 5px 0 0; color: var(--ink); font-size: 12px; line-height: 1.4; }
 .price { display: flex; gap: 8px; margin: 6px 0 0; font-size: 14px; }
 .price s { color: var(--olive-gray); }
 .stock { margin: 5px 0 0; color: var(--olive-gray); font-size: 12px; line-height: 1.4; }
