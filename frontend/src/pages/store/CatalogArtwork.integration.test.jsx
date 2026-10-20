@@ -7,6 +7,7 @@ import { Component as NewArrivalsPage } from './NewArrivalsPage'
 import { Component as SearchPage } from './SearchPage'
 import { Component as CategoryPage } from './CategoryPage'
 import { Component as ShopPage } from './ShopPage'
+import { CatalogPage } from '@/features/catalog/components/CatalogPage'
 
 // Keep the real page, catalog, artwork mapping, and product cards in this test.
 // Only the network-backed hook is replaced so we can exercise the routing behavior.
@@ -359,6 +360,75 @@ test('Men filters combine EU size and price and show the no-result recovery stat
   expectVisibleProduct('Men Nike Runner')
   expectVisibleProduct('Men Adidas Court')
   expectHiddenProduct('Unisex Nike Runner')
+})
+
+test('Men displays 20 products per page and returns to page one when filters or page size change', () => {
+  const paginatedMenProducts = Array.from({ length: 50 }, (_, index) => ({
+    id: `paginated-men-${index + 1}`,
+    slug: `paginated-men-${index + 1}`,
+    name: `Paginated Men Shoe ${index + 1}`,
+    brand: index % 2 === 0 ? 'NIKE' : 'ADIDAS',
+    audience: 'men',
+    sizes: [42],
+    price: 5000 + index,
+    image: '/men-pagination.jpg',
+  }))
+  useProducts.mockReturnValue({ data: paginatedMenProducts, isLoading: false, isError: false, refetch: vi.fn() })
+
+  renderCategoryPage('men')
+
+  expect(screen.getByText('Showing 1–20 of 50')).toBeTruthy()
+  expect(screen.getAllByRole('link', { name: /^View Paginated Men Shoe/ })).toHaveLength(20)
+  expect(screen.getByRole('button', { name: 'Previous page' }).disabled).toBe(true)
+  expect(screen.getByRole('button', { name: 'Page 1' }).getAttribute('aria-current')).toBe('page')
+  expect(screen.getByRole('combobox', { name: 'Products per page' }).value).toBe('20')
+
+  fireEvent.click(screen.getByRole('button', { name: 'Page 2' }))
+  expect(screen.getByText('Showing 21–40 of 50')).toBeTruthy()
+  expect(screen.getAllByRole('link', { name: /^View Paginated Men Shoe/ })).toHaveLength(20)
+  expect(screen.queryByRole('link', { name: 'View Paginated Men Shoe 1' })).toBeNull()
+  expect(screen.getByRole('link', { name: 'View Paginated Men Shoe 21' })).toBeTruthy()
+  expect(screen.getByRole('button', { name: 'Page 2' }).getAttribute('aria-current')).toBe('page')
+
+  fireEvent.change(screen.getByRole('combobox', { name: 'Products per page' }), { target: { value: '40' } })
+  expect(screen.getByText('Showing 1–40 of 50')).toBeTruthy()
+  expect(screen.getAllByRole('link', { name: /^View Paginated Men Shoe/ })).toHaveLength(40)
+  expect(screen.getByRole('button', { name: 'Page 1' }).getAttribute('aria-current')).toBe('page')
+
+  fireEvent.click(screen.getByRole('button', { name: 'Page 2' }))
+  expect(screen.getByText('Showing 41–50 of 50')).toBeTruthy()
+  openFilterGroup('Brand')
+  fireEvent.click(screen.getByRole('checkbox', { name: 'NIKE' }))
+  expect(screen.getByText('Showing 1–25 of 25')).toBeTruthy()
+  expect(screen.getAllByRole('link', { name: /^View Paginated Men Shoe/ })).toHaveLength(25)
+  expect(screen.getByRole('button', { name: 'Page 1' }).getAttribute('aria-current')).toBe('page')
+})
+
+test('Men pagination keeps a valid final page while refreshed results shrink', () => {
+  let catalogData = Array.from({ length: 50 }, (_, index) => ({
+    id: `refresh-men-${index + 1}`,
+    slug: `refresh-men-${index + 1}`,
+    name: `Refresh Men Shoe ${index + 1}`,
+    brand: 'NIKE',
+    audience: 'men',
+    sizes: [42],
+    price: 5000 + index,
+    image: '/men-refresh.jpg',
+  }))
+  useProducts.mockImplementation(() => ({ data: catalogData, isLoading: false, isError: false, refetch: vi.fn() }))
+
+  const renderMenPage = () => <MemoryRouter><CatalogPage title="men" filters={{ audience: 'men' }} showEditorialArtwork showExampleMetadata={false} enableMenFilters /></MemoryRouter>
+  const view = render(renderMenPage())
+
+  fireEvent.click(screen.getByRole('button', { name: 'Page 3' }))
+  expect(screen.getByText('Showing 41–50 of 50')).toBeTruthy()
+
+  catalogData = catalogData.slice(0, 25)
+  view.rerender(renderMenPage())
+
+  expect(screen.getByText('Showing 21–25 of 25')).toBeTruthy()
+  expect(screen.getAllByRole('link', { name: /^View Refresh Men Shoe/ })).toHaveLength(5)
+  expect(screen.getByRole('button', { name: 'Page 2' }).getAttribute('aria-current')).toBe('page')
 })
 
 test('new arrivals show a disclosed illustration for a known sample and keep unknown products neutral', () => {

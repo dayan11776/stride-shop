@@ -7,6 +7,16 @@
 .sortLabel { flex: 0 0 202px; }
 .sortLabel :global(.field) { min-height: 42px; padding-top: 9px; padding-bottom: 9px; }
 .filteredGrid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.pagination { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 16px; margin-top: 26px; padding-top: 20px; border-top: 1px solid rgba(38, 43, 31, .13); }
+.paginationInfo { margin: 0; font-size: 14px; }
+.pageControls { display: inline-flex; align-items: center; justify-self: center; gap: 6px; }
+.pageButton { display: inline-grid; width: 34px; height: 34px; place-items: center; border: 1px solid rgba(38, 43, 31, .16); border-radius: 6px; padding: 0; color: var(--ink); background: rgba(255,255,255,.45); font: inherit; font-size: 14px; line-height: 1; cursor: pointer; transition: .18s ease; }
+.pageButton:hover:not(:disabled), .pageButton:focus-visible { border-color: var(--sage-dark); color: var(--cream); background: var(--sage-dark); }
+.pageButton[aria-current='page'] { border-color: var(--sage-dark); color: var(--cream); background: var(--sage); }
+.pageButton:disabled { opacity: .45; cursor: not-allowed; }
+.pageGap { display: inline-grid; width: 20px; height: 34px; place-items: center; color: var(--olive-gray); font-size: 15px; }
+.pageSizeLabel { justify-self: end; }
+.pageSize { min-width: 112px; min-height: 34px; border: 1px solid rgba(38, 43, 31, .16); border-radius: 6px; padding: 7px 30px 7px 11px; color: var(--ink); background: rgba(255,255,255,.45); font: inherit; font-size: 13px; cursor: pointer; }
 
 @media (max-width: 1280px) {
   .catalogLayout { grid-template-columns: 226px minmax(0, 1fr); gap: 26px; }
@@ -24,4 +34,15 @@
   .resultsHeader { align-items: stretch; flex-direction: column; gap: 15px; padding-bottom: 20px; }
   .sortLabel { flex-basis: auto; }
   .filteredGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pagination { grid-template-columns: minmax(0, 1fr) auto; row-gap: 12px; margin-top: 20px; padding-top: 16px; }
+  .paginationInfo { grid-column: 1 / -1; }
+  .pageControls { justify-self: start; }
+  .pageSizeLabel { justify-self: end; }
+}
+
+@media (max-width: 420px) {
+  .pagination { grid-template-columns: 1fr; justify-items: center; }
+  .paginationInfo { grid-column: auto; }
+  .pageControls { max-width: 100%; flex-wrap: wrap; justify-content: center; }
+  .pageSizeLabel { justify-self: center; }
 }
