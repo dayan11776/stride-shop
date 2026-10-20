@@ -261,10 +261,24 @@ function expectHiddenProduct(name) {
   expect(screen.queryByRole('link', { name: `View ${name}` })).toBeNull()
 }
 
+function openFilterGroup(label) {
+  const toggle = screen.getByRole('button', { name: label })
+  if (toggle.getAttribute('aria-expanded') !== 'true') fireEvent.click(toggle)
+  return toggle
+}
+
 test('Men filters default to Men, expose selected chips, and clear back to the Men catalogue', () => {
   renderMenFilters()
 
   expect(useProducts).toHaveBeenCalledWith({})
+  const [genderToggle, brandToggle, sizeToggle, priceToggle] = ['Gender', 'Brand', 'Size (EU)', 'Price'].map((label) => screen.getByRole('button', { name: label }))
+  expect(genderToggle.getAttribute('aria-expanded')).toBe('false')
+  expect(brandToggle.getAttribute('aria-expanded')).toBe('false')
+  expect(sizeToggle.getAttribute('aria-expanded')).toBe('false')
+  expect(priceToggle.getAttribute('aria-expanded')).toBe('false')
+  expect(screen.queryByRole('checkbox', { name: 'Men' })).toBeNull()
+  fireEvent.click(genderToggle)
+  expect(genderToggle.getAttribute('aria-expanded')).toBe('true')
   expect(screen.getByRole('checkbox', { name: 'Men' }).checked).toBe(true)
   expect(screen.getByRole('checkbox', { name: 'Unisex' }).checked).toBe(false)
   expect(screen.getByRole('combobox', { name: 'Sort products' })).toBeTruthy()
@@ -274,6 +288,8 @@ test('Men filters default to Men, expose selected chips, and clear back to the M
   expectHiddenProduct('Unisex Nike Runner')
   expectHiddenProduct('Women Shoe Outside Men')
 
+  openFilterGroup('Brand')
+  expect(genderToggle.getAttribute('aria-expanded')).toBe('true')
   fireEvent.click(screen.getByRole('checkbox', { name: 'NIKE' }))
   expect(screen.getByRole('button', { name: 'Remove NIKE filter' })).toBeTruthy()
   expectVisibleProduct('Men Nike Runner')
@@ -305,6 +321,7 @@ test('Men filters default to Men, expose selected chips, and clear back to the M
 
   fireEvent.click(screen.getByRole('checkbox', { name: 'Unisex' }))
   fireEvent.click(screen.getByRole('button', { name: 'Clear all filters' }))
+  openFilterGroup('Gender')
   expect(screen.getByRole('checkbox', { name: 'Men' }).checked).toBe(true)
   expect(screen.getByRole('checkbox', { name: 'Unisex' }).checked).toBe(false)
   expect(screen.getByRole('checkbox', { name: 'NIKE' }).checked).toBe(false)
@@ -317,7 +334,9 @@ test('Men filters default to Men, expose selected chips, and clear back to the M
 test('Men filters combine EU size and price and show the no-result recovery state', () => {
   renderMenFilters()
 
+  openFilterGroup('Size (EU)')
   fireEvent.click(screen.getByRole('checkbox', { name: '42' }))
+  openFilterGroup('Price')
   fireEvent.change(screen.getByLabelText('Minimum price'), { target: { value: '5500' } })
   fireEvent.change(screen.getByLabelText('Maximum price'), { target: { value: '6500' } })
 
@@ -332,6 +351,7 @@ test('Men filters combine EU size and price and show the no-result recovery stat
   expect(screen.getByText('Try a different filter or clear your selections.')).toBeTruthy()
 
   fireEvent.click(screen.getByRole('button', { name: 'Clear all filters' }))
+  openFilterGroup('Gender')
   expect(screen.getByRole('checkbox', { name: 'Men' }).checked).toBe(true)
   expect(screen.getByRole('checkbox', { name: '42' }).checked).toBe(false)
   expect(screen.getByLabelText('Minimum price').value).toBe('')

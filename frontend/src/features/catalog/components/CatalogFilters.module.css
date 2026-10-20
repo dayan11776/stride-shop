@@ -3,10 +3,16 @@
 .titleRow h2 { font-family: var(--font-body); font-size: 15px; letter-spacing: .11em; line-height: 1; text-transform: uppercase; }
 .reset, .clear { border: 0; padding: 0; color: var(--olive); background: transparent; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
 .reset { font-size: 12px; }
-.group { min-width: 0; margin: 0; padding: 20px 0; border: 0; border-bottom: 1px solid rgba(38, 43, 31, .12); }
-.group:last-child { padding-bottom: 0; border-bottom: 0; }
-.group legend { display: flex; width: 100%; align-items: center; justify-content: space-between; margin-bottom: 13px; padding: 0; color: var(--ink); font-size: 12px; font-weight: 700; letter-spacing: .11em; text-transform: uppercase; }
-.group legend svg { transform: rotate(180deg); }
+.group { min-width: 0; margin: 0; border: 0; border-bottom: 1px solid rgba(38, 43, 31, .12); }
+.group:last-child { border-bottom: 0; }
+.groupToggle { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 12px; min-height: 58px; border: 0; padding: 20px 0; color: var(--ink); background: transparent; font-size: 12px; font-weight: 700; letter-spacing: .11em; line-height: 1; text-align: left; text-transform: uppercase; cursor: pointer; }
+.groupToggle:hover { color: var(--olive); }
+.groupToggle:focus-visible { outline: 2px solid var(--olive); outline-offset: 3px; }
+.groupOpen .groupToggle { padding-bottom: 0; }
+.groupIcon { flex: 0 0 auto; transition: transform 160ms ease; }
+.groupToggle:hover .groupIcon { transform: scale(1.1); }
+.groupContent { padding: 13px 0 20px; }
+.group:last-child .groupContent { padding-bottom: 0; }
 .checkbox { display: flex; align-items: center; gap: 9px; min-height: 30px; color: var(--ink); font-size: 14px; line-height: 1.3; cursor: pointer; }
 .checkbox + .checkbox { margin-top: 6px; }
 .checkbox input { width: 17px; height: 17px; margin: 0; accent-color: var(--sage-dark); }
@@ -38,14 +44,14 @@
 @media (max-width: 1024px) {
   .sidebar { position: static; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 24px; padding: 18px; }
   .titleRow { grid-column: 1 / -1; }
-  .group { padding: 18px 0; }
   .group:last-child { border-bottom: 0; }
   .optionList { grid-template-columns: repeat(2, minmax(0, 1fr)); max-height: none; }
 }
 
 @media (max-width: 680px) {
   .sidebar { display: block; padding: 16px; }
-  .group { padding: 16px 0; }
+  .groupToggle { min-height: 54px; padding: 18px 0; }
+  .groupContent { padding-bottom: 18px; }
   .optionList { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .selectedArea { align-items: flex-start; flex-direction: column; }
 }

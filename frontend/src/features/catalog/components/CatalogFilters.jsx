@@ -1,3 +1,4 @@
+import { useId, useState } from 'react'
 import { Icon } from '@/components/ui/Icon'
 import { formatPeso } from '@/lib/format'
 import styles from './CatalogFilters.module.css'
@@ -5,7 +6,22 @@ import styles from './CatalogFilters.module.css'
 const genderLabels = { men: 'Men', unisex: 'Unisex' }
 
 function FilterGroup({ label, children }) {
-  return <fieldset className={styles.group}><legend><span>{label}</span><Icon name="chevron" size={14} strokeWidth={1.8} /></legend>{children}</fieldset>
+  const [isOpen, setIsOpen] = useState(false)
+  const contentId = useId()
+
+  return <section className={`${styles.group}${isOpen ? ` ${styles.groupOpen}` : ''}`} data-state={isOpen ? 'open' : 'closed'}>
+    <button
+      type="button"
+      className={styles.groupToggle}
+      onClick={() => setIsOpen((open) => !open)}
+      aria-expanded={isOpen}
+      aria-controls={contentId}
+    >
+      <span>{label}</span>
+      <Icon className={styles.groupIcon} name={isOpen ? 'close' : 'plus'} size={18} strokeWidth={1.65} />
+    </button>
+    <div id={contentId} className={styles.groupContent} hidden={!isOpen}>{children}</div>
+  </section>
 }
 
 function FilterCheckbox({ label, checked, onChange }) {
