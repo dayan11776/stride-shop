@@ -115,6 +115,23 @@ describe('product card images', () => {
     expect(screen.queryByText('Illustration — not actual product')).toBeNull()
   })
 
+  test('uses side-view artwork first for the Men card presentation and keeps its visual copy compact', () => {
+    render(<MemoryRouter><ProductCard
+      product={{ ...product, audience: 'men', image: 'https://images.example.test/runner.jpg', variants: [{ colorName: 'Black' }] }}
+      artwork="/images/illustration-runner.webp"
+      presentation="men"
+      imagePreference="artwork"
+    /></MemoryRouter>)
+
+    const card = screen.getByRole('link', { name: 'View Runner' }).closest('article')
+    expect(card.className).toContain('menCard')
+    expect(screen.getByAltText('Illustration, not the actual product: Runner').getAttribute('src')).toBe('/images/illustration-runner.webp')
+    expect(screen.getByText('Men')).toBeTruthy()
+    expect(screen.getByText('Color : Black')).toBeTruthy()
+    expect(screen.queryByText('Illustration — not actual product')).toBeNull()
+    expect(screen.queryByText('Stock information unavailable')).toBeNull()
+  })
+
   test('displays approved artwork with a visible disclosure when the photo is missing', () => {
     render(<MemoryRouter><ProductCard product={{ ...product, image: '/images/product-placeholder.svg' }} artwork="/artwork.webp" /></MemoryRouter>)
     expect(screen.getByAltText('Illustration, not the actual product: Runner').getAttribute('src')).toBe('/artwork.webp')

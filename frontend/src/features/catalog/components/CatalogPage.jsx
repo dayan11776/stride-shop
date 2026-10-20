@@ -10,6 +10,7 @@ import { unitPrice } from '@/lib/format'
 import styles from './CatalogPage.module.css'
 
 const MEN_AUDIENCES = ['men', 'unisex']
+const MEN_ARTWORK_FALLBACK = '/images/illustration-runner.webp'
 
 function uniqueSorted(values, compare) {
   return [...new Set(values.filter((value) => value != null && value !== ''))].sort(compare)
@@ -38,6 +39,15 @@ export function CatalogPage({ title, filters, showEditorialArtwork = false, show
   }, [data, enableMenFilters])
   const brands = useMemo(() => uniqueSorted(scopedProducts.map((product) => product.brand), (a, b) => a.localeCompare(b)), [scopedProducts])
   const sizes = useMemo(() => uniqueSorted(scopedProducts.flatMap((product) => product.sizes ?? []).map(Number).filter(Number.isFinite), (a, b) => a - b), [scopedProducts])
+  const priceBounds = useMemo(() => {
+    const prices = scopedProducts.map(unitPrice).filter(Number.isFinite)
+    if (prices.length === 0) return { minimum: 0, maximum: 1000 }
+
+    return {
+      minimum: Math.floor(Math.min(...prices) / 500) * 500,
+      maximum: Math.ceil(Math.max(...prices) / 500) * 500,
+    }
+  }, [scopedProducts])
   const matchingProducts = useMemo(() => {
     if (!enableMenFilters) return scopedProducts
     const minimum = numberOrNull(minPrice)
@@ -80,7 +90,14 @@ export function CatalogPage({ title, filters, showEditorialArtwork = false, show
     {isLoading && <CatalogSkeleton />}
     {isError && <ErrorState title="The collection is taking a moment." detail={error?.message} onRetry={refetch} />}
     {!isLoading && !isError && list.length === 0 && <div className="page-state"><div><h2 style={{ fontSize: 40 }}>No matching shoes</h2><p className="muted">Try a different filter or clear your selections.</p></div></div>}
-    {!isLoading && !isError && list.length > 0 && <div className={`${styles.filteredGrid} product-grid`}>{list.map((product) => <ProductCard key={product.id} product={product} artwork={showEditorialArtwork ? catalogArtworkFor(product.slug) : undefined} showExampleMetadata={showExampleMetadata} />)}</div>}
+    {!isLoading && !isError && list.length > 0 && <div className={`${styles.filteredGrid} product-grid`}>{list.map((product) => <ProductCard
+      key={product.id}
+      product={product}
+      artwork={showEditorialArtwork ? catalogArtworkFor(product.slug) ?? (enableMenFilters ? MEN_ARTWORK_FALLBACK : undefined) : undefined}
+      showExampleMetadata={showExampleMetadata}
+      presentation={enableMenFilters ? 'men' : 'default'}
+      imagePreference={enableMenFilters ? 'artwork' : 'photo'}
+    />)}</div>}
   </>
 
   if (enableMenFilters) return (
@@ -98,6 +115,7 @@ export function CatalogPage({ title, filters, showEditorialArtwork = false, show
           selectedSizes={selectedSizes}
           minPrice={minPrice}
           maxPrice={maxPrice}
+          priceBounds={priceBounds}
           onToggleAudience={toggleAudience}
           onToggleBrand={(brand) => toggle(setSelectedBrands, brand)}
           onToggleSize={(size) => toggle(setSelectedSizes, size)}

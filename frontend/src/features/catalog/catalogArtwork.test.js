@@ -2,6 +2,7 @@ import { existsSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, test } from 'vitest'
 import batch from '../../../../backend/commerce/catalog_batch_20261018.json'
+import referenceCatalog from '../../../../backend/commerce/fixtures/reference_catalog_20261017.json'
 import { arrivalArtworkFor } from '@/pages/store/homeArtwork'
 import { catalogArtworkFor } from './catalogArtwork'
 
@@ -31,6 +32,17 @@ describe('catalog editorial artwork', () => {
     expect(new Set(images).size).toBe(10)
     for (const product of arrivals.slice().reverse()) {
       expect(catalogArtworkFor(product.slug)).toBe(homeImages[product.slug])
+    }
+  })
+
+  test('gives every reference Men listing a bundled side-view card image', () => {
+    const menProducts = referenceCatalog.filter((product) => product.audience === 'men')
+    expect(menProducts).toHaveLength(10)
+
+    for (const product of menProducts) {
+      const image = catalogArtworkFor(product.slug)
+      expect(image).toMatch(/^\/images\/.+\.webp$/)
+      expect(existsSync(resolve(process.cwd(), 'public', image.slice(1)))).toBe(true)
     }
   })
 

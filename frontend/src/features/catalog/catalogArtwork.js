@@ -28,6 +28,19 @@ const artwork = {
 // catalog updates. Never assign an illustration to an unknown new product.
 // The ten new-arrival choices match homeArtwork.js.
 const artworkBySlug = {
+  // The reference Men catalogue uses local, profile-oriented artwork so the
+  // listing grid never depends on a third-party image host.
+  'example-adidas-men-hq9534': artwork.blue,
+  'example-adidas-men-kh9103': artwork.runnerCharcoal,
+  'example-adidas-men-ki8294': artwork.runnerWhiteOrange,
+  'example-adidas-men-kj0427': artwork.runner,
+  'example-adidas-men-kj0817': artwork.sage,
+  'example-adidas-men-ki3159': artwork.retro,
+  'example-adidas-men-kj1877': artwork.trail,
+  'example-adidas-men-kj3786': artwork.trailRunner,
+  'example-adidas-men-ki7977': artwork.everydayTrail,
+  'example-adidas-men-ki4776': artwork.canvas,
+
   'example-adidas-gazelle-men-reference': artwork.retro,
   'example-adidas-handball-spezial-women-reference': artwork.casual,
   'example-adidas-sl-72-rs-kids-reference': artwork.kids,

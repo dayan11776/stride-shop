@@ -1,10 +1,10 @@
 .card { position: relative; min-width: 0; }
 .tile { position: relative; display: block; aspect-ratio: .88; overflow: hidden; border-radius: var(--radius); background: var(--beige); }
-.tile img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: contain; object-position: center; mix-blend-mode: multiply; }
+.tile img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: contain; object-position: center; mix-blend-mode: multiply; transform: translateY(var(--image-lift, 0px)); transition: transform .2s ease; }
 /* Blend pale product-photo backgrounds into the same warm card as cutouts. */
 .tileProductPhoto img { mix-blend-mode: darken; }
 /* Reposition only the known photos with extra space above the shoe. */
-.tileRecenteredPhoto img { top: 50%; right: auto; bottom: auto; left: 50%; height: auto; transform: translate(-46%, -78%); }
+.tileRecenteredPhoto img { top: 50%; right: auto; bottom: auto; left: 50%; height: auto; transform: translate(-46%, calc(-78% + var(--image-lift, 0px))); }
 .view { position: absolute; right: 10px; bottom: 10px; display: inline-flex; align-items: center; gap: 4px; border-radius: var(--radius-pill); padding: 8px 11px; color: var(--cream); background: var(--ink); font-size: 10px; font-weight: 700; letter-spacing: .07em; opacity: 0; text-transform: uppercase; transform: translateY(5px); transition: .2s ease; }
 .tile:hover .view { opacity: 1; transform: translateY(0); }
 .badge { position: absolute; top: 10px; left: 10px; z-index: 1; }
@@ -18,4 +18,37 @@
 .price { display: flex; gap: 8px; margin: 6px 0 0; font-size: 14px; }
 .price s { color: var(--olive-gray); }
 .stock { margin: 5px 0 0; color: var(--olive-gray); font-size: 12px; line-height: 1.4; }
-@media (max-width: 680px) { .tile { aspect-ratio: .8; } .copy { padding-top: 9px; } .view { display: none; } .heart { width: 36px; height: 36px; } .name { font-size: 14px; } .price { font-size: 13px; } }
+
+/* The Men collection has its own compact catalog-card treatment. The card
+   itself only gains depth; the product image is the only element that lifts. */
+.menCard { overflow: hidden; border: 1px solid rgba(38, 43, 31, .16); border-radius: 0; background: #fff; box-shadow: 0 0 0 rgba(0, 0, 0, 0); transition: box-shadow .2s ease; }
+.menCard:hover, .menCard:focus-within { box-shadow: 0 16px 34px rgba(0, 0, 0, .27); }
+.menCard:hover .tile img, .menCard:focus-within .tile img { --image-lift: -8px; }
+.menCard .tile { aspect-ratio: 1.25; border-radius: 0; border-bottom: 1px solid rgba(38, 43, 31, .12); background: var(--beige); }
+.menCard .tile img { padding: 13px 10px 10px; box-sizing: border-box; mix-blend-mode: normal; }
+.menCard .tileProductPhoto img { mix-blend-mode: darken; }
+.menCard .view, .menCard .badge { display: none; }
+.menCard .heart { top: 5px; right: 5px; width: 30px; height: 30px; border-radius: 0; background: transparent; backdrop-filter: none; }
+.menCard .copy { display: flex; min-height: 149px; flex-direction: column; padding: 12px 14px 15px; background: #fff; }
+.menCard .brand { margin-bottom: 6px; font-size: 10px; letter-spacing: .1em; }
+.menCard .name { display: -webkit-box; min-height: 36px; overflow: hidden; font-size: 15px; line-height: 1.2; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.productMeta { margin: 4px 0 0; color: var(--olive-gray); font-size: 12px; line-height: 1.25; }
+.menCard .price { margin-top: auto; padding-top: 10px; font-size: 15px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .menCard, .tile img { transition: none; }
+}
+
+@media (max-width: 680px) {
+  .tile { aspect-ratio: .8; }
+  .copy { padding-top: 9px; }
+  .view { display: none; }
+  .heart { width: 36px; height: 36px; }
+  .name { font-size: 14px; }
+  .price { font-size: 13px; }
+  .menCard .tile { aspect-ratio: 1.08; }
+  .menCard .copy { min-height: 136px; padding: 10px 11px 12px; }
+  .menCard .heart { width: 29px; height: 29px; }
+  .menCard .name { min-height: 34px; font-size: 13px; }
+  .menCard .price { font-size: 14px; }
+}

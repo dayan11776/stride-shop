@@ -67,6 +67,14 @@ function expectPlaceholder(name) {
   expect(card.queryByText('Illustration — not actual product')).toBeNull()
 }
 
+function expectMenArtwork(name, imagePath) {
+  const element = productCard(name)
+  const card = within(element)
+  expect(card.getByAltText(`Illustration, not the actual product: ${name}`).getAttribute('src')).toBe(imagePath)
+  expect(card.queryByText('Illustration — not actual product')).toBeNull()
+  expect(element.className).toContain('menCard')
+}
+
 function renderCategoryPage(audience) {
   // CategoryPage reads the audience from a data-router route handle.
   const router = createMemoryRouter(
@@ -135,19 +143,30 @@ test.each([
   // filter controls can switch between those audiences. Other category pages
   // retain their narrower request.
   expect(useProducts).toHaveBeenCalledWith(audience === 'men' ? {} : { audience })
-  expectIllustration(sampleName, imagePath)
-  expectPlaceholder('Unrecognized shoe')
+  if (audience === 'men') {
+    expectMenArtwork(sampleName, imagePath)
+    expectMenArtwork('Unrecognized shoe', '/images/illustration-runner.webp')
+  } else {
+    expectIllustration(sampleName, imagePath)
+    expectPlaceholder('Unrecognized shoe')
+  }
 
   const card = within(productCard('Adidas Tokyo with a genuine photo'))
-  expect(card.getByAltText('Adidas Tokyo with a genuine photo').getAttribute('src')).toBe('/verified-tokyo.jpg')
-  expect(card.queryByText('Illustration — not actual product')).toBeNull()
+  if (audience === 'men') {
+    expectMenArtwork('Adidas Tokyo with a genuine photo', '/images/illustration-runner.webp')
+  } else {
+    expect(card.getByAltText('Adidas Tokyo with a genuine photo').getAttribute('src')).toBe('/verified-tokyo.jpg')
+    expect(card.queryByText('Illustration — not actual product')).toBeNull()
+  }
 
-  // A broken genuine photo may fall back, but the illustration must be labeled.
-  fireEvent.error(card.getByAltText('Adidas Tokyo with a genuine photo'))
-  expectIllustration('Adidas Tokyo with a genuine photo', '/images/illustration-runner.webp')
+  if (audience !== 'men') {
+    // A broken genuine photo may fall back, but the illustration must be labeled.
+    fireEvent.error(card.getByAltText('Adidas Tokyo with a genuine photo'))
+    expectIllustration('Adidas Tokyo with a genuine photo', '/images/illustration-runner.webp')
+  }
 })
 
-test('Men keeps its product cards, prices, and verified stock while hiding example price and stock metadata', () => {
+test('Men keeps its product cards and prices while hiding example and stock metadata', () => {
   const exampleMenShoe = {
     ...products[0],
     audience: 'men',
@@ -183,7 +202,7 @@ test('Men keeps its product cards, prices, and verified stock while hiding examp
 
   const verifiedCard = within(productCard('Verified Men Runner'))
   expect(verifiedCard.getByText('₱5,290')).toBeTruthy()
-  expect(verifiedCard.getByText('7 pairs available in total')).toBeTruthy()
+  expect(verifiedCard.queryByText('7 pairs available in total')).toBeNull()
 })
 
 const menFilterProducts = [

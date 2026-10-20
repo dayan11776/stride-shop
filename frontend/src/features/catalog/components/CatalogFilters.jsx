@@ -5,7 +5,7 @@ import styles from './CatalogFilters.module.css'
 const genderLabels = { men: 'Men', unisex: 'Unisex' }
 
 function FilterGroup({ label, children }) {
-  return <fieldset className={styles.group}><legend>{label}</legend>{children}</fieldset>
+  return <fieldset className={styles.group}><legend><span>{label}</span><Icon name="chevron" size={14} strokeWidth={1.8} /></legend>{children}</fieldset>
 }
 
 function FilterCheckbox({ label, checked, onChange }) {
@@ -32,6 +32,10 @@ function priceLabel(minPrice, maxPrice) {
   return null
 }
 
+function clamp(value, minimum, maximum) {
+  return Math.min(Math.max(value, minimum), maximum)
+}
+
 export function CatalogFilters({
   brands,
   sizes,
@@ -40,6 +44,7 @@ export function CatalogFilters({
   selectedSizes,
   minPrice,
   maxPrice,
+  priceBounds,
   onToggleAudience,
   onToggleBrand,
   onToggleSize,
@@ -48,6 +53,50 @@ export function CatalogFilters({
   onClearAll,
   hasAdditionalFilters,
 }) {
+  const minimum = Number.isFinite(priceBounds?.minimum) ? priceBounds.minimum : 0
+  const maximum = Math.max(minimum, Number.isFinite(priceBounds?.maximum) ? priceBounds.maximum : minimum + 1000)
+  const selectedMinimum = minPrice === '' || !Number.isFinite(Number(minPrice))
+    ? minimum
+    : clamp(Number(minPrice), minimum, maximum)
+  const selectedMaximum = maxPrice === '' || !Number.isFinite(Number(maxPrice))
+    ? maximum
+    : clamp(Number(maxPrice), minimum, maximum)
+  const rangeSpan = Math.max(maximum - minimum, 1)
+  const rangeStart = ((selectedMinimum - minimum) / rangeSpan) * 100
+  const rangeEnd = 100 - ((selectedMaximum - minimum) / rangeSpan) * 100
+  const updateMinimumRange = (value) => {
+    const next = Math.min(Number(value), selectedMaximum)
+    onMinimumPriceChange(next <= minimum ? '' : String(next))
+  }
+  const updateMaximumRange = (value) => {
+    const next = Math.max(Number(value), selectedMinimum)
+    onMaximumPriceChange(next >= maximum ? '' : String(next))
+  }
+  const updateMinimumPrice = (value) => {
+    if (value === '') {
+      onMinimumPriceChange('')
+      return
+    }
+
+    const rawValue = Number(value)
+    if (!Number.isFinite(rawValue)) return
+    const next = clamp(rawValue, minimum, maximum)
+    onMinimumPriceChange(String(next))
+    if (next > selectedMaximum) onMaximumPriceChange(String(next))
+  }
+  const updateMaximumPrice = (value) => {
+    if (value === '') {
+      onMaximumPriceChange('')
+      return
+    }
+
+    const rawValue = Number(value)
+    if (!Number.isFinite(rawValue)) return
+    const next = clamp(rawValue, minimum, maximum)
+    onMaximumPriceChange(String(next))
+    if (next < selectedMinimum) onMinimumPriceChange(String(next))
+  }
+
   return <aside className={styles.sidebar} aria-labelledby="catalog-filters-heading">
     <div className={styles.titleRow}>
       <h2 id="catalog-filters-heading">Filters</h2>
@@ -72,8 +121,13 @@ export function CatalogFilters({
 
     <FilterGroup label="Price">
       <div className={styles.priceFields}>
-        <label><span className="sr-only">Minimum price</span><input className="field" type="number" min="0" inputMode="numeric" placeholder="Min ₱" value={minPrice} onChange={(event) => onMinimumPriceChange(event.target.value)} /></label>
-        <label><span className="sr-only">Maximum price</span><input className="field" type="number" min="0" inputMode="numeric" placeholder="Max ₱" value={maxPrice} onChange={(event) => onMaximumPriceChange(event.target.value)} /></label>
+        <label><span className="sr-only">Minimum price</span><input className="field" type="number" min={minimum} max={maximum} inputMode="numeric" placeholder="Min ₱" value={minPrice} onChange={(event) => updateMinimumPrice(event.target.value)} /></label>
+        <label><span className="sr-only">Maximum price</span><input className="field" type="number" min={minimum} max={maximum} inputMode="numeric" placeholder="Max ₱" value={maxPrice} onChange={(event) => updateMaximumPrice(event.target.value)} /></label>
+      </div>
+      <div className={styles.rangeControl} aria-label="Price range">
+        <span className={styles.rangeTrack} aria-hidden="true"><span style={{ left: `${rangeStart}%`, right: `${rangeEnd}%` }} /></span>
+        <input className={styles.rangeInput} type="range" min={minimum} max={maximum} step="500" value={selectedMinimum} onChange={(event) => updateMinimumRange(event.target.value)} aria-label="Minimum price range" />
+        <input className={styles.rangeInput} type="range" min={minimum} max={maximum} step="500" value={selectedMaximum} onChange={(event) => updateMaximumRange(event.target.value)} aria-label="Maximum price range" />
       </div>
     </FilterGroup>
   </aside>
