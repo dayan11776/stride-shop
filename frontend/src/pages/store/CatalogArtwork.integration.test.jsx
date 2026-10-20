@@ -137,6 +137,43 @@ test.each([
   expectIllustration('Adidas Tokyo with a genuine photo', '/images/illustration-runner.webp')
 })
 
+test('Men keeps its product cards, prices, and verified stock while hiding example price and stock metadata', () => {
+  const exampleMenShoe = {
+    ...products[0],
+    slug: 'example-men-runner',
+    name: 'Example Men Runner',
+    price: 6490,
+    isExamplePrice: true,
+    isExampleStock: true,
+    availableQuantity: 8,
+  }
+  const verifiedMenShoe = {
+    ...products[1],
+    slug: 'verified-men-runner',
+    name: 'Verified Men Runner',
+    price: 5290,
+    availableQuantity: 7,
+  }
+  useProducts.mockReturnValue({
+    data: [exampleMenShoe, verifiedMenShoe],
+    isLoading: false,
+    isError: false,
+    refetch: vi.fn(),
+  })
+
+  renderCategoryPage('men')
+
+  const exampleCard = within(productCard('Example Men Runner'))
+  expect(exampleCard.getByText('₱6,490')).toBeTruthy()
+  expect(exampleCard.queryByText('Example price; not verified by the store.')).toBeNull()
+  expect(exampleCard.queryByText(/^Example stock:/)).toBeNull()
+  expect(exampleCard.queryByText('8 pairs available in total')).toBeNull()
+
+  const verifiedCard = within(productCard('Verified Men Runner'))
+  expect(verifiedCard.getByText('₱5,290')).toBeTruthy()
+  expect(verifiedCard.getByText('7 pairs available in total')).toBeTruthy()
+})
+
 test('new arrivals show a disclosed illustration for a known sample and keep unknown products neutral', () => {
   renderPage(NewArrivalsPage, '/new-arrivals')
   expect(useProducts).toHaveBeenCalledWith({ isNew: true })

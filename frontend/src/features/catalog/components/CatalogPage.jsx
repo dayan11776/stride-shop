@@ -6,7 +6,7 @@ import { catalogArtworkFor } from '../catalogArtwork'
 import { ErrorState, LoadingState } from '@/components/ui/PageState'
 import { Chip } from '@/components/ui/Chip'
 
-export function CatalogPage({ title, filters, showEditorialArtwork = false }) {
+export function CatalogPage({ title, filters, showEditorialArtwork = false, showExampleMetadata = true }) {
   const [sort, setSort] = useState('new')
   const { data, isLoading, isError, error, refetch } = useProducts(filters)
   const list = useMemo(() => {
@@ -28,7 +28,7 @@ export function CatalogPage({ title, filters, showEditorialArtwork = false }) {
       {isLoading && <CatalogSkeleton />}
       {isError && <ErrorState title="The collection is taking a moment." detail={error?.message} onRetry={refetch} />}
       {!isLoading && !isError && list.length === 0 && <div className="page-state"><div><h2 style={{ fontSize: 40 }}>No matches yet</h2><p className="muted">Try a different search or browse all styles.</p></div></div>}
-      {!isLoading && !isError && list.length > 0 && <div className="product-grid">{list.map((product) => <ProductCard key={product.id} product={product} artwork={showEditorialArtwork ? catalogArtworkFor(product.slug) : undefined} />)}</div>}
+      {!isLoading && !isError && list.length > 0 && <div className="product-grid">{list.map((product) => <ProductCard key={product.id} product={product} artwork={showEditorialArtwork ? catalogArtworkFor(product.slug) : undefined} showExampleMetadata={showExampleMetadata} />)}</div>}
     </section>
   )
 }
