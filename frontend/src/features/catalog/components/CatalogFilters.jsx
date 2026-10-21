@@ -3,7 +3,7 @@ import { Icon } from '@/components/ui/Icon'
 import { formatPeso } from '@/lib/format'
 import styles from './CatalogFilters.module.css'
 
-const genderLabels = { men: 'Men', unisex: 'Unisex' }
+const genderLabels = { men: 'Men', women: 'Women', unisex: 'Unisex' }
 
 function FilterGroup({ label, children }) {
   const [isOpen, setIsOpen] = useState(false)
@@ -53,6 +53,7 @@ function clamp(value, minimum, maximum) {
 }
 
 export function CatalogFilters({
+  audienceOptions = ['men', 'unisex'],
   brands,
   sizes,
   selectedAudiences,
@@ -120,7 +121,7 @@ export function CatalogFilters({
     </div>
 
     <FilterGroup label="Gender">
-      {Object.entries(genderLabels).map(([value, label]) => <FilterCheckbox key={value} label={label} checked={selectedAudiences.includes(value)} onChange={() => onToggleAudience(value)} />)}
+      {audienceOptions.map((value) => <FilterCheckbox key={value} label={genderLabels[value] ?? value} checked={selectedAudiences.includes(value)} onChange={() => onToggleAudience(value)} />)}
     </FilterGroup>
 
     <FilterGroup label="Brand">
@@ -149,12 +150,12 @@ export function CatalogFilters({
   </aside>
 }
 
-export function SelectedFilters({ selectedAudiences, selectedBrands, selectedSizes, minPrice, maxPrice, onRemoveAudience, onRemoveBrand, onRemoveSize, onClearPrice, onClearAll, hasActiveFilters }) {
-  // Men is the route's starting collection rather than an extra filter. Once
-  // the shopper changes Gender, both selected audience values become removable.
-  const audienceFilters = selectedAudiences.length === 1 && selectedAudiences[0] === 'men' ? [] : selectedAudiences
+export function SelectedFilters({ primaryAudience = 'men', selectedAudiences, selectedBrands, selectedSizes, minPrice, maxPrice, onRemoveAudience, onRemoveBrand, onRemoveSize, onClearPrice, onClearAll, hasActiveFilters }) {
+  // The route's primary collection is the starting state rather than an extra
+  // filter. Once the shopper changes Gender, both audience values become removable.
+  const audienceFilters = selectedAudiences.length === 1 && selectedAudiences[0] === primaryAudience ? [] : selectedAudiences
   const filters = [
-    ...audienceFilters.map((audience) => ({ key: `audience-${audience}`, label: genderLabels[audience], remove: () => onRemoveAudience(audience) })),
+    ...audienceFilters.map((audience) => ({ key: `audience-${audience}`, label: genderLabels[audience] ?? audience, remove: () => onRemoveAudience(audience) })),
     ...selectedBrands.map((brand) => ({ key: `brand-${brand}`, label: brand, remove: () => onRemoveBrand(brand) })),
     ...selectedSizes.map((size) => ({ key: `size-${size}`, label: `EU ${formattedSize(size)}`, remove: () => onRemoveSize(size) })),
   ]

@@ -68,12 +68,12 @@ function expectPlaceholder(name) {
   expect(card.queryByText('Illustration — not actual product')).toBeNull()
 }
 
-function expectMenArtwork(name, imagePath) {
+function expectCompactCatalogArtwork(name, imagePath) {
   const element = productCard(name)
   const card = within(element)
   expect(card.getByAltText(`Illustration, not the actual product: ${name}`).getAttribute('src')).toBe(imagePath)
   expect(card.queryByText('Illustration — not actual product')).toBeNull()
-  expect(element.className).toContain('menCard')
+  expect(element.className).toContain('catalogCard')
 }
 
 function renderCategoryPage(audience) {
@@ -125,9 +125,9 @@ test.each([
 ])('%s category displays disclosed artwork while preserving genuine photos and unknown placeholders', (audience, slug, imagePath) => {
   const sampleName = `Example ${audience} shoe`
   useProducts.mockReturnValue({
-    // The Men route receives the complete product list so it can expose the
-    // optional Unisex filter; preserve the route audience on these fixtures
-    // so the selected Men default keeps the existing artwork assertions.
+  // Men and Women receive the complete product list so their optional Unisex
+  // filters can be applied locally. Preserve the route audience on these
+  // fixtures so each default collection remains focused.
     data: [
       { ...products[0], audience, slug, name: sampleName },
       { ...products[1], audience },
@@ -140,13 +140,15 @@ test.each([
 
   renderCategoryPage(audience)
   expect(screen.getByRole('heading', { level: 1, name: audience })).toBeTruthy()
-  // The Men collection deliberately fetches Men and Unisex once so its local
-  // filter controls can switch between those audiences. Other category pages
-  // retain their narrower request.
-  expect(useProducts).toHaveBeenCalledWith(audience === 'men' ? {} : { audience })
+  // Men and Women fetch their primary audience plus Unisex once; Kids keeps
+  // its narrower request.
+  expect(useProducts).toHaveBeenCalledWith(['men', 'women'].includes(audience) ? {} : { audience })
   if (audience === 'men') {
-    expectMenArtwork(sampleName, imagePath)
-    expectMenArtwork('Unrecognized shoe', '/images/illustration-runner.webp')
+    expectCompactCatalogArtwork(sampleName, imagePath)
+    expectCompactCatalogArtwork('Unrecognized shoe', '/images/illustration-runner.webp')
+  } else if (audience === 'women') {
+    expectCompactCatalogArtwork(sampleName, imagePath)
+    expectCompactCatalogArtwork('Unrecognized shoe', '/images/illustration-casual.webp')
   } else {
     expectIllustration(sampleName, imagePath)
     expectPlaceholder('Unrecognized shoe')
@@ -154,13 +156,18 @@ test.each([
 
   const card = within(productCard('Adidas Tokyo with a genuine photo'))
   if (audience === 'men') {
-    expectMenArtwork('Adidas Tokyo with a genuine photo', '/images/illustration-runner.webp')
+    expectCompactCatalogArtwork('Adidas Tokyo with a genuine photo', '/images/illustration-runner.webp')
   } else {
     expect(card.getByAltText('Adidas Tokyo with a genuine photo').getAttribute('src')).toBe('/verified-tokyo.jpg')
     expect(card.queryByText('Illustration — not actual product')).toBeNull()
   }
 
-  if (audience !== 'men') {
+  if (audience === 'women') {
+    // Women's compact cards retain a genuine product photo before falling
+    // back to mapped artwork when that photo fails.
+    fireEvent.error(card.getByAltText('Adidas Tokyo with a genuine photo'))
+    expectCompactCatalogArtwork('Adidas Tokyo with a genuine photo', '/images/illustration-runner.webp')
+  } else if (audience !== 'men') {
     // A broken genuine photo may fall back, but the illustration must be labeled.
     fireEvent.error(card.getByAltText('Adidas Tokyo with a genuine photo'))
     expectIllustration('Adidas Tokyo with a genuine photo', '/images/illustration-runner.webp')
@@ -362,6 +369,114 @@ test('Men filters combine EU size and price and show the no-result recovery stat
   expectHiddenProduct('Unisex Nike Runner')
 })
 
+const womenFilterProducts = [
+  {
+    id: 'women-nike-39',
+    slug: 'women-nike-39',
+    name: 'Women Nike Runner',
+    brand: 'NIKE',
+    audience: 'women',
+    sizes: [39],
+    price: 6000,
+    image: '/women-nike.jpg',
+  },
+  {
+    id: 'women-adidas-38',
+    slug: 'women-adidas-38',
+    name: 'Women Adidas Court',
+    brand: 'ADIDAS',
+    audience: 'women',
+    sizes: [38],
+    price: 4500,
+    image: '/women-adidas.jpg',
+  },
+  {
+    id: 'unisex-women-nike-39',
+    slug: 'unisex-women-nike-39',
+    name: 'Unisex Women Nike Runner',
+    brand: 'NIKE',
+    audience: 'unisex',
+    sizes: [39],
+    price: 6200,
+    image: '/unisex-women-nike.jpg',
+  },
+  {
+    id: 'men-outside-women-catalog',
+    slug: 'men-outside-women-catalog',
+    name: 'Men Shoe Outside Women',
+    brand: 'PUMA',
+    audience: 'men',
+    sizes: [42],
+    price: 5000,
+    image: '/men.jpg',
+  },
+]
+
+function renderWomenFilters() {
+  useProducts.mockReturnValue({ data: womenFilterProducts, isLoading: false, isError: false, refetch: vi.fn() })
+  renderCategoryPage('women')
+}
+
+test('Women filters default to Women, expose Women and Unisex only, and clear back to the Women catalogue', () => {
+  renderWomenFilters()
+
+  expect(useProducts).toHaveBeenCalledWith({})
+  const genderToggle = openFilterGroup('Gender')
+  expect(genderToggle.getAttribute('aria-expanded')).toBe('true')
+  expect(screen.getByRole('checkbox', { name: 'Women' }).checked).toBe(true)
+  expect(screen.getByRole('checkbox', { name: 'Unisex' }).checked).toBe(false)
+  expect(screen.queryByRole('checkbox', { name: 'Men' })).toBeNull()
+  expect(screen.queryByRole('button', { name: 'Remove Women filter' })).toBeNull()
+  expectVisibleProduct('Women Nike Runner')
+  expectVisibleProduct('Women Adidas Court')
+  expectHiddenProduct('Unisex Women Nike Runner')
+  expectHiddenProduct('Men Shoe Outside Women')
+
+  fireEvent.click(screen.getByRole('checkbox', { name: 'Unisex' }))
+  expect(screen.getByRole('button', { name: 'Remove Women filter' })).toBeTruthy()
+  expect(screen.getByRole('button', { name: 'Remove Unisex filter' })).toBeTruthy()
+  expectVisibleProduct('Unisex Women Nike Runner')
+
+  fireEvent.click(screen.getByRole('checkbox', { name: 'Women' }))
+  expect(screen.getByRole('checkbox', { name: 'Women' }).checked).toBe(false)
+  expect(screen.getByRole('checkbox', { name: 'Unisex' }).checked).toBe(true)
+  expectHiddenProduct('Women Nike Runner')
+  expectVisibleProduct('Unisex Women Nike Runner')
+
+  // The final gender selection returns to the Women's route baseline instead
+  // of producing an empty, unexplained catalog.
+  fireEvent.click(screen.getByRole('checkbox', { name: 'Unisex' }))
+  expect(screen.getByRole('checkbox', { name: 'Women' }).checked).toBe(true)
+  expect(screen.getByRole('checkbox', { name: 'Unisex' }).checked).toBe(false)
+  expectVisibleProduct('Women Nike Runner')
+  expectHiddenProduct('Unisex Women Nike Runner')
+})
+
+test('Women cards use the compact catalog design while retaining product photos', () => {
+  const exampleWomenShoe = {
+    ...products[1],
+    audience: 'women',
+    name: 'Example Women Runner',
+    slug: 'example-women-runner',
+    price: 6490,
+    isExamplePrice: true,
+    isExampleStock: true,
+    availableQuantity: 8,
+  }
+  useProducts.mockReturnValue({ data: [exampleWomenShoe], isLoading: false, isError: false, refetch: vi.fn() })
+
+  renderCategoryPage('women')
+
+  const card = within(productCard('Example Women Runner'))
+  expect(productCard('Example Women Runner').className).toContain('catalogCard')
+  expect(card.getByAltText('Example Women Runner').getAttribute('src')).toBe('/verified-tokyo.jpg')
+  expect(card.getByText('₱6,490')).toBeTruthy()
+  expect(card.queryByText('Illustration — not actual product')).toBeNull()
+  expect(card.queryByText('Example price; not verified by the store.')).toBeNull()
+  expect(card.queryByText(/^Example stock:/)).toBeNull()
+  expect(card.queryByText('8 pairs available in total')).toBeNull()
+})
+
 test('Men displays 20 products per page and returns to page one when filters or page size change', () => {
   const paginatedMenProducts = Array.from({ length: 50 }, (_, index) => ({
     id: `paginated-men-${index + 1}`,
@@ -404,6 +519,37 @@ test('Men displays 20 products per page and returns to page one when filters or 
   expect(screen.getByRole('button', { name: 'Page 1' }).getAttribute('aria-current')).toBe('page')
 })
 
+test('Women displays 20 products per page and resets to page one when the page size changes', () => {
+  const paginatedWomenProducts = Array.from({ length: 50 }, (_, index) => ({
+    id: `paginated-women-${index + 1}`,
+    slug: `paginated-women-${index + 1}`,
+    name: `Paginated Women Shoe ${index + 1}`,
+    brand: index % 2 === 0 ? 'NIKE' : 'ADIDAS',
+    audience: 'women',
+    sizes: [39],
+    price: 5000 + index,
+    image: '/women-pagination.jpg',
+  }))
+  useProducts.mockReturnValue({ data: paginatedWomenProducts, isLoading: false, isError: false, refetch: vi.fn() })
+
+  renderCategoryPage('women')
+
+  expect(screen.getByText('Showing 1–20 of 50')).toBeTruthy()
+  expect(screen.getAllByRole('link', { name: /^View Paginated Women Shoe/ })).toHaveLength(20)
+  expect(screen.getByRole('button', { name: 'Previous page' }).disabled).toBe(true)
+  expect(screen.getByRole('button', { name: 'Page 1' }).getAttribute('aria-current')).toBe('page')
+
+  fireEvent.click(screen.getByRole('button', { name: 'Page 2' }))
+  expect(screen.getByText('Showing 21–40 of 50')).toBeTruthy()
+  expect(screen.queryByRole('link', { name: 'View Paginated Women Shoe 1' })).toBeNull()
+  expect(screen.getByRole('link', { name: 'View Paginated Women Shoe 21' })).toBeTruthy()
+
+  fireEvent.change(screen.getByRole('combobox', { name: 'Products per page' }), { target: { value: '40' } })
+  expect(screen.getByText('Showing 1–40 of 50')).toBeTruthy()
+  expect(screen.getAllByRole('link', { name: /^View Paginated Women Shoe/ })).toHaveLength(40)
+  expect(screen.getByRole('button', { name: 'Page 1' }).getAttribute('aria-current')).toBe('page')
+})
+
 test('Men pagination keeps a valid final page while refreshed results shrink', () => {
   let catalogData = Array.from({ length: 50 }, (_, index) => ({
     id: `refresh-men-${index + 1}`,
@@ -417,7 +563,7 @@ test('Men pagination keeps a valid final page while refreshed results shrink', (
   }))
   useProducts.mockImplementation(() => ({ data: catalogData, isLoading: false, isError: false, refetch: vi.fn() }))
 
-  const renderMenPage = () => <MemoryRouter><CatalogPage title="men" filters={{ audience: 'men' }} showEditorialArtwork showExampleMetadata={false} enableMenFilters /></MemoryRouter>
+  const renderMenPage = () => <MemoryRouter><CatalogPage title="men" filters={{ audience: 'men' }} showEditorialArtwork showExampleMetadata={false} filteredCollection="men" /></MemoryRouter>
   const view = render(renderMenPage())
 
   fireEvent.click(screen.getByRole('button', { name: 'Page 3' }))

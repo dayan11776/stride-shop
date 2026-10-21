@@ -9,10 +9,13 @@ import { CatalogFilters, SelectedFilters } from './CatalogFilters'
 import { unitPrice } from '@/lib/format'
 import styles from './CatalogPage.module.css'
 
-const MEN_AUDIENCES = ['men', 'unisex']
-const MEN_ARTWORK_FALLBACK = '/images/illustration-runner.webp'
-const MEN_PAGE_SIZES = [20, 40, 50]
-const DEFAULT_MEN_PAGE_SIZE = MEN_PAGE_SIZES[0]
+const FILTERED_COLLECTIONS = {
+  men: { primaryAudience: 'men', audiences: ['men', 'unisex'], imagePreference: 'artwork', artworkFallback: '/images/illustration-runner.webp' },
+  women: { primaryAudience: 'women', audiences: ['women', 'unisex'], imagePreference: 'photo', artworkFallback: '/images/illustration-casual.webp' },
+}
+const EMPTY_AUDIENCES = []
+const CATALOG_PAGE_SIZES = [20, 40, 50]
+const DEFAULT_CATALOG_PAGE_SIZE = CATALOG_PAGE_SIZES[0]
 
 function uniqueSorted(values, compare) {
   return [...new Set(values.filter((value) => value != null && value !== ''))].sort(compare)
@@ -56,29 +59,34 @@ function CatalogPagination({ currentPage, pageCount, pageSize, totalProducts, on
     <label className={styles.pageSizeLabel}>
       <span className="sr-only">Products per page</span>
       <select className={styles.pageSize} value={pageSize} onChange={(event) => onPageSizeChange(Number(event.target.value))} aria-label="Products per page">
-        {MEN_PAGE_SIZES.map((size) => <option key={size} value={size}>{size} per page</option>)}
+        {CATALOG_PAGE_SIZES.map((size) => <option key={size} value={size}>{size} per page</option>)}
       </select>
     </label>
   </nav>
 }
 
-export function CatalogPage({ title, filters, showEditorialArtwork = false, showExampleMetadata = true, enableMenFilters = false }) {
+export function CatalogPage({ title, filters, showEditorialArtwork = false, showExampleMetadata = true, filteredCollection = null }) {
+  const collectionConfig = FILTERED_COLLECTIONS[filteredCollection] ?? null
+  const hasCollectionFilters = collectionConfig != null
+  const primaryAudience = collectionConfig?.primaryAudience
+  const collectionAudiences = collectionConfig?.audiences ?? EMPTY_AUDIENCES
   const [sort, setSort] = useState('new')
-  const [selectedAudiences, setSelectedAudiences] = useState(['men'])
+  const [selectedAudiences, setSelectedAudiences] = useState(() => primaryAudience ? [primaryAudience] : [])
   const [selectedBrands, setSelectedBrands] = useState([])
   const [selectedSizes, setSelectedSizes] = useState([])
   const [minPrice, setMinPrice] = useState('')
   const [maxPrice, setMaxPrice] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
-  const [pageSize, setPageSize] = useState(DEFAULT_MEN_PAGE_SIZE)
-  // The Men screen fetches the catalogue once so a future Unisex item can be
-  // selected alongside Men even though the public API accepts one audience.
-  const queryFilters = enableMenFilters ? {} : filters
+  const [pageSize, setPageSize] = useState(DEFAULT_CATALOG_PAGE_SIZE)
+  // Filtered category screens fetch the catalogue once so shoppers can switch
+  // between their primary audience and Unisex even though the public API only
+  // accepts one audience per request.
+  const queryFilters = hasCollectionFilters ? {} : filters
   const { data, isLoading, isError, error, refetch } = useProducts(queryFilters)
   const scopedProducts = useMemo(() => {
     const source = data ?? []
-    return enableMenFilters ? source.filter((product) => MEN_AUDIENCES.includes(product.audience)) : source
-  }, [data, enableMenFilters])
+    return hasCollectionFilters ? source.filter((product) => collectionAudiences.includes(product.audience)) : source
+  }, [collectionAudiences, data, hasCollectionFilters])
   const brands = useMemo(() => uniqueSorted(scopedProducts.map((product) => product.brand), (a, b) => a.localeCompare(b)), [scopedProducts])
   const sizes = useMemo(() => uniqueSorted(scopedProducts.flatMap((product) => product.sizes ?? []).map(Number).filter(Number.isFinite), (a, b) => a - b), [scopedProducts])
   const priceBounds = useMemo(() => {
@@ -91,7 +99,7 @@ export function CatalogPage({ title, filters, showEditorialArtwork = false, show
     }
   }, [scopedProducts])
   const matchingProducts = useMemo(() => {
-    if (!enableMenFilters) return scopedProducts
+    if (!hasCollectionFilters) return scopedProducts
     const minimum = numberOrNull(minPrice)
     const maximum = numberOrNull(maxPrice)
     return scopedProducts.filter((product) => {
@@ -103,14 +111,14 @@ export function CatalogPage({ title, filters, showEditorialArtwork = false, show
         (minimum == null || price >= minimum) &&
         (maximum == null || price <= maximum)
     })
-  }, [enableMenFilters, maxPrice, minPrice, scopedProducts, selectedAudiences, selectedBrands, selectedSizes])
+  }, [hasCollectionFilters, maxPrice, minPrice, scopedProducts, selectedAudiences, selectedBrands, selectedSizes])
   const list = useMemo(() => {
     const source = matchingProducts
     return sort === 'low' ? sortByPrice(source, 1) : sort === 'high' ? sortByPrice(source, -1) : source
   }, [matchingProducts, sort])
   const pageCount = Math.max(1, Math.ceil(list.length / pageSize))
   const displayPage = Math.min(currentPage, pageCount)
-  const productsForGrid = enableMenFilters ? list.slice((displayPage - 1) * pageSize, displayPage * pageSize) : list
+  const productsForGrid = hasCollectionFilters ? list.slice((displayPage - 1) * pageSize, displayPage * pageSize) : list
 
   useEffect(() => {
     if (currentPage !== displayPage) setCurrentPage(displayPage)
@@ -126,22 +134,22 @@ export function CatalogPage({ title, filters, showEditorialArtwork = false, show
     setSelectedAudiences((selected) => {
       if (!selected.includes(audience)) return [...selected, audience]
 
-      // The Men collection always needs one active gender. If a shopper has
-      // narrowed the page to Unisex only, toggling it returns to the Men
+      // The catalog always needs one active gender. If a shopper has narrowed
+      // the page to Unisex only, toggling it returns to the route's primary
       // collection instead of leaving the catalogue in an unexplained empty state.
-      if (selected.length === 1) return audience === 'unisex' ? ['men'] : selected
+      if (selected.length === 1) return audience === 'unisex' ? [primaryAudience] : selected
       return selected.filter((entry) => entry !== audience)
     })
   }
   const clearAll = () => {
     resetPagination()
-    setSelectedAudiences(['men'])
+    setSelectedAudiences(primaryAudience ? [primaryAudience] : [])
     setSelectedBrands([])
     setSelectedSizes([])
     setMinPrice('')
     setMaxPrice('')
   }
-  const hasAdditionalFilters = selectedAudiences.length !== 1 || selectedAudiences[0] !== 'men' || selectedBrands.length > 0 || selectedSizes.length > 0 || minPrice !== '' || maxPrice !== ''
+  const hasAdditionalFilters = selectedAudiences.length !== 1 || selectedAudiences[0] !== primaryAudience || selectedBrands.length > 0 || selectedSizes.length > 0 || minPrice !== '' || maxPrice !== ''
   const resultCopy = isLoading ? 'Finding your next pair…' : `${list.length} ${list.length === 1 ? 'result' : 'results'}`
 
   const renderGrid = () => <>
@@ -151,14 +159,14 @@ export function CatalogPage({ title, filters, showEditorialArtwork = false, show
     {!isLoading && !isError && list.length > 0 && <div className={`${styles.filteredGrid} product-grid`}>{productsForGrid.map((product) => <ProductCard
       key={product.id}
       product={product}
-      artwork={showEditorialArtwork ? catalogArtworkFor(product.slug) ?? (enableMenFilters ? MEN_ARTWORK_FALLBACK : undefined) : undefined}
+      artwork={showEditorialArtwork ? catalogArtworkFor(product.slug) ?? collectionConfig?.artworkFallback : undefined}
       showExampleMetadata={showExampleMetadata}
-      presentation={enableMenFilters ? 'men' : 'default'}
-      imagePreference={enableMenFilters ? 'artwork' : 'photo'}
+      presentation={hasCollectionFilters ? 'catalog' : 'default'}
+      imagePreference={collectionConfig?.imagePreference ?? 'photo'}
     />)}</div>}
   </>
 
-  if (enableMenFilters) return (
+  if (hasCollectionFilters) return (
     <section className="container section">
       <div className={styles.collectionHeading}>
         <div><p className="eyebrow">STRIDE collection</p><h1 className="page-heading capitalize">{title}</h1></div>
@@ -166,6 +174,7 @@ export function CatalogPage({ title, filters, showEditorialArtwork = false, show
       </div>
       <div className={styles.catalogLayout}>
         <CatalogFilters
+          audienceOptions={collectionAudiences}
           brands={brands}
           sizes={sizes}
           selectedAudiences={selectedAudiences}
@@ -186,6 +195,7 @@ export function CatalogPage({ title, filters, showEditorialArtwork = false, show
           <div className={styles.resultsHeader}>
             <div><p className={styles.resultsCount} aria-live="polite">Showing <strong>{resultCopy}</strong></p>
               <SelectedFilters
+                primaryAudience={primaryAudience}
                 selectedAudiences={selectedAudiences}
                 selectedBrands={selectedBrands}
                 selectedSizes={selectedSizes}

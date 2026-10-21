@@ -115,16 +115,16 @@ describe('product card images', () => {
     expect(screen.queryByText('Illustration — not actual product')).toBeNull()
   })
 
-  test('uses side-view artwork first for the Men card presentation and keeps its visual copy compact', () => {
+  test('uses side-view artwork first for the compact catalog card presentation and keeps its visual copy compact', () => {
     render(<MemoryRouter><ProductCard
       product={{ ...product, audience: 'men', image: 'https://images.example.test/runner.jpg', variants: [{ colorName: 'Black' }] }}
       artwork="/images/illustration-runner.webp"
-      presentation="men"
+      presentation="catalog"
       imagePreference="artwork"
     /></MemoryRouter>)
 
     const card = screen.getByRole('link', { name: 'View Runner' }).closest('article')
-    expect(card.className).toContain('menCard')
+    expect(card.className).toContain('catalogCard')
     expect(screen.getByAltText('Illustration, not the actual product: Runner').getAttribute('src')).toBe('/images/illustration-runner.webp')
     expect(screen.getByText('Men')).toBeTruthy()
     expect(screen.getByText('Color : Black')).toBeTruthy()
