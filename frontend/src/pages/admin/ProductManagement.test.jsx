@@ -191,3 +191,44 @@ test('requires confirmation to recycle and restores products as drafts', async (
   fireEvent.click(await screen.findByRole('button', { name: /Restore Everyday Runner/ }))
   await screen.findByText('“Everyday Runner” was restored as a draft.')
 })
+
+test('Recycle Bin confirms before permanently deleting a product', async () => {
+  api.mockImplementation((path, options = {}) => {
+    if (path === '/staff/products' && options.params?.recycled === 'true') return Promise.resolve([{ ...product, recycled_at: '2026-10-17T00:00:00Z' }])
+    if (path === '/staff/products/product-1/permanent-delete' && options.method === 'DELETE') return Promise.resolve(null)
+    return Promise.reject(new Error('Unexpected request'))
+  })
+  render(<MemoryRouter initialEntries={['/admin/product-control?tab=recycled']}><ProductControl /></MemoryRouter>)
+
+  const deleteButton = await screen.findByRole('button', { name: 'Delete Everyday Runner permanently' })
+  expect(screen.getByRole('button', { name: /Restore Everyday Runner/ })).toBeTruthy()
+  fireEvent.click(deleteButton)
+  expect(screen.getByRole('alertdialog', { name: 'Delete permanently?' })).toBeTruthy()
+  expect(screen.getByText('“Everyday Runner” and its product information will be permanently removed. This cannot be undone.')).toBeTruthy()
+  expect(api.mock.calls.some(([path]) => path === '/staff/products/product-1/permanent-delete')).toBe(false)
+
+  fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+  await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull())
+  expect(screen.getByRole('button', { name: 'Delete Everyday Runner permanently' })).toBeTruthy()
+
+  fireEvent.click(screen.getByRole('button', { name: 'Delete Everyday Runner permanently' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Delete permanently' }))
+  await screen.findByText('“Everyday Runner” was permanently deleted.')
+  expect(api.mock.calls.filter(([path, options]) => path === '/staff/products/product-1/permanent-delete' && options?.method === 'DELETE')).toHaveLength(1)
+  expect(screen.queryByRole('button', { name: 'Delete Everyday Runner permanently' })).toBeNull()
+})
+
+test('Recycle Bin keeps a product visible when permanent deletion is blocked', async () => {
+  api.mockImplementation((path, options = {}) => {
+    if (path === '/staff/products' && options.params?.recycled === 'true') return Promise.resolve([{ ...product, recycled_at: '2026-10-17T00:00:00Z' }])
+    if (path === '/staff/products/product-1/permanent-delete' && options.method === 'DELETE') return Promise.reject(new Error('This product cannot be permanently deleted because it has cart, order, or inventory history.'))
+    return Promise.reject(new Error('Unexpected request'))
+  })
+  render(<MemoryRouter initialEntries={['/admin/product-control?tab=recycled']}><ProductControl /></MemoryRouter>)
+
+  fireEvent.click(await screen.findByRole('button', { name: 'Delete Everyday Runner permanently' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Delete permanently' }))
+  expect((await screen.findByRole('alert')).textContent).toContain('This product cannot be permanently deleted because it has cart, order, or inventory history.')
+  expect(screen.getByRole('alertdialog', { name: 'Delete permanently?' })).toBeTruthy()
+  expect(screen.getByRole('button', { name: 'Delete Everyday Runner permanently' })).toBeTruthy()
+})

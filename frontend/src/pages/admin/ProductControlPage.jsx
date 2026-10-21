@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 import { Link, useLocation, useSearchParams } from 'react-router-dom'
+import { Icon } from '@/components/ui/Icon'
 import { ErrorState, LoadingState } from '@/components/ui/PageState'
 import { api, listFrom } from '@/lib/apiClient'
 import './productManagement.css'
@@ -19,6 +20,58 @@ function dateLabel(value) {
   return Number.isNaN(date.getTime()) ? '—' : date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
 }
 
+function PermanentDeleteDialog({ product, busy, error, onCancel, onConfirm }) {
+  const dialog = useRef(null)
+  const cancelButton = useRef(null)
+  const titleId = useId()
+  const descriptionId = useId()
+
+  useEffect(() => {
+    cancelButton.current?.focus()
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape' && !busy) {
+        event.preventDefault()
+        onCancel()
+      }
+      if (event.key === 'Tab') {
+        const focusable = [...(dialog.current?.querySelectorAll('button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])') || [])]
+        if (!focusable.length) return
+        const first = focusable[0]
+        const last = focusable[focusable.length - 1]
+        if (!dialog.current.contains(document.activeElement)) {
+          event.preventDefault()
+          const nextFocus = event.shiftKey ? last : first
+          nextFocus.focus()
+        } else if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault()
+          last.focus()
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault()
+          first.focus()
+        }
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [busy, onCancel])
+
+  return <div className="product-admin__dialog-backdrop" onMouseDown={(event) => {
+    if (event.currentTarget === event.target && !busy) onCancel()
+  }}>
+    <section ref={dialog} className="product-admin__dialog" role="alertdialog" aria-modal="true" aria-labelledby={titleId} aria-describedby={descriptionId}>
+      <button className="product-admin__dialog-close" type="button" aria-label={`Close delete confirmation for ${product.name}`} disabled={busy} onClick={onCancel}><Icon name="close" size={18} /></button>
+      <p className="eyebrow">Permanent deletion</p>
+      <h2 id={titleId}>Delete permanently?</h2>
+      <p id={descriptionId}>“{product.name}” and its product information will be permanently removed. This cannot be undone.</p>
+      {error && <p className="product-admin__dialog-error" role="alert">{error}</p>}
+      <div className="product-admin__dialog-actions">
+        <button ref={cancelButton} className="product-admin__action" type="button" disabled={busy} onClick={onCancel}>Cancel</button>
+        <button className="product-admin__action product-admin__action--danger" type="button" disabled={busy} onClick={onConfirm}>{busy ? 'Deleting…' : 'Delete permanently'}</button>
+      </div>
+    </section>
+  </div>
+}
+
 export function Component() {
   const [params, setParams] = useSearchParams()
   const recycled = params.get('tab') === 'recycled'
@@ -31,8 +84,11 @@ export function Component() {
   const [actionError, setActionError] = useState('')
   const [message, setMessage] = useState(location.state?.message || '')
   const [busy, setBusy] = useState('')
+  const [deleteTarget, setDeleteTarget] = useState(null)
+  const [deleteError, setDeleteError] = useState('')
   const productsTab = useRef(null)
   const binTab = useRef(null)
+  const deleteTrigger = useRef(null)
 
   const load = useCallback(async (signal) => {
     setLoading(true)
@@ -64,6 +120,8 @@ export function Component() {
     setStatus('')
     setMessage('')
     setActionError('')
+    setDeleteTarget(null)
+    setDeleteError('')
   }
 
   const handleTabKey = (event) => {
@@ -95,6 +153,40 @@ export function Component() {
     }
   }
 
+  const openPermanentDelete = (product, event) => {
+    deleteTrigger.current = event.currentTarget
+    setActionError('')
+    setDeleteError('')
+    setDeleteTarget(product)
+  }
+
+  const closePermanentDelete = useCallback(() => {
+    if (busy) return
+    setDeleteError('')
+    setDeleteTarget(null)
+    requestAnimationFrame(() => deleteTrigger.current?.focus())
+  }, [busy])
+
+  const permanentlyDeleteProduct = async () => {
+    if (!deleteTarget) return
+    const product = deleteTarget
+    setBusy(product.id)
+    setActionError('')
+    setDeleteError('')
+    setMessage('')
+    try {
+      await api(`/staff/products/${product.id}/permanent-delete`, { method: 'DELETE' })
+      setEntries((current) => current.filter((entry) => entry.id !== product.id))
+      setDeleteTarget(null)
+      setMessage(`“${product.name}” was permanently deleted.`)
+      requestAnimationFrame(() => binTab.current?.focus())
+    } catch (reason) {
+      setDeleteError(reason.message || 'The product could not be permanently deleted. Please try again.')
+    } finally {
+      setBusy('')
+    }
+  }
+
   return <section className="product-admin">
     <p className="product-admin__crumb"><Link to="/admin/products">Products</Link> / Product Control</p>
     <div className="product-admin__header"><div><h1 className="page-heading">Product Control</h1><p className="product-admin__intro">Manage and update your products.</p></div></div>
@@ -116,11 +208,12 @@ export function Component() {
             <td data-label="Product"><div className="product-admin__product-cell">{primaryImage(product) ? <img className="product-admin__thumb" src={primaryImage(product)} alt="" /> : <span className="product-admin__thumb" aria-hidden="true" />}<div><b>{product.name}</b><div className="muted text-xs">{product.brand_name}</div></div></div></td>
             <td data-label="Category">{product.category_name || '—'}</td>
             {recycled ? <td data-label="Removed on">{dateLabel(product.recycled_at)}</td> : <><td data-label="Status"><span className={`tag ${product.status === 'active' ? 'green' : product.status === 'draft' ? 'gray' : ''}`}>{product.status}</span></td><td data-label="Available">{availableStock(product)}</td></>}
-            <td data-label="Actions"><div className="product-admin__row-actions">{!recycled && <Link className="product-admin__action product-admin__action--link" to={`/admin/product-control/${product.id}/edit`}>Edit<span className="sr-only"> {product.name}</span></Link>}<button className="product-admin__action" type="button" disabled={Boolean(busy)} onClick={() => changeProduct(product)}>{busy === product.id ? 'Working…' : recycled ? 'Restore' : 'Move to bin'}<span className="sr-only"> {product.name}</span></button></div></td>
+            <td data-label="Actions"><div className="product-admin__row-actions">{!recycled && <Link className="product-admin__action product-admin__action--link" to={`/admin/product-control/${product.id}/edit`}>Edit<span className="sr-only"> {product.name}</span></Link>}<button className="product-admin__action" type="button" disabled={Boolean(busy)} onClick={() => changeProduct(product)}>{busy === product.id ? 'Working…' : recycled ? 'Restore' : 'Move to bin'}<span className="sr-only"> {product.name}</span></button>{recycled && <button className="product-admin__action product-admin__action--danger product-admin__action--link" type="button" aria-label={`Delete ${product.name} permanently`} disabled={Boolean(busy)} onClick={(event) => openPermanentDelete(product, event)}><Icon name="trash" size={15} />Delete</button>}</div></td>
           </tr>)}
         </tbody></table>{!filtered.length && <p className="product-admin__empty">{entries.length ? 'No products match your search or filter.' : recycled ? 'The recycle bin is empty.' : 'No products yet. Add your first product to get started.'}</p>}</div>
         {!recycled && <p className="product-admin__notice">Products moved to the recycle bin can be restored later as drafts.</p>}
       </>}
     </div>
+    {deleteTarget && <PermanentDeleteDialog product={deleteTarget} busy={busy === deleteTarget.id} error={deleteError} onCancel={closePermanentDelete} onConfirm={permanentlyDeleteProduct} />}
   </section>
 }

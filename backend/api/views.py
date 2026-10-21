@@ -10,6 +10,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db import IntegrityError, transaction
 from django.db.models import Avg, Count, F, Prefetch, Q, Sum
+from django.db.models.deletion import ProtectedError
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.decorators import method_decorator
@@ -878,7 +879,7 @@ class AdminProductViewSet(viewsets.ModelViewSet):
         if self.request.method in {"PATCH", "PUT", "DELETE", "POST"}:
             obj = get_object_or_404(Product.objects.select_for_update(), pk=self.kwargs["pk"])
             self.check_object_permissions(self.request, obj)
-            if self.action != "restore" and obj.recycled_at:
+            if self.action not in {"restore", "permanent_delete"} and obj.recycled_at:
                 raise NotFound("This product is in the recycle bin.")
             return obj
         return super().get_object()
@@ -933,6 +934,28 @@ class AdminProductViewSet(viewsets.ModelViewSet):
         product.save(update_fields=["recycled_at", "status", "updated_at"])
         audit(request, "restored", "product", product.pk, {"status": "draft"})
         return Response(self.get_serializer(product).data)
+
+    @action(detail=True, methods=["delete"], url_path="permanent-delete")
+    @transaction.atomic
+    def permanent_delete(self, request, pk=None):
+        product = self.get_object()
+        if not product.recycled_at:
+            raise ValidationError({"detail": "Only products in the recycle bin can be permanently deleted."})
+
+        product_id = product.pk
+        product_name = product.name
+        try:
+            product.delete()
+        except ProtectedError:
+            # Orders, carts, and inventory movements deliberately protect their
+            # variants. Never erase that history simply to empty the recycle bin.
+            return Response(
+                {"detail": "This product cannot be permanently deleted because it has cart, order, or inventory history."},
+                status=status.HTTP_409_CONFLICT,
+            )
+
+        audit(request, "permanently_deleted", "product", product_id, {"name": product_name})
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class AdminVariantViewSet(viewsets.ModelViewSet):

@@ -8,6 +8,7 @@ from django.test import TestCase
 from catalog.models import Brand, Category, Inventory, Product, ProductImage, ProductVariant, Review, WishlistItem
 from commerce.models import InventoryMovement, Order, Payment, ShippingMethod
 from commerce.services import capture_payment
+from content.models import AuditLog
 
 
 class AdminProductManagementTests(TestCase):
@@ -50,7 +51,7 @@ class AdminProductManagementTests(TestCase):
     def test_access_is_limited_to_team_members(self):
         self.assertIn(self.client.get("/api/staff/products").status_code, (401, 403))
         self.client.force_login(self.customer)
-        for method, path, body in [("post", "/api/staff/products", self.payload()), ("patch", f"/api/staff/products/{self.product.id}", {"name": "Hacked"}), ("delete", f"/api/staff/products/{self.product.id}", {})]:
+        for method, path, body in [("post", "/api/staff/products", self.payload()), ("patch", f"/api/staff/products/{self.product.id}", {"name": "Hacked"}), ("delete", f"/api/staff/products/{self.product.id}", {}), ("delete", f"/api/staff/products/{self.product.id}/permanent-delete", {})]:
             self.assertIn(self.request_json(method, path, body).status_code, (401, 403))
         self.product.refresh_from_db()
         self.assertEqual(self.product.name, "Original")
@@ -245,6 +246,44 @@ class AdminProductManagementTests(TestCase):
         self.assertTrue(ProductImage.objects.filter(pk=self.image.pk).exists())
         self.assertEqual(self.request_json("patch", f"/api/staff/products/{self.product.id}", {"status": "active"}).status_code, 200)
         self.assertEqual(self.client.get("/api/products/original").status_code, 200)
+
+    def test_permanent_delete_removes_an_unreferenced_recycled_product_and_audits_it(self):
+        WishlistItem.objects.create(user=self.customer, product=self.product)
+        review = Review.objects.create(user=self.customer, product=self.product, rating=5, status="published")
+        product_id = self.product.id
+        variant_id = self.variant.id
+        image_id = self.image.id
+        self.login_staff()
+        self.assertEqual(self.client.delete(f"/api/staff/products/{product_id}").status_code, 204)
+
+        response = self.client.delete(f"/api/staff/products/{product_id}/permanent-delete")
+
+        self.assertEqual(response.status_code, 204, response.content)
+        self.assertFalse(Product.objects.filter(pk=product_id).exists())
+        self.assertFalse(ProductVariant.objects.filter(pk=variant_id).exists())
+        self.assertFalse(ProductImage.objects.filter(pk=image_id).exists())
+        self.assertFalse(Inventory.objects.filter(variant_id=variant_id).exists())
+        self.assertFalse(WishlistItem.objects.filter(product_id=product_id).exists())
+        self.assertFalse(Review.objects.filter(pk=review.pk).exists())
+        self.assertTrue(AuditLog.objects.filter(action="permanently_deleted", entity="product", entity_id=str(product_id), changes={"name": "Original"}).exists())
+
+    def test_permanent_delete_requires_a_recycled_product_and_preserves_protected_history(self):
+        self.login_staff()
+        response = self.client.delete(f"/api/staff/products/{self.product.id}/permanent-delete")
+        self.assertEqual(response.status_code, 400, response.content)
+        self.assertTrue(Product.objects.filter(pk=self.product.pk).exists())
+
+        self.assertEqual(self.client.delete(f"/api/staff/products/{self.product.id}").status_code, 204)
+        InventoryMovement.objects.create(variant=self.variant, change=1, reason=InventoryMovement.Reason.ADJUSTMENT)
+
+        response = self.client.delete(f"/api/staff/products/{self.product.id}/permanent-delete")
+
+        self.assertEqual(response.status_code, 409, response.content)
+        self.product.refresh_from_db()
+        self.assertIsNotNone(self.product.recycled_at)
+        self.assertTrue(ProductVariant.objects.filter(pk=self.variant.pk).exists())
+        self.assertTrue(ProductImage.objects.filter(pk=self.image.pk).exists())
+        self.assertFalse(AuditLog.objects.filter(action="permanently_deleted", entity_id=str(self.product.id)).exists())
 
     def test_old_cart_cannot_buy_recycled_product(self):
         self.inventory.quantity_reserved = 0

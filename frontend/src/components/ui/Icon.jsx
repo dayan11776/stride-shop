@@ -7,6 +7,7 @@ const paths = {
   arrow: <path d="M5 12h13M13 6l6 6-6 6" />,
   chevron: <path d="m8 10 4 4 4-4" />,
   close: <><path d="m6 6 12 12M18 6 6 18" /></>,
+  trash: <><path d="M4 7h16M9.5 7V4.5h5V7M6.5 7l.8 13h9.4l.8-13M10 11v5M14 11v5" /></>,
   home: <><path d="m4 11 8-7 8 7v9H4v-9Z" /><path d="M9 20v-6h6v6" /></>,
   truck: <><path d="M3 6h11v11H3zM14 10h3l3 3v4h-6z" /><circle cx="7" cy="19" r="1.5" /><circle cx="17" cy="19" r="1.5" /></>,
   plus: <path d="M12 5v14M5 12h14" />,
