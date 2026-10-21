@@ -3,7 +3,7 @@ import { Icon } from '@/components/ui/Icon'
 import { formatPeso } from '@/lib/format'
 import styles from './CatalogFilters.module.css'
 
-const genderLabels = { men: 'Men', women: 'Women', unisex: 'Unisex' }
+const genderLabels = { men: 'Men', women: 'Women', kids: 'Kids', unisex: 'Unisex' }
 
 function FilterGroup({ label, children }) {
   const [isOpen, setIsOpen] = useState(false)
@@ -54,6 +54,7 @@ function clamp(value, minimum, maximum) {
 
 export function CatalogFilters({
   audienceOptions = ['men', 'unisex'],
+  showAudienceFilter = true,
   brands,
   sizes,
   selectedAudiences,
@@ -120,9 +121,9 @@ export function CatalogFilters({
       {hasAdditionalFilters && <button type="button" className={styles.reset} onClick={onClearAll}>Reset</button>}
     </div>
 
-    <FilterGroup label="Gender">
+    {showAudienceFilter && <FilterGroup label="Gender">
       {audienceOptions.map((value) => <FilterCheckbox key={value} label={genderLabels[value] ?? value} checked={selectedAudiences.includes(value)} onChange={() => onToggleAudience(value)} />)}
-    </FilterGroup>
+    </FilterGroup>}
 
     <FilterGroup label="Brand">
       <div className={styles.optionList}>

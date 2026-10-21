@@ -122,11 +122,11 @@ test.each([
   ['men', 'example-adidas-gazelle-men-reference', '/images/arrival-retro.webp'],
   ['women', 'example-adidas-handball-spezial-women-reference', '/images/illustration-casual.webp'],
   ['kids', 'example-adidas-sl-72-rs-kids-reference', '/images/illustration-kids.webp'],
-])('%s category displays disclosed artwork while preserving genuine photos and unknown placeholders', (audience, slug, imagePath) => {
+])('%s category uses compact artwork fallbacks while preserving genuine photos', (audience, slug, imagePath) => {
   const sampleName = `Example ${audience} shoe`
   useProducts.mockReturnValue({
-  // Men and Women receive the complete product list so their optional Unisex
-  // filters can be applied locally. Preserve the route audience on these
+  // Filtered collections receive the complete product list so their local
+  // scope can be applied consistently. Preserve the route audience on these
   // fixtures so each default collection remains focused.
     data: [
       { ...products[0], audience, slug, name: sampleName },
@@ -140,9 +140,7 @@ test.each([
 
   renderCategoryPage(audience)
   expect(screen.getByRole('heading', { level: 1, name: audience })).toBeTruthy()
-  // Men and Women fetch their primary audience plus Unisex once; Kids keeps
-  // its narrower request.
-  expect(useProducts).toHaveBeenCalledWith(['men', 'women'].includes(audience) ? {} : { audience })
+  expect(useProducts).toHaveBeenCalledWith({})
   if (audience === 'men') {
     expectCompactCatalogArtwork(sampleName, imagePath)
     expectCompactCatalogArtwork('Unrecognized shoe', '/images/illustration-runner.webp')
@@ -150,8 +148,8 @@ test.each([
     expectCompactCatalogArtwork(sampleName, imagePath)
     expectCompactCatalogArtwork('Unrecognized shoe', '/images/illustration-casual.webp')
   } else {
-    expectIllustration(sampleName, imagePath)
-    expectPlaceholder('Unrecognized shoe')
+    expectCompactCatalogArtwork(sampleName, imagePath)
+    expectCompactCatalogArtwork('Unrecognized shoe', '/images/illustration-kids.webp')
   }
 
   const card = within(productCard('Adidas Tokyo with a genuine photo'))
@@ -162,15 +160,11 @@ test.each([
     expect(card.queryByText('Illustration — not actual product')).toBeNull()
   }
 
-  if (audience === 'women') {
-    // Women's compact cards retain a genuine product photo before falling
-    // back to mapped artwork when that photo fails.
+  if (audience !== 'men') {
+    // Women's and Kids' compact cards retain genuine product photos before
+    // falling back to mapped artwork when those photos fail.
     fireEvent.error(card.getByAltText('Adidas Tokyo with a genuine photo'))
     expectCompactCatalogArtwork('Adidas Tokyo with a genuine photo', '/images/illustration-runner.webp')
-  } else if (audience !== 'men') {
-    // A broken genuine photo may fall back, but the illustration must be labeled.
-    fireEvent.error(card.getByAltText('Adidas Tokyo with a genuine photo'))
-    expectIllustration('Adidas Tokyo with a genuine photo', '/images/illustration-runner.webp')
   }
 })
 
@@ -452,6 +446,93 @@ test('Women filters default to Women, expose Women and Unisex only, and clear ba
   expectHiddenProduct('Unisex Women Nike Runner')
 })
 
+const kidsFilterProducts = [
+  {
+    id: 'kids-nike-34',
+    slug: 'kids-nike-34',
+    name: 'Kids Nike Runner',
+    brand: 'NIKE',
+    audience: 'kids',
+    sizes: [34],
+    price: 3200,
+    image: '/kids-nike.jpg',
+  },
+  {
+    id: 'kids-adidas-33',
+    slug: 'kids-adidas-33',
+    name: 'Kids Adidas Court',
+    brand: 'ADIDAS',
+    audience: 'kids',
+    sizes: [33],
+    price: 2800,
+    image: '/kids-adidas.jpg',
+  },
+  {
+    id: 'men-outside-kids-catalog',
+    slug: 'men-outside-kids-catalog',
+    name: 'Men Shoe Outside Kids',
+    brand: 'PUMA',
+    audience: 'men',
+    sizes: [42],
+    price: 5000,
+    image: '/men.jpg',
+  },
+  {
+    id: 'women-outside-kids-catalog',
+    slug: 'women-outside-kids-catalog',
+    name: 'Women Shoe Outside Kids',
+    brand: 'PUMA',
+    audience: 'women',
+    sizes: [39],
+    price: 5000,
+    image: '/women.jpg',
+  },
+  {
+    id: 'unisex-outside-kids-catalog',
+    slug: 'unisex-outside-kids-catalog',
+    name: 'Unisex Shoe Outside Kids',
+    brand: 'PUMA',
+    audience: 'unisex',
+    sizes: [40],
+    price: 5000,
+    image: '/unisex.jpg',
+  },
+]
+
+function renderKidsFilters() {
+  useProducts.mockReturnValue({ data: kidsFilterProducts, isLoading: false, isError: false, refetch: vi.fn() })
+  renderCategoryPage('kids')
+}
+
+test('Kids keeps its collection scoped to Kids footwear while retaining brand filters and reset behavior', () => {
+  renderKidsFilters()
+
+  expect(useProducts).toHaveBeenCalledWith({})
+  // A child-only route has no alternate adult or Unisex scope, so it omits a
+  // non-functional Gender control while keeping the catalog filters intact.
+  expect(screen.queryByRole('button', { name: 'Gender' })).toBeNull()
+  expectVisibleProduct('Kids Nike Runner')
+  expectVisibleProduct('Kids Adidas Court')
+  expectHiddenProduct('Men Shoe Outside Kids')
+  expectHiddenProduct('Women Shoe Outside Kids')
+  expectHiddenProduct('Unisex Shoe Outside Kids')
+
+  openFilterGroup('Brand')
+  expect(screen.getByRole('checkbox', { name: 'NIKE' })).toBeTruthy()
+  expect(screen.getByRole('checkbox', { name: 'ADIDAS' })).toBeTruthy()
+  expect(screen.queryByRole('checkbox', { name: 'PUMA' })).toBeNull()
+  fireEvent.click(screen.getByRole('checkbox', { name: 'NIKE' }))
+  expect(screen.getByRole('button', { name: 'Remove NIKE filter' })).toBeTruthy()
+  expectVisibleProduct('Kids Nike Runner')
+  expectHiddenProduct('Kids Adidas Court')
+
+  fireEvent.click(screen.getByRole('button', { name: 'Clear all filters' }))
+  expect(screen.queryByRole('button', { name: 'Remove NIKE filter' })).toBeNull()
+  expectVisibleProduct('Kids Nike Runner')
+  expectVisibleProduct('Kids Adidas Court')
+  expectHiddenProduct('Men Shoe Outside Kids')
+})
+
 test('Women cards use the compact catalog design while retaining product photos', () => {
   const exampleWomenShoe = {
     ...products[1],
@@ -547,6 +628,38 @@ test('Women displays 20 products per page and resets to page one when the page s
   fireEvent.change(screen.getByRole('combobox', { name: 'Products per page' }), { target: { value: '40' } })
   expect(screen.getByText('Showing 1–40 of 50')).toBeTruthy()
   expect(screen.getAllByRole('link', { name: /^View Paginated Women Shoe/ })).toHaveLength(40)
+  expect(screen.getByRole('button', { name: 'Page 1' }).getAttribute('aria-current')).toBe('page')
+})
+
+test('Kids displays 20 products per page and resets to page one when the page size changes', () => {
+  const paginatedKidsProducts = Array.from({ length: 50 }, (_, index) => ({
+    id: `paginated-kids-${index + 1}`,
+    slug: `paginated-kids-${index + 1}`,
+    name: `Paginated Kids Shoe ${index + 1}`,
+    brand: index % 2 === 0 ? 'NIKE' : 'ADIDAS',
+    audience: 'kids',
+    sizes: [34],
+    price: 3000 + index,
+    image: '/kids-pagination.jpg',
+  }))
+  useProducts.mockReturnValue({ data: paginatedKidsProducts, isLoading: false, isError: false, refetch: vi.fn() })
+
+  renderCategoryPage('kids')
+
+  expect(screen.getByText('Showing 1–20 of 50')).toBeTruthy()
+  expect(screen.getAllByRole('link', { name: /^View Paginated Kids Shoe/ })).toHaveLength(20)
+  expect(screen.getByRole('button', { name: 'Previous page' }).disabled).toBe(true)
+  expect(screen.getByRole('button', { name: 'Page 1' }).getAttribute('aria-current')).toBe('page')
+  expect(screen.getByRole('combobox', { name: 'Products per page' }).value).toBe('20')
+
+  fireEvent.click(screen.getByRole('button', { name: 'Page 2' }))
+  expect(screen.getByText('Showing 21–40 of 50')).toBeTruthy()
+  expect(screen.queryByRole('link', { name: 'View Paginated Kids Shoe 1' })).toBeNull()
+  expect(screen.getByRole('link', { name: 'View Paginated Kids Shoe 21' })).toBeTruthy()
+
+  fireEvent.change(screen.getByRole('combobox', { name: 'Products per page' }), { target: { value: '40' } })
+  expect(screen.getByText('Showing 1–40 of 50')).toBeTruthy()
+  expect(screen.getAllByRole('link', { name: /^View Paginated Kids Shoe/ })).toHaveLength(40)
   expect(screen.getByRole('button', { name: 'Page 1' }).getAttribute('aria-current')).toBe('page')
 })
 

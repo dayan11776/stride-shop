@@ -12,6 +12,7 @@ import styles from './CatalogPage.module.css'
 const FILTERED_COLLECTIONS = {
   men: { primaryAudience: 'men', audiences: ['men', 'unisex'], imagePreference: 'artwork', artworkFallback: '/images/illustration-runner.webp' },
   women: { primaryAudience: 'women', audiences: ['women', 'unisex'], imagePreference: 'photo', artworkFallback: '/images/illustration-casual.webp' },
+  kids: { primaryAudience: 'kids', audiences: ['kids'], imagePreference: 'photo', artworkFallback: '/images/illustration-kids.webp' },
 }
 const EMPTY_AUDIENCES = []
 const CATALOG_PAGE_SIZES = [20, 40, 50]
@@ -78,9 +79,9 @@ export function CatalogPage({ title, filters, showEditorialArtwork = false, show
   const [maxPrice, setMaxPrice] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const [pageSize, setPageSize] = useState(DEFAULT_CATALOG_PAGE_SIZE)
-  // Filtered category screens fetch the catalogue once so shoppers can switch
-  // between their primary audience and Unisex even though the public API only
-  // accepts one audience per request.
+  // Filtered category screens fetch the catalogue once so a collection can
+  // apply its local scope and, where available, switch audience filters even
+  // though the public API only accepts one audience per request.
   const queryFilters = hasCollectionFilters ? {} : filters
   const { data, isLoading, isError, error, refetch } = useProducts(queryFilters)
   const scopedProducts = useMemo(() => {
@@ -175,6 +176,7 @@ export function CatalogPage({ title, filters, showEditorialArtwork = false, show
       <div className={styles.catalogLayout}>
         <CatalogFilters
           audienceOptions={collectionAudiences}
+          showAudienceFilter={collectionAudiences.length > 1}
           brands={brands}
           sizes={sizes}
           selectedAudiences={selectedAudiences}
